@@ -18,7 +18,7 @@ export function MemberCard({ member, index }: MemberCardProps) {
         ease: [0.25, 1, 0.5, 1],
         delay: Math.min(index * 0.05, 0.4),
       }}
-      className="group p-6 rounded-xl border border-border-subtle bg-surface-0 hover:border-brand-purple/30 hover:bg-surface-1 transition-all duration-[var(--duration-normal)]"
+      className="group p-6 rounded-xl border border-border-subtle bg-bg hover:border-brand-purple/30 hover:bg-bg-card transition-all duration-[var(--duration-normal)]"
     >
       <div className="flex items-start gap-4">
         {/* Avatar */}
@@ -35,7 +35,7 @@ export function MemberCard({ member, index }: MemberCardProps) {
         )}
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-text-primary text-sm">
+          <h3 className="font-semibold text-white text-sm">
             {member.name}
           </h3>
           <p className="text-xs text-text-secondary mt-0.5">
@@ -49,7 +49,7 @@ export function MemberCard({ member, index }: MemberCardProps) {
             href={`https://x.com/${member.twitter_handle}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-surface-3 transition-colors"
+            className="shrink-0 w-8 h-8 rounded-lg bg-bg-card-hover flex items-center justify-center text-text-muted hover:text-white hover:bg-bg-elevated transition-colors"
             aria-label={`${member.name} on Twitter`}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">

@@ -3,181 +3,100 @@ import { SOCIAL_LINKS } from "@/lib/constants";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* Gradient orbs */}
-        <div className="absolute -top-[30%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-brand-purple/8 blur-[120px]" />
-        <div className="absolute -bottom-[20%] -left-[10%] w-[40vw] h-[40vw] rounded-full bg-brand-green/5 blur-[100px]" />
-
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(oklch(93% 0.01 285) 1px, transparent 1px),
-                              linear-gradient(90deg, oklch(93% 0.01 285) 1px, transparent 1px)`,
-            backgroundSize: "64px 64px",
-          }}
-        />
+    <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full bg-brand-purple/[0.07] blur-[120px]" />
       </div>
 
-      <div className="relative w-full max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-16 lg:pt-32 lg:pb-20">
-        {/* Two column layout on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Text content */}
-          <div>
-            {/* Tag */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-border-subtle mb-6"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
-              <span className="text-xs font-medium text-text-secondary tracking-wide">
-                Solana Ecosystem &middot; Malaysia
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.1 }}
-              className="text-fluid-2xl font-bold tracking-tight leading-[1.1] text-text-primary"
-            >
-              Build the future of{" "}
-              <span className="text-brand-purple-light">Web3</span>
-              <br />
-              from{" "}
-              <span className="relative inline-block">
-                Malaysia
-                <svg
-                  className="absolute -bottom-1 left-0 w-full"
-                  viewBox="0 0 200 8"
-                  fill="none"
-                  preserveAspectRatio="none"
-                >
-                  <path
-                    d="M1 5.5C40 2.5 80 1.5 120 3.5C160 5.5 185 4 199 2.5"
-                    stroke="oklch(80% 0.2 155)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
-              className="mt-5 text-fluid-base text-text-secondary max-w-lg leading-relaxed"
-            >
-              Superteam Malaysia connects builders, designers, and creators with
-              opportunities in the Solana ecosystem. Earn, learn, and ship.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.3 }}
-              className="mt-8 flex flex-col sm:flex-row gap-3"
-            >
-              <a
-                href={SOCIAL_LINKS.telegram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-brand-purple text-white font-semibold text-sm hover:bg-brand-purple-light transition-colors duration-[var(--duration-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple"
-              >
-                Join Community
-                <svg className="ml-2 w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 8h10M9 4l4 4-4 4" />
-                </svg>
-              </a>
-              <a
-                href="https://earn.superteam.fun"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-border-default text-text-primary font-semibold text-sm hover:bg-surface-2 transition-colors duration-[var(--duration-fast)]"
-              >
-                Explore Opportunities
-              </a>
-            </motion.div>
-          </div>
-
-          {/* Right side — visual element */}
+      <div className="relative max-w-[1200px] mx-auto px-6">
+        {/* Centered text */}
+        <div className="text-center max-w-3xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1], delay: 0.2 }}
-            className="hidden lg:flex items-center justify-center"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border-subtle bg-[#ffffff08] mb-8"
           >
-            <div className="relative w-full max-w-md aspect-square">
-              {/* Abstract visual — overlapping circles representing community */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-64 h-64">
-                  {/* Orbit rings */}
-                  <div className="absolute inset-0 rounded-full border border-border-subtle" />
-                  <div className="absolute inset-6 rounded-full border border-border-subtle" />
-                  <div className="absolute inset-12 rounded-full border border-border-subtle" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-green" />
+            <span className="text-xs font-medium text-text-secondary">
+              Solana Ecosystem &middot; Malaysia
+            </span>
+          </motion.div>
 
-                  {/* Center logo */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-2xl bg-brand-purple/20 border border-brand-purple/30 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-brand-purple-light">ST</span>
-                    </div>
-                  </div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.08 }}
+            className="text-fluid-3xl font-semibold tracking-tight leading-[1.08] text-white"
+          >
+            The Home for Solana Builders in Malaysia
+          </motion.h1>
 
-                  {/* Floating nodes */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-                    className="absolute inset-0"
-                  >
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-green" />
-                  </motion.div>
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-                    className="absolute inset-6"
-                  >
-                    <div className="absolute top-0 right-0 w-3 h-3 rounded-full bg-brand-purple-light" />
-                  </motion.div>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-                    className="absolute inset-0"
-                  >
-                    <div className="absolute bottom-4 left-0 w-3.5 h-3.5 rounded-full bg-accent-gold" />
-                  </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.16 }}
+            className="mt-5 text-fluid-lg text-text-secondary max-w-xl mx-auto leading-relaxed"
+          >
+            Connect, collaborate, and grow together with a community of founders, developers, and creators shaping the future on Solana.
+          </motion.p>
 
-                  {/* Glow */}
-                  <div className="absolute inset-8 rounded-full bg-brand-purple/5 blur-xl" />
-                </div>
-              </div>
-            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1], delay: 0.24 }}
+            className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
+          >
+            <a
+              href={SOCIAL_LINKS.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors duration-150"
+            >
+              Join Community
+              <svg className="ml-2 w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </a>
+            <a
+              href="https://earn.superteam.fun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-full border border-border-default text-white text-sm font-medium hover:bg-[#ffffff08] transition-colors duration-150"
+            >
+              Explore Opportunities
+            </a>
           </motion.div>
         </div>
-      </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-5 h-8 rounded-full border-2 border-text-muted/30 flex justify-center pt-1.5">
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-            className="w-1 h-1 rounded-full bg-text-muted/50"
-          />
-        </div>
-      </motion.div>
+        {/* Community image grid — placeholder cards mimicking event photos */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1], delay: 0.35 }}
+          className="mt-16 lg:mt-20"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: "Builder Night KL", color: "from-brand-purple/20 to-brand-purple/5" },
+              { label: "Hackathon 2025", color: "from-brand-green/15 to-brand-green/5" },
+              { label: "Solana Workshop", color: "from-[#09f]/15 to-[#09f]/5" },
+              { label: "Community Meetup", color: "from-[#eab308]/15 to-[#eab308]/5" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="aspect-[4/3] rounded-xl border border-border-subtle bg-bg-card overflow-hidden relative group"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.color}`} />
+                <div className="absolute inset-0 flex items-end p-4">
+                  <span className="text-xs font-medium text-text-secondary">{item.label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }

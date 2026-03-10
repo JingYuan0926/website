@@ -49,7 +49,7 @@ export default function AdminDashboard() {
         {cards.map(({ label, value, icon: Icon, color }) => (
           <div
             key={label}
-            className="p-5 rounded-xl border border-border-subtle bg-surface-1"
+            className="p-5 rounded-xl border border-border-subtle bg-bg-card"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-text-muted uppercase tracking-wider">
@@ -57,15 +57,15 @@ export default function AdminDashboard() {
               </span>
               <Icon size={16} className={color} />
             </div>
-            <div className="text-2xl font-bold text-text-primary tabular-nums">
+            <div className="text-2xl font-bold text-white tabular-nums">
               {value}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 p-6 rounded-xl border border-border-subtle bg-surface-1">
-        <h2 className="text-sm font-semibold text-text-primary mb-2">
+      <div className="mt-8 p-6 rounded-xl border border-border-subtle bg-bg-card">
+        <h2 className="text-sm font-semibold text-white mb-2">
           Welcome to the Admin Dashboard
         </h2>
         <p className="text-sm text-text-secondary leading-relaxed">

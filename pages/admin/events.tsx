@@ -45,7 +45,7 @@ const COLUMNS: Column<Event>[] = [
           e.status === "upcoming"
             ? "bg-brand-green/10 text-brand-green-dark"
             : e.status === "past"
-            ? "bg-surface-2 text-text-muted"
+            ? "bg-bg-card-hover text-text-muted"
             : "bg-error/10 text-error"
         }`}
       >

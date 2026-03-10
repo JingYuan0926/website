@@ -20,61 +20,62 @@ export function Navbar() {
   }, [router.pathname]);
 
   return (
-    <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all",
-        "duration-[var(--duration-normal)] ease-[var(--ease-out-quart)]",
-        isScrolled
-          ? "bg-surface-0/90 backdrop-blur-md border-b border-border-subtle"
-          : "bg-transparent"
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <div
+          className={cn(
+            "flex items-center justify-between h-14 px-5 rounded-2xl transition-all duration-300",
+            "border border-border-subtle backdrop-blur-xl",
+            isScrolled ? "bg-[#0f0f0f]/80" : "bg-[#ffffff08]"
+          )}
+        >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm text-white">
-              ST
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center">
+              <span className="text-[10px] font-bold text-black tracking-tight">ST</span>
             </div>
-            <span className="font-semibold text-text-primary text-sm tracking-tight">
-              Superteam{" "}
-              <span className="text-brand-purple-light">Malaysia</span>
+            <span className="font-semibold text-white text-sm">
+              Superteam <span className="text-text-secondary">Malaysia</span>
             </span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors duration-[var(--duration-fast)]",
+                  "px-3.5 py-1.5 text-sm font-medium rounded-lg transition-colors duration-150",
                   router.pathname === link.href
-                    ? "text-text-primary"
-                    : "text-text-muted hover:text-text-primary"
+                    ? "text-white bg-[#ffffff10]"
+                    : "text-text-muted hover:text-white"
                 )}
               >
                 {link.label}
               </Link>
             ))}
+            <div className="w-px h-5 bg-border-subtle mx-2" />
             <a
               href={SOCIAL_LINKS.twitter}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-surface-0 bg-brand-purple hover:bg-brand-purple-light px-4 py-2 rounded-lg transition-colors duration-[var(--duration-fast)]"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium text-text-muted hover:text-white transition-colors duration-150"
             >
-              Join Community
+              Follow on X
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
             </a>
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="md:hidden p-2 text-text-secondary hover:text-text-primary"
+            className="md:hidden p-2 text-text-secondary hover:text-white"
             aria-label="Toggle menu"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               {isMobileOpen ? (
                 <path d="M6 6l12 12M6 18L18 6" />
               ) : (
@@ -83,37 +84,37 @@ export function Navbar() {
             </svg>
           </button>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {isMobileOpen && (
-        <div className="md:hidden bg-surface-1 border-t border-border-subtle">
-          <div className="px-6 py-4 space-y-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "block py-3 text-sm font-medium transition-colors",
-                  router.pathname === link.href
-                    ? "text-text-primary"
-                    : "text-text-muted"
-                )}
+        {/* Mobile menu */}
+        {isMobileOpen && (
+          <div className="md:hidden mt-2 rounded-2xl border border-border-subtle bg-[#0f0f0f]/95 backdrop-blur-xl overflow-hidden">
+            <div className="p-4 space-y-1">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
+                    router.pathname === link.href
+                      ? "text-white bg-[#ffffff10]"
+                      : "text-text-muted hover:text-white"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <a
+                href={SOCIAL_LINKS.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-3 py-2.5 text-sm font-medium text-text-muted hover:text-white"
               >
-                {link.label}
-              </Link>
-            ))}
-            <a
-              href={SOCIAL_LINKS.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-3 text-center text-sm font-medium text-surface-0 bg-brand-purple px-4 py-2.5 rounded-lg"
-            >
-              Join Community
-            </a>
+                Follow on X
+              </a>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 }

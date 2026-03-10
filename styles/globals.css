@@ -1,137 +1,96 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Brand Colors - Solana inspired, OKLCH for perceptual uniformity */
-  --color-brand-purple: oklch(55% 0.22 285);
-  --color-brand-purple-light: oklch(70% 0.15 285);
-  --color-brand-purple-dark: oklch(40% 0.18 285);
-  --color-brand-green: oklch(80% 0.2 155);
-  --color-brand-green-dark: oklch(65% 0.18 155);
+  /* Superteam dark palette */
+  --color-bg: #0f0f0f;
+  --color-bg-card: #161616;
+  --color-bg-card-hover: #1c1c1c;
+  --color-bg-elevated: #1a1a1a;
 
-  /* Malaysian accent - warm gold, used sparingly */
-  --color-accent-gold: oklch(82% 0.15 85);
-  --color-accent-gold-dark: oklch(65% 0.12 85);
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
 
-  /* Tinted neutrals - subtle purple tint for cohesion */
-  --color-surface-0: oklch(12% 0.015 285);
-  --color-surface-1: oklch(16% 0.012 285);
-  --color-surface-2: oklch(21% 0.01 285);
-  --color-surface-3: oklch(26% 0.008 285);
+  /* Borders — white at low opacity */
+  --color-border-subtle: #ffffff1a;
+  --color-border-default: #ffffff26;
+  --color-border-hover: #ffffff40;
 
-  /* Text colors */
-  --color-text-primary: oklch(93% 0.01 285);
-  --color-text-secondary: oklch(70% 0.015 285);
-  --color-text-muted: oklch(55% 0.01 285);
+  /* Solana brand */
+  --color-brand-purple: #9945ff;
+  --color-brand-purple-light: #b77dff;
+  --color-brand-green: #14f195;
+  --color-brand-green-dark: #0bc47a;
 
-  /* Borders */
-  --color-border-subtle: oklch(25% 0.015 285);
-  --color-border-default: oklch(32% 0.012 285);
+  /* Accent */
+  --color-accent: #09f;
 
   /* Semantic */
-  --color-success: oklch(72% 0.18 155);
-  --color-error: oklch(65% 0.2 25);
-  --color-warning: oklch(78% 0.15 85);
+  --color-success: #14f195;
+  --color-error: #ef4444;
+  --color-warning: #eab308;
 
-  /* Typography — only font-sans goes in @theme (maps to font-sans utility) */
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Typography — Inter to match Superteam brand */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
-/* Custom properties that don't need Tailwind utility generation */
 :root {
-  --font-display: "Instrument Serif", Georgia, serif;
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --duration-slow: 500ms;
 }
 
-/* Base styles */
 html {
-  font-kerning: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--color-surface-0);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   line-height: 1.6;
-  font-weight: 350;
 }
 
-/* Selection */
 ::selection {
-  background: oklch(55% 0.22 285 / 0.3);
-  color: var(--color-text-primary);
+  background: #9945ff40;
+  color: #fff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 
-::-webkit-scrollbar-track {
-  background: var(--color-surface-0);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-surface-3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(35% 0.01 285);
-}
-
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Tabular numbers for stats */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Fluid type scale */
+.text-fluid-sm { font-size: clamp(0.875rem, 0.8rem + 0.25vw, 1rem); }
+.text-fluid-base { font-size: clamp(1rem, 0.9rem + 0.35vw, 1.125rem); }
+.text-fluid-lg { font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem); }
+.text-fluid-xl { font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem); }
+.text-fluid-2xl { font-size: clamp(2rem, 1.4rem + 2vw, 3.25rem); }
+.text-fluid-3xl { font-size: clamp(2.5rem, 1.8rem + 2.5vw, 4.5rem); }
+
+/* Glass card effect — Superteam UAE style */
+.glass-card {
+  background: #ffffff08;
+  border: 1px solid #ffffff15;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Fluid typography */
-.text-fluid-sm {
-  font-size: clamp(0.875rem, 0.8rem + 0.25vw, 1rem);
-}
-
-.text-fluid-base {
-  font-size: clamp(1rem, 0.9rem + 0.35vw, 1.125rem);
-}
-
-.text-fluid-lg {
-  font-size: clamp(1.25rem, 1rem + 0.75vw, 1.75rem);
-}
-
-.text-fluid-xl {
-  font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem);
-}
-
-.text-fluid-2xl {
-  font-size: clamp(2.25rem, 1.5rem + 2.5vw, 4rem);
-}
-
-.text-fluid-3xl {
-  font-size: clamp(3rem, 2rem + 3.5vw, 5.5rem);
-}
-
-/* Grid template rows animation for accordions */
-.grid-rows-collapsed {
-  grid-template-rows: 0fr;
-}
-
-.grid-rows-expanded {
-  grid-template-rows: 1fr;
+.glass-card:hover {
+  background: #ffffff0d;
+  border-color: #ffffff25;
 }

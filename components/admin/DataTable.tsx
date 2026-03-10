@@ -24,7 +24,7 @@ export function DataTable<T extends { id: string }>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-surface-1">
+            <tr className="bg-bg-card">
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
@@ -42,7 +42,7 @@ export function DataTable<T extends { id: string }>({
             {data.map((item) => (
               <tr
                 key={item.id}
-                className="hover:bg-surface-1/50 transition-colors"
+                className="hover:bg-bg-card/50 transition-colors"
               >
                 {columns.map((col) => (
                   <td

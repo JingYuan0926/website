@@ -3,8 +3,8 @@ import { SOCIAL_LINKS } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border-subtle bg-surface-0">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+    <footer className="border-t border-border-subtle">
+      <div className="max-w-[1200px] mx-auto px-6 py-16 lg:py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
           {/* Brand */}
           <div className="md:col-span-5">
@@ -12,7 +12,7 @@ export function Footer() {
               <div className="w-8 h-8 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm text-white">
                 ST
               </div>
-              <span className="font-semibold text-text-primary text-sm tracking-tight">
+              <span className="font-semibold text-white text-sm tracking-tight">
                 Superteam{" "}
                 <span className="text-brand-purple-light">Malaysia</span>
               </span>
@@ -113,7 +113,7 @@ function FooterLink({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-[var(--duration-fast)]"
+          className="text-sm text-text-secondary hover:text-white transition-colors"
         >
           {children}
         </a>
@@ -124,7 +124,7 @@ function FooterLink({
     <li>
       <Link
         href={href}
-        className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-[var(--duration-fast)]"
+        className="text-sm text-text-secondary hover:text-white transition-colors"
       >
         {children}
       </Link>
@@ -147,7 +147,7 @@ function SocialIcon({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="w-9 h-9 rounded-lg bg-surface-2 flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-surface-3 transition-colors duration-[var(--duration-fast)]"
+      className="w-9 h-9 rounded-lg bg-[#ffffff0a] border border-border-subtle flex items-center justify-center text-text-secondary hover:text-white hover:bg-[#ffffff15] transition-colors"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
         {children}

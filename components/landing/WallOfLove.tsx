@@ -9,8 +9,8 @@ interface WallOfLoveProps {
 
 export function WallOfLove({ testimonials }: WallOfLoveProps) {
   return (
-    <section className="py-24 lg:py-32 bg-surface-1">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="py-24 lg:py-32">
+      <div className="max-w-[1200px] mx-auto px-6">
         <AnimatedSection>
           <SectionHeading
             label="Community"
@@ -22,11 +22,11 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
 
         <AnimatedSection
           stagger
-          className="mt-16 columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
+          className="mt-14 columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
         >
           {testimonials.map((testimonial) => (
             <AnimatedItem key={testimonial.id}>
-              <div className="break-inside-avoid p-6 rounded-xl border border-border-subtle bg-surface-0">
+              <div className="break-inside-avoid glass-card rounded-2xl p-6">
                 {/* Quote */}
                 <p className="text-sm text-text-secondary leading-relaxed">
                   &ldquo;{testimonial.content}&rdquo;
@@ -46,7 +46,7 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
                     </div>
                   )}
                   <div>
-                    <p className="text-xs font-semibold text-text-primary">
+                    <p className="text-xs font-semibold text-white">
                       {testimonial.author_name}
                     </p>
                     {testimonial.author_title && (

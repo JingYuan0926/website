@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedSection, AnimatedItem } from "@/components/shared/AnimatedSection";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ChevronDown } from "lucide-react";
@@ -20,20 +19,20 @@ function AccordionItem({ item }: { item: FAQItem }) {
         className="w-full flex items-center justify-between gap-4 py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className="text-sm font-medium text-text-primary group-hover:text-brand-purple-light transition-colors duration-[var(--duration-fast)]">
+        <span className="text-sm font-medium text-white group-hover:text-brand-purple-light transition-colors">
           {item.question}
         </span>
         <ChevronDown
           size={16}
           className={cn(
-            "shrink-0 text-text-muted transition-transform duration-[var(--duration-normal)]",
+            "shrink-0 text-text-muted transition-transform duration-300",
             isOpen && "rotate-180"
           )}
         />
       </button>
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-[var(--duration-normal)] ease-[var(--ease-out-quart)]",
+          "grid transition-[grid-template-rows] duration-300",
           isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
@@ -50,7 +49,7 @@ function AccordionItem({ item }: { item: FAQItem }) {
 export function FAQSection({ items }: FAQSectionProps) {
   return (
     <section className="py-24 lg:py-32">
-      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-6">
         <AnimatedSection>
           <SectionHeading
             label="FAQ"

@@ -7,7 +7,7 @@ export default function Document() {
         <meta name="theme-color" content="#0a0a0a" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body className="bg-surface-0 text-text-primary antialiased">
+      <body className="bg-bg text-white antialiased">
         <Main />
         <NextScript />
       </body>

@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { useInView } from "framer-motion";
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
-
-interface StatItemProps {
-  label: string;
-  value: number;
-  suffix?: string;
-  prefix?: string;
-}
 
 function AnimatedCounter({ value, suffix = "", prefix = "" }: { value: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
@@ -24,7 +17,6 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }: { value: number; s
 
     const timer = setInterval(() => {
       currentStep++;
-      // Ease-out-quart curve
       const t = currentStep / steps;
       const eased = 1 - Math.pow(1 - t, 4);
       setCount(Math.round(eased * value));
@@ -45,10 +37,17 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }: { value: number; s
   );
 }
 
+interface StatItemProps {
+  label: string;
+  value: number;
+  suffix?: string;
+  prefix?: string;
+}
+
 function StatItem({ label, value, suffix, prefix }: StatItemProps) {
   return (
-    <div className="text-left">
-      <div className="text-fluid-2xl font-bold text-text-primary leading-none mb-2">
+    <div className="text-center">
+      <div className="text-fluid-2xl font-bold text-white leading-none mb-2">
         <AnimatedCounter value={value} suffix={suffix} prefix={prefix} />
       </div>
       <div className="text-sm text-text-secondary font-medium">{label}</div>
@@ -68,15 +67,17 @@ interface StatsSectionProps {
 
 export function StatsSection({ stats }: StatsSectionProps) {
   return (
-    <section className="py-20 lg:py-24 border-y border-border-subtle">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="py-16 lg:py-20">
+      <div className="max-w-[1200px] mx-auto px-6">
         <AnimatedSection>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
-            <StatItem label="Community Members" value={stats.members_count} suffix="+" />
-            <StatItem label="Events Hosted" value={stats.events_hosted} />
-            <StatItem label="Projects Funded" value={stats.projects_funded} />
-            <StatItem label="Bounties Completed" value={stats.bounties_completed} />
-            <StatItem label="Community Reach" value={stats.community_reach} suffix="+" />
+          <div className="glass-card rounded-2xl p-8 lg:p-12">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+              <StatItem label="Community Members" value={stats.members_count} suffix="+" />
+              <StatItem label="Events Hosted" value={stats.events_hosted} />
+              <StatItem label="Projects Funded" value={stats.projects_funded} />
+              <StatItem label="Bounties Completed" value={stats.bounties_completed} />
+              <StatItem label="Community Reach" value={stats.community_reach} suffix="+" />
+            </div>
           </div>
         </AnimatedSection>
       </div>

@@ -63,7 +63,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-0">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="w-6 h-6 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -71,9 +71,9 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-0 px-6">
+      <div className="min-h-screen flex items-center justify-center bg-bg px-6">
         <div className="text-center max-w-md">
-          <h1 className="text-xl font-bold text-text-primary mb-3">Admin Dashboard</h1>
+          <h1 className="text-xl font-bold text-white mb-3">Admin Dashboard</h1>
           <p className="text-sm text-text-secondary mb-6">
             Supabase is not configured. The admin dashboard requires a Supabase
             connection to manage content.
@@ -95,11 +95,11 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-surface-0 flex">
+    <div className="min-h-screen bg-bg flex">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-40 w-60 bg-surface-1 border-r border-border-subtle flex flex-col transition-transform duration-[var(--duration-normal)] ease-[var(--ease-out-quart)]",
+          "fixed lg:static inset-y-0 left-0 z-40 w-60 bg-bg-card border-r border-border-subtle flex flex-col transition-transform duration-[var(--duration-normal)] ease-[var(--ease-out-quart)]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -108,7 +108,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           <div className="w-7 h-7 rounded-md bg-brand-purple flex items-center justify-center font-bold text-xs text-white">
             ST
           </div>
-          <span className="text-sm font-semibold text-text-primary">
+          <span className="text-sm font-semibold text-white">
             Admin
           </span>
           <button
@@ -133,7 +133,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-[var(--duration-fast)]",
                   isActive
                     ? "bg-brand-purple/10 text-brand-purple-light"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-2"
+                    : "text-text-secondary hover:text-white hover:bg-bg-card-hover"
                 )}
               >
                 <Icon size={16} />
@@ -176,7 +176,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-base font-semibold text-text-primary">{title}</h1>
+          <h1 className="text-base font-semibold text-white">{title}</h1>
         </header>
 
         {/* Page content */}

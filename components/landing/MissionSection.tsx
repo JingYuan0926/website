@@ -23,25 +23,26 @@ const ICON_MAP: Record<string, LucideIcon> = {
 export function MissionSection() {
   return (
     <section className="py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-[1200px] mx-auto px-6">
         <AnimatedSection>
           <SectionHeading
             label="What We Do"
-            title="Empowering Malaysia's Web3 builders"
+            title="Empowering Malaysia's Solana Builders"
             description="From mentorship to funding, we provide everything builders need to succeed in the Solana ecosystem."
+            align="center"
           />
         </AnimatedSection>
 
-        <AnimatedSection stagger className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden">
+        <AnimatedSection stagger className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {MISSION_PILLARS.map((pillar) => {
             const Icon = ICON_MAP[pillar.icon];
             return (
               <AnimatedItem key={pillar.title}>
-                <div className="bg-surface-0 p-8 lg:p-10 group hover:bg-surface-1 transition-colors duration-[var(--duration-normal)]">
-                  <div className="w-10 h-10 rounded-lg bg-brand-purple/10 flex items-center justify-center mb-5 group-hover:bg-brand-purple/15 transition-colors duration-[var(--duration-normal)]">
-                    {Icon && <Icon size={20} className="text-brand-purple-light" />}
+                <div className="glass-card rounded-2xl p-6 lg:p-8 h-full transition-all duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-[#ffffff0a] border border-border-subtle flex items-center justify-center mb-5">
+                    {Icon && <Icon size={18} className="text-text-secondary" />}
                   </div>
-                  <h3 className="text-base font-semibold text-text-primary mb-2">
+                  <h3 className="text-base font-semibold text-white mb-2">
                     {pillar.title}
                   </h3>
                   <p className="text-sm text-text-secondary leading-relaxed">

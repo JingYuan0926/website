@@ -48,7 +48,7 @@ export function MemberFilters({ members }: MemberFiltersProps) {
             placeholder="Search members..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-surface-1 border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20 transition-colors"
           />
         </div>
 
@@ -62,7 +62,7 @@ export function MemberFilters({ members }: MemberFiltersProps) {
                 "px-3 py-1.5 text-xs font-medium rounded-lg transition-colors duration-[var(--duration-fast)]",
                 activeSkill === skill
                   ? "bg-brand-purple text-white"
-                  : "bg-surface-2 text-text-secondary hover:bg-surface-3 hover:text-text-primary"
+                  : "bg-bg-card-hover text-text-secondary hover:bg-bg-elevated hover:text-white"
               )}
             >
               {skill}

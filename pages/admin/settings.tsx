@@ -63,7 +63,7 @@ export default function AdminSettings() {
   return (
     <AdminLayout title="Settings">
       <div className="max-w-xl">
-        <h2 className="text-sm font-semibold text-text-primary mb-1">
+        <h2 className="text-sm font-semibold text-white mb-1">
           Site Statistics
         </h2>
         <p className="text-xs text-text-secondary mb-6">
@@ -80,7 +80,7 @@ export default function AdminSettings() {
                 type="number"
                 value={Number(stats[key] || 0)}
                 onChange={(e) => updateStat(key, Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 text-sm bg-surface-1 border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
+                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
               />
             </div>
           ))}

@@ -20,7 +20,7 @@ interface SkillBadgeProps {
 }
 
 export function SkillBadge({ skill, size = "sm" }: SkillBadgeProps) {
-  const colorClass = SKILL_COLORS[skill] || "bg-surface-2 text-text-secondary";
+  const colorClass = SKILL_COLORS[skill] || "bg-[#ffffff0a] text-text-secondary";
 
   return (
     <span

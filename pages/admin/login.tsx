@@ -35,13 +35,13 @@ export default function AdminLogin() {
         <title>Admin Login — Superteam Malaysia</title>
       </Head>
 
-      <div className="min-h-screen flex items-center justify-center bg-surface-0 px-6">
+      <div className="min-h-screen flex items-center justify-center bg-bg px-6">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <div className="w-10 h-10 rounded-lg bg-brand-purple flex items-center justify-center font-bold text-sm text-white mx-auto mb-4">
               ST
             </div>
-            <h1 className="text-xl font-bold text-text-primary">Admin Dashboard</h1>
+            <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
             <p className="text-sm text-text-secondary mt-1">
               Sign in to manage content
             </p>
@@ -58,7 +58,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 text-sm bg-surface-1 border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
+                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
                 placeholder="admin@superteam.my"
               />
             </div>
@@ -73,7 +73,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 text-sm bg-surface-1 border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
+                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
                 placeholder="••••••••"
               />
             </div>
