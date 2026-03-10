@@ -1,78 +1,117 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import Head from "next/head";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { MissionSection } from "@/components/landing/MissionSection";
+import { StatsSection } from "@/components/landing/StatsSection";
+import { EventsSection } from "@/components/landing/EventsSection";
+import { MemberSpotlight } from "@/components/landing/MemberSpotlight";
+import { PartnersSection } from "@/components/landing/PartnersSection";
+import { WallOfLove } from "@/components/landing/WallOfLove";
+import { FAQSection } from "@/components/landing/FAQSection";
+import { JoinCTA } from "@/components/landing/JoinCTA";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import {
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  SAMPLE_MEMBERS,
+  SAMPLE_EVENTS,
+  SAMPLE_STATS,
+  SAMPLE_PARTNERS,
+  SAMPLE_TESTIMONIALS,
+  FAQ_DEFAULT,
+} from "@/lib/constants";
+import type { Member, Event, Partner, Testimonial, FAQItem } from "@/lib/types";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+interface HomePageProps {
+  members: Member[];
+  events: Event[];
+  stats: {
+    members_count: number;
+    events_hosted: number;
+    projects_funded: number;
+    bounties_completed: number;
+    community_reach: number;
+  };
+  partners: Partner[];
+  testimonials: Testimonial[];
+  faqItems: FAQItem[];
+}
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
+  if (isSupabaseConfigured() && supabase) {
+    const [membersRes, eventsRes, statsRes, partnersRes, testimonialsRes, faqRes] =
+      await Promise.all([
+        supabase.from("members").select("*").eq("is_spotlight", true).order("display_order"),
+        supabase.from("events").select("*").eq("status", "upcoming").order("date"),
+        supabase.from("site_stats").select("*").limit(1).single(),
+        supabase.from("partners").select("*").order("display_order"),
+        supabase.from("testimonials").select("*").order("display_order"),
+        supabase.from("faq_items").select("*").order("display_order"),
+      ]);
 
-export default function Home() {
+    return {
+      props: {
+        members: (membersRes.data as Member[]) || [],
+        events: (eventsRes.data as Event[]) || [],
+        stats: statsRes.data || SAMPLE_STATS,
+        partners: (partnersRes.data as Partner[]) || [],
+        testimonials: (testimonialsRes.data as Testimonial[]) || [],
+        faqItems: (faqRes.data as FAQItem[]) || [],
+      },
+      revalidate: 3600,
+    };
+  }
+
+  // Fallback to sample data when Supabase is not configured
+  return {
+    props: {
+      members: SAMPLE_MEMBERS as unknown as Member[],
+      events: SAMPLE_EVENTS as unknown as Event[],
+      stats: SAMPLE_STATS,
+      partners: SAMPLE_PARTNERS as unknown as Partner[],
+      testimonials: SAMPLE_TESTIMONIALS as unknown as Testimonial[],
+      faqItems: FAQ_DEFAULT.map((item, i) => ({
+        id: String(i + 1),
+        question: item.question,
+        answer: item.answer,
+        display_order: i,
+        created_at: new Date().toISOString(),
+      })),
+    },
+  };
+};
+
+export default function Home({
+  members,
+  events,
+  stats,
+  partners,
+  testimonials,
+  faqItems,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the index.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Head>
+        <title>{`${SITE_NAME} — Build the Future of Web3 from Malaysia`}</title>
+        <meta name="description" content={SITE_DESCRIPTION} />
+        <meta property="og:title" content={`${SITE_NAME} — Build the Future of Web3 from Malaysia`} />
+        <meta property="og:description" content={SITE_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@SuperteamMY" />
+      </Head>
+
+      <main>
+        <HeroSection />
+        <MissionSection />
+        <StatsSection stats={stats} />
+        <EventsSection events={events} />
+        <MemberSpotlight members={members} />
+        <PartnersSection partners={partners} />
+        <WallOfLove testimonials={testimonials} />
+        <FAQSection items={faqItems} />
+        <JoinCTA />
       </main>
-    </div>
+    </>
   );
 }
