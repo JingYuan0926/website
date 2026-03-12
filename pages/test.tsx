@@ -377,8 +377,8 @@ function EventCard({ event }: { event: LumaEvent }) {
             {event.title}
           </h3>
 
-          <div className="mt-3 flex items-center gap-2">
-            <div className="flex items-center -space-x-1 w-[38px] shrink-0">
+          <div className="mt-3 flex items-center gap-2 min-w-0">
+            <div className="flex items-center -space-x-1 shrink-0">
               {event.organizers.slice(0, 3).map((org) => (
                 <img
                   key={org.name}
@@ -388,14 +388,14 @@ function EventCard({ event }: { event: LumaEvent }) {
                 />
               ))}
             </div>
-            <span className="text-sm text-[#888] truncate">
+            <span className="text-sm text-[#888] truncate min-w-0">
               By {event.organizers.map((o) => o.name).join(", ")}
             </span>
           </div>
 
-          <p className="mt-2.5 text-sm text-[#888] inline-flex items-center gap-1.5">
-            <MapPin size={12} />
-            {event.location}
+          <p className="mt-2.5 text-sm text-[#888] flex items-center gap-1.5 min-w-0">
+            <MapPin size={14} className="shrink-0" />
+            <span className="truncate">{event.location}</span>
           </p>
         </div>
 
