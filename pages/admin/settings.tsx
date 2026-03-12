@@ -16,6 +16,14 @@ export default function AdminSettings() {
 
   useEffect(() => {
     fetchStats();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("stats-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "site_stats" }, () => {
+        fetchStats();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function fetchStats() {
@@ -63,7 +71,7 @@ export default function AdminSettings() {
   return (
     <AdminLayout title="Settings">
       <div className="max-w-xl">
-        <h2 className="text-sm font-semibold text-white mb-1">
+        <h2 className="text-sm font-semibold text-text-primary mb-1">
           Site Statistics
         </h2>
         <p className="text-xs text-text-secondary mb-6">
@@ -80,7 +88,7 @@ export default function AdminSettings() {
                 type="number"
                 value={Number(stats[key] || 0)}
                 onChange={(e) => updateStat(key, Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-white focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
+                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
               />
             </div>
           ))}

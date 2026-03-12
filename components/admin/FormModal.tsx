@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { ImageUpload } from "./ImageUpload";
+import { Markdown } from "@/components/shared/Markdown";
 
 export interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags";
+  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags" | "image" | "markdown";
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
+  bucket?: string;
+  folder?: string;
 }
 
 interface FormModalProps {
@@ -40,6 +44,7 @@ export function FormModal({
         if (f.type === "toggle") defaults[f.key] = false;
         else if (f.type === "number") defaults[f.key] = 0;
         else if (f.type === "tags") defaults[f.key] = [];
+        else if (f.type === "select" && f.options?.length) defaults[f.key] = f.options[0].value;
         else defaults[f.key] = "";
       });
       setFormData(defaults);
@@ -81,13 +86,13 @@ export function FormModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-bg-card border border-border-subtle rounded-xl">
+      <div className={`relative w-full max-h-[85vh] overflow-y-auto bg-bg-card border border-border-subtle rounded-xl ${fields.some(f => f.type === 'markdown') ? 'max-w-3xl' : 'max-w-lg'}`}>
         {/* Header */}
         <div className="sticky top-0 bg-bg-card flex items-center justify-between px-6 py-4 border-b border-border-subtle">
-          <h2 className="text-base font-semibold text-white">{title}</h2>
+          <h2 className="text-base font-semibold text-text-primary">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 text-text-muted hover:text-white"
+            className="p-1 text-text-muted hover:text-text-primary"
           >
             <X size={18} />
           </button>
@@ -109,7 +114,7 @@ export function FormModal({
                   onChange={(e) => updateField(field.key, e.target.value)}
                   placeholder={field.placeholder}
                   required={field.required}
-                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50"
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50"
                 />
               )}
 
@@ -120,7 +125,7 @@ export function FormModal({
                   placeholder={field.placeholder}
                   required={field.required}
                   rows={3}
-                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 resize-y"
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 resize-y"
                 />
               )}
 
@@ -129,7 +134,7 @@ export function FormModal({
                   type="number"
                   value={Number(formData[field.key] || 0)}
                   onChange={(e) => updateField(field.key, Number(e.target.value))}
-                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white focus:outline-none focus:border-brand-purple/50"
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
                 />
               )}
 
@@ -143,7 +148,7 @@ export function FormModal({
                   }
                   onChange={(e) => updateField(field.key, new Date(e.target.value).toISOString())}
                   required={field.required}
-                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white focus:outline-none focus:border-brand-purple/50"
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
                 />
               )}
 
@@ -151,7 +156,7 @@ export function FormModal({
                 <select
                   value={String(formData[field.key] || "")}
                   onChange={(e) => updateField(field.key, e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white focus:outline-none focus:border-brand-purple/50"
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
                 >
                   {field.options?.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -191,7 +196,7 @@ export function FormModal({
                         }
                       }}
                       placeholder="Type and press Enter"
-                      className="flex-1 px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-white placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50"
+                      className="flex-1 px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50"
                     />
                     <button
                       type="button"
@@ -220,6 +225,35 @@ export function FormModal({
                   </div>
                 </div>
               )}
+
+              {field.type === "image" && (
+                <ImageUpload
+                  value={String(formData[field.key] || "")}
+                  onChange={(url) => updateField(field.key, url)}
+                  bucket={field.bucket || "general"}
+                  folder={field.folder}
+                />
+              )}
+
+              {field.type === "markdown" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <textarea
+                    value={String(formData[field.key] || "")}
+                    onChange={(e) => updateField(field.key, e.target.value)}
+                    placeholder={field.placeholder || "Write markdown..."}
+                    required={field.required}
+                    rows={6}
+                    className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50 resize-y font-mono"
+                  />
+                  <div className="px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg overflow-y-auto text-text-secondary leading-relaxed">
+                    {formData[field.key] ? (
+                      <Markdown content={String(formData[field.key])} />
+                    ) : (
+                      <span className="text-text-muted text-xs">Preview</span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
 
@@ -228,7 +262,7 @@ export function FormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-white"
+              className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary"
             >
               Cancel
             </button>

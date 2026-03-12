@@ -57,7 +57,7 @@ export default function AdminDashboard() {
               </span>
               <Icon size={16} className={color} />
             </div>
-            <div className="text-2xl font-bold text-white tabular-nums">
+            <div className="text-2xl font-bold text-text-primary tabular-nums">
               {value}
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="mt-8 p-6 rounded-xl border border-border-subtle bg-bg-card">
-        <h2 className="text-sm font-semibold text-white mb-2">
+        <h2 className="text-sm font-semibold text-text-primary mb-2">
           Welcome to the Admin Dashboard
         </h2>
         <p className="text-sm text-text-secondary leading-relaxed">

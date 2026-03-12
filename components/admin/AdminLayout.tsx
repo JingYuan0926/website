@@ -1,29 +1,30 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import {
   Users,
-  Calendar,
   Handshake,
   MessageCircle,
   HelpCircle,
   Settings,
   LayoutDashboard,
-  LogOut,
   Menu,
   X,
+  FileText,
+  Megaphone,
+  Sun,
+  Moon,
 } from "lucide-react";
-import type { User } from "@supabase/supabase-js";
 
 const SIDEBAR_LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/members", label: "Members", icon: Users },
-  { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageCircle },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
+  { href: "/admin/content", label: "Content", icon: FileText },
+  { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -33,65 +34,23 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children, title }: AdminLayoutProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const router = useRouter();
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
+    const saved = localStorage.getItem("admin-theme") as "dark" | "light" | null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.classList.toggle("light", saved === "light");
     }
+  }, []);
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        router.replace("/admin/login");
-      } else {
-        setUser(data.user);
-      }
-      setLoading(false);
-    });
-  }, [router]);
-
-  async function handleLogout() {
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
-    router.push("/admin/login");
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg">
-        <div className="w-6 h-6 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg px-6">
-        <div className="text-center max-w-md">
-          <h1 className="text-xl font-bold text-white mb-3">Admin Dashboard</h1>
-          <p className="text-sm text-text-secondary mb-6">
-            Supabase is not configured. The admin dashboard requires a Supabase
-            connection to manage content.
-          </p>
-          <p className="text-xs text-text-muted">
-            Set <code className="text-brand-purple-light">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-            <code className="text-brand-purple-light">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in your{" "}
-            <code className="text-brand-purple-light">.env.local</code> file.
-          </p>
-          <Link
-            href="/"
-            className="inline-block mt-6 text-sm text-brand-purple-light hover:underline"
-          >
-            &larr; Back to website
-          </Link>
-        </div>
-      </div>
-    );
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("admin-theme", next);
+    document.documentElement.classList.toggle("light", next === "light");
   }
 
   return (
@@ -108,7 +67,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           <div className="w-7 h-7 rounded-md bg-brand-purple flex items-center justify-center font-bold text-xs text-white">
             ST
           </div>
-          <span className="text-sm font-semibold text-white">
+          <span className="text-sm font-semibold text-text-primary">
             Admin
           </span>
           <button
@@ -133,7 +92,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-[var(--duration-fast)]",
                   isActive
                     ? "bg-brand-purple/10 text-brand-purple-light"
-                    : "text-text-secondary hover:text-white hover:bg-bg-card-hover"
+                    : "text-text-secondary hover:text-text-primary hover:bg-bg-card-hover"
                 )}
               >
                 <Icon size={16} />
@@ -143,17 +102,17 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           })}
         </nav>
 
-        {/* User */}
-        <div className="p-4 border-t border-border-subtle">
-          <div className="text-xs text-text-muted truncate mb-2">
-            {user?.email}
-          </div>
+        {/* Footer */}
+        <div className="p-4 border-t border-border-subtle flex items-center justify-between">
+          <Link href="/" className="text-xs text-text-muted hover:text-brand-purple-light transition-colors">
+            &larr; Back to site
+          </Link>
           <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-xs text-text-secondary hover:text-error transition-colors"
+            onClick={toggleTheme}
+            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors"
+            aria-label="Toggle theme"
           >
-            <LogOut size={14} />
-            Sign out
+            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
           </button>
         </div>
       </aside>
@@ -176,7 +135,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-base font-semibold text-white">{title}</h1>
+          <h1 className="text-base font-semibold text-text-primary">{title}</h1>
         </header>
 
         {/* Page content */}

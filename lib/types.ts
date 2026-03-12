@@ -76,6 +76,26 @@ export interface Profile {
   created_at: string;
 }
 
+export interface SiteContent {
+  id: string;
+  section: string;
+  key: string;
+  value: string;
+  type: "text" | "markdown" | "image" | "url";
+  updated_at: string;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string;
+  link_url: string;
+  is_published: boolean;
+  published_at: string;
+  created_at: string;
+}
+
 export type SkillCategory =
   | "All"
   | "Core Team"
