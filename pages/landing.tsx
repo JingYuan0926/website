@@ -286,6 +286,89 @@ export default function Landing() {
       {/* Features section */}
       <FeaturesSection />
 
+      {/* Statistics section */}
+      <section className="relative py-28 lg:py-36 px-6 overflow-hidden">
+        {/* Neon purple gradient background */}
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(153,69,255,0.25) 0%, rgba(153,69,255,0.08) 40%, #000 80%)",
+        }} />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[180px] bg-[#9945ff]/15" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[150px] bg-[#9945ff]/10" />
+
+        <div className="relative max-w-[1200px] mx-auto">
+          {/* Glass card */}
+          <div
+            className="rounded-3xl p-10 lg:p-14"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              backdropFilter: "blur(40px) saturate(1.5)",
+              WebkitBackdropFilter: "blur(40px) saturate(1.5)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
+            }}
+          >
+            {/* Header row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-12">
+              <div>
+                <h2 className="text-white font-semibold text-2xl lg:text-3xl tracking-tight">
+                  We only deliver results.
+                </h2>
+                <p className="mt-2 text-[#a1a1aa] text-base lg:text-lg">
+                  Building the strongest Solana community in Malaysia.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: "#fff",
+                    backdropFilter: "blur(12px)",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  Demo
+                </a>
+                <a
+                  href="#"
+                  className="inline-flex items-center px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors"
+                >
+                  Get Started
+                </a>
+              </div>
+            </div>
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
+              {[
+                { value: "150+", label: "Community Members", desc: "Active builders across Malaysia contributing to the Solana ecosystem." },
+                { value: "24", label: "Events Hosted", desc: "Meetups, hackathons, and workshops bringing the community together." },
+                { value: "12", label: "Projects Funded", desc: "Startups and projects supported through grants and mentorship." },
+                { value: "85", label: "Bounties Completed", desc: "Tasks shipped by community members on Superteam Earn." },
+                { value: "5,000+", label: "Community Reach", desc: "People reached across social media and event attendance." },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p
+                    className="font-semibold tracking-tight text-white"
+                    style={{ fontSize: "clamp(2rem, 1.5rem + 2vw, 3.5rem)" }}
+                  >
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1.5 text-xs text-[#888] leading-relaxed">
+                    {stat.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <style jsx>{`
         @keyframes scroll {
           0% {
