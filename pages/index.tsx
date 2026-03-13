@@ -987,7 +987,7 @@ function EventsPane({ content = {} }: { content?: ContentMap }) {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90 min-h-[520px]" style={{ transformOrigin: "center right" }}>
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:w-[480px] lg:ml-auto lg:scale-90 min-h-[520px]" style={{ transformOrigin: "center right" }}>
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
@@ -1015,10 +1015,10 @@ function EventsPane({ content = {} }: { content?: ContentMap }) {
         {/* Scrollable event list */}
         <div
           ref={scrollRef}
-          className="max-h-[calc(85vh-80px)] min-h-[400px] overflow-y-auto p-4 scrollbar-thin"
+          className="h-[500px] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
-            <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center justify-center h-full">
               <Loader2 size={24} className="animate-spin text-[#666]" />
             </div>
           )}
