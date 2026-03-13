@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { supabase } from "@/lib/supabase";
 import { Users, Calendar, Handshake, MessageCircle } from "lucide-react";
 
@@ -64,15 +65,15 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="mt-8 p-6 rounded-xl border border-border-subtle bg-bg-card">
-        <h2 className="text-sm font-semibold text-text-primary mb-2">
-          Welcome to the Admin Dashboard
-        </h2>
-        <p className="text-sm text-text-secondary leading-relaxed">
-          Use the sidebar to manage members, events, partners, testimonials, FAQ
-          items, and site settings. All changes will be reflected on the public
-          website.
-        </p>
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary mb-4">Hero Section</h2>
+          <SectionContent section="hero" keyOrder={["headline", "description"]} labels={{ headline: "Headline", description: "Description" }} />
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary mb-4">Join CTA / Footer</h2>
+          <SectionContent section="join_cta" keyOrder={["headline", "description", "telegram_url", "twitter_url"]} labels={{ headline: "Headline", description: "Description", telegram_url: "Telegram URL", twitter_url: "Twitter / X URL" }} />
+        </div>
       </div>
     </AdminLayout>
   );

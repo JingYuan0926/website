@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
@@ -106,6 +107,11 @@ export default function AdminEvents() {
 
   return (
     <AdminLayout title="Events">
+      <SectionContent
+        section="events"
+        keyOrder={["title", "description", "submit_label", "submit_url", "luma_label", "luma_url"]}
+        labels={{ title: "Section Title", description: "Description", submit_label: "Submit Button Text", submit_url: "Submit Button URL", luma_label: "Luma Button Text", luma_url: "Luma Calendar URL" }}
+      />
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-text-secondary">
           {events.length} event{events.length !== 1 ? "s" : ""}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { SkillBadge } from "@/components/shared/SkillBadge";
@@ -8,6 +9,32 @@ import { SKILL_CATEGORIES } from "@/lib/constants";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Member } from "@/lib/types";
+
+interface CommunityProject { id: string; name: string; logo_url: string; website_url: string; display_order: number }
+
+const PROJECT_FIELDS: FieldDef[] = [
+  { key: "logo_url", label: "Logo", type: "image", bucket: "general", required: true, noCrop: true },
+  { key: "name", label: "Name", type: "text", required: true },
+  { key: "website_url", label: "Link URL", type: "text", placeholder: "https://..." },
+];
+
+const PROJECT_COLUMNS: Column<CommunityProject>[] = [
+  {
+    key: "logo_url",
+    label: "Logo",
+    render: (p) => p.logo_url ? (
+      <img src={p.logo_url} alt={p.name} className="h-8 w-8 rounded object-cover" />
+    ) : <span className="text-xs text-text-muted">—</span>,
+  },
+  { key: "name", label: "Name" },
+  {
+    key: "website_url",
+    label: "Link",
+    render: (p) => p.website_url ? (
+      <a href={p.website_url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-purple-light hover:underline truncate max-w-[200px] block">{p.website_url}</a>
+    ) : <span className="text-xs text-text-muted">—</span>,
+  },
+];
 
 const SKILL_OPTIONS = SKILL_CATEGORIES
   .filter((s) => s !== "All")
@@ -56,22 +83,69 @@ export default function AdminMembers() {
   const [editing, setEditing] = useState<Member | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Projects state
+  const [projects, setProjects] = useState<CommunityProject[]>([]);
+  const [editingProject, setEditingProject] = useState<CommunityProject | null>(null);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
   useEffect(() => {
     fetchMembers();
+    fetchProjects();
     if (!supabase) return;
-    const channel = supabase
-      .channel("members-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "members" }, () => {
-        fetchMembers();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const ch1 = supabase.channel("members-changes").on("postgres_changes", { event: "*", schema: "public", table: "members" }, () => fetchMembers()).subscribe();
+    const ch2 = supabase.channel("projects-changes").on("postgres_changes", { event: "*", schema: "public", table: "community_projects" }, () => fetchProjects()).subscribe();
+    return () => { supabase.removeChannel(ch1); supabase.removeChannel(ch2); };
   }, []);
 
   async function fetchMembers() {
     if (!supabase) return;
     const { data } = await supabase.from("members").select("*").order("display_order");
     if (data) setMembers(data as Member[]);
+  }
+
+  async function fetchProjects() {
+    if (!supabase) return;
+    const { data } = await supabase.from("community_projects").select("*").order("display_order");
+    if (data) setProjects(data as CommunityProject[]);
+  }
+
+  async function handleProjectSubmit(raw: Record<string, unknown>) {
+    if (!supabase) return;
+    const data: Record<string, unknown> = {};
+    for (const f of PROJECT_FIELDS) { if (f.key in raw) data[f.key] = raw[f.key]; }
+    if (editingProject) {
+      const { error } = await supabase.from("community_projects").update(data).eq("id", editingProject.id).select();
+      if (error) { toast.error(error.message); return; }
+      toast.success("Project updated");
+    } else {
+      data.display_order = projects.length > 0 ? Math.max(...projects.map((p) => p.display_order ?? 0)) + 1 : 0;
+      const { error } = await supabase.from("community_projects").insert(data).select();
+      if (error) { toast.error(error.message); return; }
+      toast.success("Project created");
+    }
+    setEditingProject(null);
+    fetchProjects();
+  }
+
+  async function handleProjectDelete(project: CommunityProject) {
+    if (!confirm(`Delete "${project.name}"?`)) return;
+    if (!supabase) return;
+    await supabase.from("community_projects").delete().eq("id", project.id);
+    toast.success("Project deleted");
+    fetchProjects();
+  }
+
+  async function handleProjectMove(project: CommunityProject, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = projects.findIndex((p) => p.id === project.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= projects.length) return;
+    const other = projects[swapIdx];
+    await Promise.all([
+      supabase.from("community_projects").update({ display_order: other.display_order }).eq("id", project.id),
+      supabase.from("community_projects").update({ display_order: project.display_order }).eq("id", other.id),
+    ]);
+    fetchProjects();
   }
 
   async function handleSubmit(data: Record<string, unknown>) {
@@ -133,6 +207,35 @@ export default function AdminMembers() {
 
   return (
     <AdminLayout title="Members">
+      <SectionContent
+        section="community"
+        keyOrder={["title", "description"]}
+        labels={{ title: "Section Title", description: "Section Description" }}
+      />
+      {/* Community Projects */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-text-primary">Community Projects</h3>
+          <button
+            onClick={() => { setEditingProject(null); setIsProjectModalOpen(true); }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-brand-purple text-white rounded-lg hover:bg-brand-purple-light transition-colors"
+          >
+            <Plus size={14} />
+            Add Project
+          </button>
+        </div>
+        <DataTable columns={PROJECT_COLUMNS} data={projects} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleProjectDelete} onMove={handleProjectMove} />
+      </div>
+
+      <FormModal
+        title={editingProject ? "Edit Project" : "Add Project"}
+        fields={PROJECT_FIELDS}
+        initialData={editingProject ? (editingProject as unknown as Record<string, unknown>) : undefined}
+        isOpen={isProjectModalOpen}
+        onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }}
+        onSubmit={handleProjectSubmit}
+      />
+
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-text-secondary">
           {members.length} member{members.length !== 1 ? "s" : ""}

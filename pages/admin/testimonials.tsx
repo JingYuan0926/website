@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
@@ -17,7 +18,14 @@ const FIELDS: FieldDef[] = [
   { key: "twitter_url", label: "Tweet URL", type: "text", placeholder: "https://x.com/..." },
 ];
 
+const MAX_TESTIMONIALS = 16;
+
 const COLUMNS: Column<Testimonial>[] = [
+  {
+    key: "display_order",
+    label: "#",
+    render: (_, i) => <span className="text-xs font-mono text-text-muted">{(i ?? 0) + 1}</span>,
+  },
   {
     key: "author_name",
     label: "Author",
@@ -133,11 +141,19 @@ export default function AdminTestimonials() {
 
   return (
     <AdminLayout title="Wall of Love">
+      <SectionContent
+        section="testimonials"
+        keyOrder={["title", "description"]}
+        labels={{ title: "Section Title", description: "Section Description" }}
+      />
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-text-secondary">{testimonials.length} testimonial{testimonials.length !== 1 ? "s" : ""}</p>
+        <p className="text-sm text-text-secondary">{testimonials.length}/{MAX_TESTIMONIALS} testimonial{testimonials.length !== 1 ? "s" : ""}</p>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { setShowTweetInput(!showTweetInput); }}
+            onClick={() => {
+              if (testimonials.length >= MAX_TESTIMONIALS) { toast.error(`Max ${MAX_TESTIMONIALS}/${MAX_TESTIMONIALS} reached. Delete one to add more.`); return; }
+              setShowTweetInput(!showTweetInput);
+            }}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#1d9bf0] text-white rounded-lg hover:bg-[#1a8cd8] transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
@@ -146,7 +162,10 @@ export default function AdminTestimonials() {
             Add Tweet
           </button>
           <button
-            onClick={() => { setEditing(null); setIsModalOpen(true); }}
+            onClick={() => {
+              if (testimonials.length >= MAX_TESTIMONIALS) { toast.error(`Max ${MAX_TESTIMONIALS}/${MAX_TESTIMONIALS} reached. Delete one to add more.`); return; }
+              setEditing(null); setIsModalOpen(true);
+            }}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-brand-purple text-white rounded-lg hover:bg-brand-purple-light transition-colors"
           >
             <Plus size={16} />

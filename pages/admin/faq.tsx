@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
@@ -8,12 +9,26 @@ import toast from "react-hot-toast";
 import type { FAQItem } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
+  { key: "image_url", label: "Category", type: "select", options: [
+    { value: "General", label: "General" },
+    { value: "Events", label: "Events" },
+    { value: "Opportunities", label: "Opportunities" },
+  ]},
   { key: "question", label: "Question", type: "text", required: true },
   { key: "answer", label: "Answer", type: "markdown", required: true },
-  { key: "image_url", label: "Image", type: "image", bucket: "general" },
 ];
 
 const COLUMNS: Column<FAQItem>[] = [
+  {
+    key: "display_order",
+    label: "#",
+    render: (_, i) => <span className="text-xs font-mono text-text-muted">{(i ?? 0) + 1}</span>,
+  },
+  {
+    key: "image_url",
+    label: "Category",
+    render: (f) => <span className="text-xs font-medium">{f.image_url || "—"}</span>,
+  },
   { key: "question", label: "Question" },
   {
     key: "answer",
@@ -89,6 +104,11 @@ export default function AdminFAQ() {
 
   return (
     <AdminLayout title="FAQ">
+      <SectionContent
+        section="faq"
+        keyOrder={["image_general", "image_events", "image_opportunities"]}
+        labels={{ image_general: "General Section Image", image_events: "Events Section Image", image_opportunities: "Opportunities Section Image" }}
+      />
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-text-secondary">{items.length} item{items.length !== 1 ? "s" : ""}</p>
         <button
