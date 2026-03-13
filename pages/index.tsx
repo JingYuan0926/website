@@ -15,6 +15,7 @@ import type { Testimonial, MissionPillar, Announcement, Partner } from "@/lib/ty
 /* ── constants ─────────────────────────────────────── */
 
 const NAV_ITEMS = [
+  { label: "HOME", href: "#hero" },
   { label: "EVENTS", href: "#events" },
   { label: "MISSION", href: "#mission" },
   { label: "STATISTICS", href: "#statistics" },
@@ -368,6 +369,12 @@ export default function Landing({ testimonials, missionPillars, announcements, p
 
           <div className="hidden md:flex items-center gap-3">
             <a
+              href="/members"
+              className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full border border-white/30 text-white/80 hover:border-white/60 hover:text-white transition-colors"
+            >
+              MEMBERS
+            </a>
+            <a
               href="#cta"
               className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
             >
@@ -391,7 +398,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
       </header>
 
       {/* Hero section + logo loop */}
-      <section className="relative flex flex-col overflow-hidden" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
+      <section id="hero" className="relative flex flex-col overflow-hidden" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
         <AnimatePresence mode="wait">
           <motion.video
             key={heroVideo}
@@ -494,7 +501,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
           scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)",
+            "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
         }}
       >
@@ -978,7 +985,7 @@ function EventsPane() {
         {/* Scrollable event list */}
         <div
           ref={scrollRef}
-          className="max-h-[calc(85vh-80px)] overflow-y-auto p-4 scrollbar-thin"
+          className="max-h-[calc(85vh-80px)] min-h-[400px] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
             <div className="flex justify-center py-16">
@@ -1073,7 +1080,7 @@ function EventsPane() {
 
 /* ── features section ─────────────────────────────── */
 
-const FEATURES = [
+const FEATURES: { label: string; title: string; description: string; bullets: string[]; cta: string; ctaUrl?: string; imageUrl?: string; imageLink?: string }[] = [
   {
     label: "BUILDER SUPPORT",
     title: "Hands-on mentorship for builders",
@@ -1164,6 +1171,7 @@ function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
         bullets: p.bullets || [],
         cta: p.cta_text || "",
         ctaUrl: p.cta_url || "#",
+        imageUrl: p.image_url || "",
       }))
     : FEATURES;
 
@@ -1328,6 +1336,9 @@ function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
                 transition={{ duration: 0.35, ease }}
                 className="rounded-2xl border border-[#262626] bg-[#111] overflow-hidden aspect-[4/3]"
               >
+                {feat.imageUrl ? (
+                  <img src={feat.imageUrl} alt={feat.label} className="w-full h-full object-cover" />
+                ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-8">
                   <div className="w-16 h-16 rounded-xl bg-[#1a1a1a] border border-[#333] flex items-center justify-center mb-5">
                     <span className="text-2xl font-mono text-white/60">
@@ -1341,6 +1352,7 @@ function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
                     {feat.title}
                   </p>
                 </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>

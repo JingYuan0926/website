@@ -71,6 +71,7 @@ export interface MissionPillar {
   bullets: string[];
   icon: string;
   image_url: string;
+  image_link: string;
   cta_text: string;
   cta_url: string;
   display_order: number;

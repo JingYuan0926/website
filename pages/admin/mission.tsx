@@ -12,7 +12,7 @@ const FIELDS: FieldDef[] = [
   { key: "heading", label: "Heading", type: "text", required: true, placeholder: "e.g. Hands-on mentorship for builders" },
   { key: "description", label: "Description", type: "textarea", required: true, placeholder: "Paragraph describing this pillar..." },
   { key: "bullets", label: "Bullet Points", type: "bulletlist" },
-  { key: "image_url", label: "Image", type: "image", bucket: "general" },
+  { key: "image_url", label: "Image (upload or paste URL)", type: "image", bucket: "general" },
   { key: "cta_text", label: "Button Text", type: "text", placeholder: "e.g. Find a Mentor" },
   { key: "cta_url", label: "Button URL", type: "text", placeholder: "e.g. /members" },
 ];
