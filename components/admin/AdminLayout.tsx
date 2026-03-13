@@ -21,7 +21,7 @@ const SIDEBAR_LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/members", label: "Members", icon: Users },
   { href: "/admin/partners", label: "Partners", icon: Handshake },
-  { href: "/admin/testimonials", label: "Testimonials", icon: MessageCircle },
+  { href: "/admin/testimonials", label: "Wall of Love", icon: MessageCircle },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
