@@ -198,9 +198,23 @@ html.light .tweet-card:hover {
 .tweet-prose p:last-child { margin-bottom: 0; }
 html.light .tweet-prose a { color: #1d9bf0 !important; }
 
-/* react-tweet embed overrides for masonry layout */
+/* react-tweet embed overrides */
 .tweet-embed {
   --tweet-container-margin: 0;
+}
+.tweet-embed .react-tweet-theme {
+  --tweet-body-font-size: 0.9375rem !important;
+  --tweet-body-line-height: 1.25rem !important;
+  --tweet-header-font-size: 0.9375rem !important;
+  --tweet-header-line-height: 1.25rem !important;
+  --tweet-quoted-body-font-size: 0.8125rem !important;
+  --tweet-quoted-body-line-height: 1.125rem !important;
+  --tweet-info-font-size: 0.8125rem !important;
+  --tweet-info-line-height: 1rem !important;
+  --tweet-actions-font-size: 0.8125rem !important;
+  --tweet-actions-line-height: 1rem !important;
+  --tweet-replies-font-size: 0.8125rem !important;
+  --tweet-replies-line-height: 1rem !important;
 }
 .tweet-embed > div {
   margin: 0 !important;

@@ -344,7 +344,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
       `}</style>
 
       {/* Heading — top left at 5% from top */}
-      <div className="absolute left-0 right-0 z-20 px-10 lg:px-16 pointer-events-none" style={{ top: "15%" }}>
+      <div className="absolute left-0 right-0 z-20 px-6 lg:px-16 pointer-events-none" style={{ top: "15%" }}>
         <div className="max-w-md">
           <h2
             className="text-white font-semibold tracking-tight leading-[1.1]"
@@ -352,14 +352,14 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           >
             Meet the community
           </h2>
-          <p className="mt-5 text-[#a1a1aa] text-base leading-relaxed">
+          <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
             Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
           </p>
         </div>
       </div>
 
       {/* View all members — bottom right at 5% from bottom */}
-      <div className="absolute right-0 z-20 px-10 lg:px-16" style={{ bottom: "15%" }}>
+      <div className="absolute right-0 z-20 px-6 lg:px-16" style={{ bottom: "15%" }}>
         <Link
           href="/members"
           className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
@@ -369,8 +369,25 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         </Link>
       </div>
 
-      {/* Full-width grid */}
-      <div className="relative z-10 w-screen">
+      {/* Mobile: scrollable avatar grid */}
+      <div className="lg:hidden relative z-10 w-full px-6 mt-[45%]">
+        <div className="grid grid-cols-5 gap-2">
+          {spotlightMembers.slice(0, 15).map((m: Member, i: number) => (
+            <div key={m.id || i} className="aspect-square rounded-lg overflow-hidden bg-[#1a1a1a]">
+              {m.avatar_url ? (
+                <img src={m.avatar_url} alt={m.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-white/40">
+                  {getInitials(m.name)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Full-width pixel grid */}
+      <div className="hidden lg:block relative z-10 w-screen">
         <AnimatedSection>
           <div className="relative" onMouseLeave={clearActive}>
             <div

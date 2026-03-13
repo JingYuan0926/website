@@ -1,6 +1,5 @@
+import React from "react";
 import dynamic from "next/dynamic";
-import { AnimatedSection, AnimatedItem } from "@/components/shared/AnimatedSection";
-import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Markdown } from "@/components/shared/Markdown";
 import { getInitials } from "@/lib/utils";
 import type { Testimonial } from "@/lib/types";
@@ -12,7 +11,7 @@ interface WallOfLoveProps {
 const ReactTweet = dynamic(
   () => import("react-tweet").then((m) => ({ default: m.Tweet })),
   { ssr: false }
-);
+) as React.ComponentType<{ id: string }>;
 
 function extractTweetId(url: string): string | null {
   const match = url.match(/(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/);
@@ -34,7 +33,7 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
 
   return (
     <div
-      className={`break-inside-avoid tweet-card rounded-2xl px-4 pt-3 pb-3 transition-colors ${hasLink ? "cursor-pointer" : ""}`}
+      className={`break-inside-avoid tweet-card rounded-2xl px-4 pt-3 pb-3 transition-colors h-full flex flex-col ${hasLink ? "cursor-pointer" : ""}`}
       onClick={
         hasLink
           ? () => window.open(testimonial.twitter_url, "_blank", "noopener")
@@ -78,17 +77,17 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
       </div>
 
       {/* Content */}
-      <div className="mt-3 text-[15px] text-[#e7e9ea] leading-[1.5]">
+      <div className="mt-3 text-[15px] text-[#e7e9ea] leading-[1.5] flex-1 overflow-hidden">
         <Markdown content={processedContent} className="tweet-prose" />
       </div>
 
       {/* Image */}
       {testimonial.image_url && (
-        <div className="mt-3 rounded-xl overflow-hidden border border-[rgb(56,68,77)]">
+        <div className="mt-3 rounded-xl overflow-hidden border border-[rgb(56,68,77)] flex-shrink-0 aspect-video">
           <img
             src={testimonial.image_url}
             alt=""
-            className="w-full object-cover max-h-[300px]"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
@@ -97,24 +96,27 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
 }
 
 export function WallOfLove({ testimonials }: WallOfLoveProps) {
-  if (!testimonials.length) return null;
+  if (!testimonials?.length) return null;
 
   return (
-    <section className="py-24 lg:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <AnimatedSection>
-          <SectionHeading
-            label="Community"
-            title="Wall of love"
-            description="Hear from builders and ecosystem leaders in our community."
-            align="center"
-          />
-        </AnimatedSection>
+    <section
+      className="relative bg-black px-6 py-16 lg:py-24"
+      style={{ scrollSnapAlign: "start" }}
+    >
+      <div className="max-w-[1400px] mx-auto w-full">
+        <div className="mb-8">
+          <h2
+            className="text-white font-semibold tracking-tight leading-[1.1]"
+            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+          >
+            Wall of love
+          </h2>
+          <p className="mt-3 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
+            Hear from builders and ecosystem leaders in our community.
+          </p>
+        </div>
 
-        <AnimatedSection
-          stagger
-          className="mt-14 columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
-        >
+        <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4">
           {testimonials.map((testimonial) => {
             const tweetId =
               testimonial.is_tweet_embed && testimonial.twitter_url
@@ -122,18 +124,20 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
                 : null;
 
             return (
-              <AnimatedItem key={testimonial.id}>
-                {tweetId ? (
-                  <div className="break-inside-avoid tweet-embed" data-theme="dark">
-                    <ReactTweet id={tweetId} />
-                  </div>
-                ) : (
-                  <TweetCard testimonial={testimonial} />
-                )}
-              </AnimatedItem>
+              <div key={testimonial.id}>
+                <div className="rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] overflow-hidden">
+                  {tweetId ? (
+                    <div className="tweet-embed" data-theme="dark">
+                      <ReactTweet id={tweetId} />
+                    </div>
+                  ) : (
+                    <TweetCard testimonial={testimonial} />
+                  )}
+                </div>
+              </div>
             );
           })}
-        </AnimatedSection>
+        </div>
       </div>
     </section>
   );
