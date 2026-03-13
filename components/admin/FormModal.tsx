@@ -14,6 +14,8 @@ export interface FieldDef {
   bucket?: string;
   folder?: string;
   noCrop?: boolean;
+  /** When set, the logo editor will read/write a scale value from this formData key */
+  scaleKey?: string;
 }
 
 interface FormModalProps {
@@ -312,6 +314,8 @@ export function FormModal({
                   bucket={field.bucket || "general"}
                   folder={field.folder}
                   noCrop={field.noCrop}
+                  scaleValue={field.scaleKey ? Number(formData[field.scaleKey] || 1) : undefined}
+                  onScaleChange={field.scaleKey ? (s) => updateField(field.scaleKey!, s) : undefined}
                 />
               )}
 

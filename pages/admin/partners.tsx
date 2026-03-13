@@ -3,12 +3,12 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
-import { Plus, Minus } from "lucide-react";
+import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Partner } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
-  { key: "logo_url", label: "Logo", type: "image", bucket: "logos", required: true, noCrop: true },
+  { key: "logo_url", label: "Logo", type: "image", bucket: "logos", required: true, noCrop: true, scaleKey: "logo_scale" },
   { key: "website_url", label: "Link URL", type: "text", placeholder: "https://..." },
 ];
 
@@ -35,15 +35,6 @@ export default function AdminPartners() {
     if (data) setPartners(data as Partner[]);
   }
 
-  async function handleScale(partner: Partner, delta: number) {
-    if (!supabase) return;
-    const current = partner.logo_scale ?? 1;
-    const next = Math.max(0.3, Math.min(3, +(current + delta).toFixed(1)));
-    // Optimistic update
-    setPartners((prev) => prev.map((p) => p.id === partner.id ? { ...p, logo_scale: next } : p));
-    await supabase.from("partners").update({ logo_scale: next }).eq("id", partner.id);
-  }
-
   const COLUMNS: Column<Partner>[] = [
     {
       key: "logo_url",
@@ -52,29 +43,6 @@ export default function AdminPartners() {
         <img src={p.logo_url} alt={p.name || "Partner"} className="h-8 max-w-[120px] object-contain" />
       ) : (
         <span className="text-xs text-text-muted">No logo</span>
-      ),
-    },
-    {
-      key: "logo_scale",
-      label: "Size",
-      render: (p) => (
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); handleScale(p, -0.2); }}
-            className="w-6 h-6 flex items-center justify-center rounded bg-bg-elevated hover:bg-bg-card-hover text-text-secondary"
-          >
-            <Minus size={12} />
-          </button>
-          <span className="text-xs font-mono text-text-primary w-8 text-center">{(p.logo_scale ?? 1).toFixed(1)}</span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); handleScale(p, 0.2); }}
-            className="w-6 h-6 flex items-center justify-center rounded bg-bg-elevated hover:bg-bg-card-hover text-text-secondary"
-          >
-            <Plus size={12} />
-          </button>
-        </div>
       ),
     },
     {
@@ -93,10 +61,11 @@ export default function AdminPartners() {
   async function handleSubmit(raw: Record<string, unknown>) {
     if (!supabase) return;
 
-    // Only send known fields
+    // Only send known fields + scale
     const data: Record<string, unknown> = {};
     for (const f of FIELDS) {
       if (f.key in raw) data[f.key] = raw[f.key];
+      if (f.scaleKey && f.scaleKey in raw) data[f.scaleKey] = raw[f.scaleKey];
     }
 
     if (editing) {
