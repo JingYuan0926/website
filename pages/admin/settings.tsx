@@ -2,105 +2,152 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import type { SiteStats } from "@/lib/types";
+
+interface StatItem {
+  value: string;
+  label: string;
+  desc: string;
+}
+
+const DEFAULT_STATS: StatItem[] = [
+  { value: "150+", label: "Community Members", desc: "Active builders across Malaysia contributing to the Solana ecosystem." },
+  { value: "24", label: "Events Hosted", desc: "Meetups, hackathons, and workshops bringing the community together." },
+  { value: "12", label: "Projects Funded", desc: "Startups and projects supported through grants and mentorship." },
+  { value: "85", label: "Bounties Completed", desc: "Tasks shipped by community members on Superteam Earn." },
+  { value: "5,000+", label: "Community Reach", desc: "People reached across social media and event attendance." },
+];
 
 export default function AdminSettings() {
-  const [stats, setStats] = useState<Partial<SiteStats>>({
-    members_count: 0,
-    events_hosted: 0,
-    projects_funded: 0,
-    bounties_completed: 0,
-    community_reach: 0,
-  });
+  const [stats, setStats] = useState<StatItem[]>(DEFAULT_STATS);
   const [loading, setLoading] = useState(false);
+  const [rowId, setRowId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
-    if (!supabase) return;
-    const channel = supabase
-      .channel("stats-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "site_stats" }, () => {
-        fetchStats();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function fetchStats() {
     if (!supabase) return;
     const { data } = await supabase.from("site_stats").select("*").limit(1).single();
-    if (data) setStats(data as SiteStats);
+    if (data) {
+      setRowId(data.id);
+      if (data.stats_json) {
+        try {
+          setStats(JSON.parse(data.stats_json));
+        } catch {
+          // fallback to defaults
+        }
+      }
+    }
   }
 
   async function handleSave() {
     if (!supabase) return;
     setLoading(true);
 
-    // Upsert: update existing or insert new
-    const { error } = await supabase.from("site_stats").upsert({
-      id: stats.id || undefined,
-      members_count: stats.members_count,
-      events_hosted: stats.events_hosted,
-      projects_funded: stats.projects_funded,
-      bounties_completed: stats.bounties_completed,
-      community_reach: stats.community_reach,
+    const payload = {
+      stats_json: JSON.stringify(stats),
       updated_at: new Date().toISOString(),
-    });
+    };
+
+    let error;
+    if (rowId) {
+      ({ error } = await supabase.from("site_stats").update(payload).eq("id", rowId));
+    } else {
+      ({ error } = await supabase.from("site_stats").insert(payload));
+    }
 
     setLoading(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Stats updated");
+    toast.success("Results updated");
     fetchStats();
   }
 
-  function updateStat(key: keyof SiteStats, value: number) {
-    setStats((prev) => ({ ...prev, [key]: value }));
+  function updateStat(idx: number, field: keyof StatItem, val: string) {
+    setStats((prev) => prev.map((s, i) => i === idx ? { ...s, [field]: val } : s));
   }
 
-  const statFields = [
-    { key: "members_count" as const, label: "Community Members" },
-    { key: "events_hosted" as const, label: "Events Hosted" },
-    { key: "projects_funded" as const, label: "Projects Funded" },
-    { key: "bounties_completed" as const, label: "Bounties Completed" },
-    { key: "community_reach" as const, label: "Community Reach" },
-  ];
+  function addStat() {
+    setStats((prev) => [...prev, { value: "0", label: "New Stat", desc: "" }]);
+  }
+
+  function removeStat(idx: number) {
+    setStats((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   return (
-    <AdminLayout title="Settings">
-      <div className="max-w-xl">
-        <h2 className="text-sm font-semibold text-text-primary mb-1">
-          Site Statistics
-        </h2>
+    <AdminLayout title="Results">
+      <div className="max-w-2xl">
         <p className="text-xs text-text-secondary mb-6">
-          These numbers are displayed on the landing page in the stats section.
+          These stats are displayed on the landing page. Edit the number, label, and description for each.
         </p>
 
-        <div className="space-y-4">
-          {statFields.map(({ key, label }) => (
-            <div key={key}>
-              <label className="block text-xs font-medium text-text-secondary mb-1.5">
-                {label}
-              </label>
-              <input
-                type="number"
-                value={Number(stats[key] || 0)}
-                onChange={(e) => updateStat(key, Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 text-sm bg-bg-card border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50 focus:ring-1 focus:ring-brand-purple/20"
-              />
+        <div className="space-y-6">
+          {stats.map((stat, idx) => (
+            <div key={idx} className="p-4 rounded-xl border border-border-subtle bg-bg-card">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Stat {idx + 1}</span>
+                <button
+                  onClick={() => removeStat(idx)}
+                  className="text-xs text-text-muted hover:text-error transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-text-secondary mb-1">Value</label>
+                  <input
+                    type="text"
+                    value={stat.value}
+                    onChange={(e) => updateStat(idx, "value", e.target.value)}
+                    placeholder="e.g. 150+"
+                    className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-text-secondary mb-1">Label</label>
+                  <input
+                    type="text"
+                    value={stat.label}
+                    onChange={(e) => updateStat(idx, "label", e.target.value)}
+                    placeholder="e.g. Community Members"
+                    className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
+                  />
+                </div>
+              </div>
+              <div className="mt-3">
+                <label className="block text-xs font-medium text-text-secondary mb-1">Description</label>
+                <input
+                  type="text"
+                  value={stat.desc}
+                  onChange={(e) => updateStat(idx, "desc", e.target.value)}
+                  placeholder="Short description..."
+                  className="w-full px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
+                />
+              </div>
             </div>
           ))}
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="mt-6 px-5 py-2.5 text-sm font-semibold bg-brand-purple text-white rounded-lg hover:bg-brand-purple-light disabled:opacity-50 transition-colors"
-        >
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
+        <div className="flex items-center gap-3 mt-6">
+          <button
+            onClick={addStat}
+            className="px-4 py-2 text-sm font-medium text-brand-purple-light bg-brand-purple/10 rounded-lg hover:bg-brand-purple/15 transition-colors"
+          >
+            + Add Stat
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="px-5 py-2 text-sm font-semibold bg-brand-purple text-white rounded-lg hover:bg-brand-purple-light disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </div>
     </AdminLayout>
   );

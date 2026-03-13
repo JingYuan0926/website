@@ -65,6 +65,9 @@ INSERT INTO mission_pillars (title, heading, description, bullets, icon, cta_tex
 -- 2. Add image_url to faq_items
 ALTER TABLE faq_items ADD COLUMN IF NOT EXISTS image_url text DEFAULT '';
 
+-- 3. Add stats_json to site_stats for flexible stat editing
+ALTER TABLE site_stats ADD COLUMN IF NOT EXISTS stats_json text DEFAULT '';
+
 -- 3. Enable Realtime for mission_pillars
 DO $$
 BEGIN

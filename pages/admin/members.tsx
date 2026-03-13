@@ -24,7 +24,6 @@ const FIELDS: FieldDef[] = [
   { key: "linkedin_url", label: "LinkedIn URL", type: "text" },
   { key: "wallet_address", label: "Solana Wallet", type: "text" },
   { key: "is_spotlight", label: "Featured on Homepage", type: "toggle" },
-  { key: "display_order", label: "Display Order", type: "number" },
 ];
 
 const COLUMNS: Column<Member>[] = [
@@ -89,6 +88,9 @@ export default function AdminMembers() {
       }
       toast.success("Member updated");
     } else {
+      data.display_order = members.length > 0
+        ? Math.max(...members.map((m) => (m as unknown as Record<string, number>).display_order ?? 0)) + 1
+        : 0;
       const { error } = await supabase.from("members").insert(data);
       if (error) {
         toast.error(error.message);
@@ -98,6 +100,21 @@ export default function AdminMembers() {
     }
 
     setEditing(null);
+    fetchMembers();
+  }
+
+  async function handleMove(member: Member, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = members.findIndex((m) => m.id === member.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= members.length) return;
+    const other = members[swapIdx];
+    const myOrder = (member as unknown as Record<string, number>).display_order ?? idx;
+    const otherOrder = (other as unknown as Record<string, number>).display_order ?? swapIdx;
+    await Promise.all([
+      supabase.from("members").update({ display_order: otherOrder }).eq("id", member.id),
+      supabase.from("members").update({ display_order: myOrder }).eq("id", other.id),
+    ]);
     fetchMembers();
   }
 
@@ -140,6 +157,7 @@ export default function AdminMembers() {
           setIsModalOpen(true);
         }}
         onDelete={handleDelete}
+        onMove={handleMove}
       />
 
       <FormModal

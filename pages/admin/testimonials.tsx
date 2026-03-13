@@ -15,7 +15,6 @@ const FIELDS: FieldDef[] = [
   { key: "content", label: "Testimonial", type: "markdown", required: true },
   { key: "image_url", label: "Card Image", type: "image", bucket: "general" },
   { key: "twitter_url", label: "Tweet URL", type: "text", placeholder: "https://x.com/..." },
-  { key: "display_order", label: "Display Order", type: "number" },
 ];
 
 const COLUMNS: Column<Testimonial>[] = [
@@ -76,11 +75,29 @@ export default function AdminTestimonials() {
       if (error) { toast.error(error.message); return; }
       toast.success("Testimonial updated");
     } else {
+      data.display_order = testimonials.length > 0
+        ? Math.max(...testimonials.map((t) => (t as unknown as Record<string, number>).display_order ?? 0)) + 1
+        : 0;
       const { error } = await supabase.from("testimonials").insert(data);
       if (error) { toast.error(error.message); return; }
       toast.success("Testimonial created");
     }
     setEditing(null);
+    fetchTestimonials();
+  }
+
+  async function handleMove(testimonial: Testimonial, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = testimonials.findIndex((t) => t.id === testimonial.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= testimonials.length) return;
+    const other = testimonials[swapIdx];
+    const myOrder = (testimonial as unknown as Record<string, number>).display_order ?? idx;
+    const otherOrder = (other as unknown as Record<string, number>).display_order ?? swapIdx;
+    await Promise.all([
+      supabase.from("testimonials").update({ display_order: otherOrder }).eq("id", testimonial.id),
+      supabase.from("testimonials").update({ display_order: myOrder }).eq("id", other.id),
+    ]);
     fetchTestimonials();
   }
 
@@ -165,7 +182,7 @@ export default function AdminTestimonials() {
         </div>
       )}
 
-      <DataTable columns={COLUMNS} data={testimonials} onEdit={(t) => { setEditing(t); setIsModalOpen(true); }} onDelete={handleDelete} />
+      <DataTable columns={COLUMNS} data={testimonials} onEdit={(t) => { setEditing(t); setIsModalOpen(true); }} onDelete={handleDelete} onMove={handleMove} />
 
       <FormModal
         title={editing ? "Edit Testimonial" : "Add Testimonial"}

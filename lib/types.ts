@@ -36,6 +36,7 @@ export interface Partner {
   website_url: string;
   tier: "gold" | "silver" | "partner";
   display_order: number;
+  logo_scale: number;
   created_at: string;
 }
 

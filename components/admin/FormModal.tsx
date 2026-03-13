@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
 import { Markdown } from "@/components/shared/Markdown";
+import toast from "react-hot-toast";
 
 export interface FieldDef {
   key: string;
@@ -12,6 +13,7 @@ export interface FieldDef {
   required?: boolean;
   bucket?: string;
   folder?: string;
+  noCrop?: boolean;
 }
 
 interface FormModalProps {
@@ -53,6 +55,13 @@ export function FormModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Validate required image fields (not covered by native HTML required)
+    for (const field of fields) {
+      if (field.required && field.type === "image" && !formData[field.key]) {
+        toast.error(`${field.label} is required`);
+        return;
+      }
+    }
     setLoading(true);
     try {
       await onSubmit(formData);
@@ -302,6 +311,7 @@ export function FormModal({
                   onChange={(url) => updateField(field.key, url)}
                   bucket={field.bucket || "general"}
                   folder={field.folder}
+                  noCrop={field.noCrop}
                 />
               )}
 

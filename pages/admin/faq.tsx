@@ -11,7 +11,6 @@ const FIELDS: FieldDef[] = [
   { key: "question", label: "Question", type: "text", required: true },
   { key: "answer", label: "Answer", type: "markdown", required: true },
   { key: "image_url", label: "Image", type: "image", bucket: "general" },
-  { key: "display_order", label: "Display Order", type: "number" },
 ];
 
 const COLUMNS: Column<FAQItem>[] = [
@@ -23,7 +22,6 @@ const COLUMNS: Column<FAQItem>[] = [
       <span className="text-xs line-clamp-2 max-w-md">{f.answer}</span>
     ),
   },
-  { key: "display_order", label: "Order" },
 ];
 
 export default function AdminFAQ() {
@@ -56,11 +54,27 @@ export default function AdminFAQ() {
       if (error) { toast.error(error.message); return; }
       toast.success("FAQ updated");
     } else {
+      data.display_order = items.length > 0
+        ? Math.max(...items.map((i) => i.display_order)) + 1
+        : 0;
       const { error } = await supabase.from("faq_items").insert(data);
       if (error) { toast.error(error.message); return; }
       toast.success("FAQ created");
     }
     setEditing(null);
+    fetchItems();
+  }
+
+  async function handleMove(item: FAQItem, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = items.findIndex((i) => i.id === item.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= items.length) return;
+    const other = items[swapIdx];
+    await Promise.all([
+      supabase.from("faq_items").update({ display_order: other.display_order }).eq("id", item.id),
+      supabase.from("faq_items").update({ display_order: item.display_order }).eq("id", other.id),
+    ]);
     fetchItems();
   }
 
@@ -86,7 +100,7 @@ export default function AdminFAQ() {
         </button>
       </div>
 
-      <DataTable columns={COLUMNS} data={items} onEdit={(f) => { setEditing(f); setIsModalOpen(true); }} onDelete={handleDelete} />
+      <DataTable columns={COLUMNS} data={items} onEdit={(f) => { setEditing(f); setIsModalOpen(true); }} onDelete={handleDelete} onMove={handleMove} />
 
       <FormModal
         title={editing ? "Edit FAQ" : "Add FAQ"}

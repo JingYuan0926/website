@@ -7,33 +7,17 @@ import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import type { MissionPillar } from "@/lib/types";
 
-const ICON_OPTIONS = [
-  { value: "code", label: "Code" },
-  { value: "calendar", label: "Calendar" },
-  { value: "coins", label: "Coins" },
-  { value: "briefcase", label: "Briefcase" },
-  { value: "graduation-cap", label: "Graduation Cap" },
-  { value: "globe", label: "Globe" },
-  { value: "rocket", label: "Rocket" },
-  { value: "shield", label: "Shield" },
-  { value: "heart", label: "Heart" },
-  { value: "zap", label: "Zap" },
-];
-
 const FIELDS: FieldDef[] = [
   { key: "title", label: "Title (sidebar label)", type: "text", required: true, placeholder: "e.g. Builder Support" },
   { key: "heading", label: "Heading", type: "text", required: true, placeholder: "e.g. Hands-on mentorship for builders" },
   { key: "description", label: "Description", type: "textarea", required: true, placeholder: "Paragraph describing this pillar..." },
   { key: "bullets", label: "Bullet Points", type: "bulletlist" },
-  { key: "icon", label: "Icon", type: "select", options: ICON_OPTIONS },
   { key: "image_url", label: "Image", type: "image", bucket: "general" },
   { key: "cta_text", label: "Button Text", type: "text", placeholder: "e.g. Find a Mentor" },
   { key: "cta_url", label: "Button URL", type: "text", placeholder: "e.g. /members" },
-  { key: "display_order", label: "Display Order", type: "number" },
 ];
 
-// Only send these keys to Supabase (exclude id, created_at, etc.)
-const SAVE_KEYS = FIELDS.map((f) => f.key);
+const SAVE_KEYS = [...FIELDS.map((f) => f.key), "icon", "display_order"];
 
 const COLUMNS: Column<MissionPillar>[] = [
   { key: "title", label: "Title" },
@@ -51,8 +35,6 @@ const COLUMNS: Column<MissionPillar>[] = [
       <span className="text-xs text-text-muted">{p.bullets?.length || 0} items</span>
     ),
   },
-  { key: "icon", label: "Icon" },
-  { key: "display_order", label: "Order" },
 ];
 
 export default function AdminMission() {
@@ -81,7 +63,6 @@ export default function AdminMission() {
   async function handleSubmit(raw: Record<string, unknown>) {
     if (!supabase) return;
 
-    // Only send known fields to Supabase
     const data: Record<string, unknown> = {};
     for (const key of SAVE_KEYS) {
       if (key in raw) data[key] = raw[key];
@@ -100,6 +81,9 @@ export default function AdminMission() {
       }
       toast.success("Pillar updated");
     } else {
+      data.display_order = pillars.length > 0
+        ? Math.max(...pillars.map((p) => p.display_order)) + 1
+        : 0;
       const { data: inserted, error } = await supabase
         .from("mission_pillars")
         .insert(data)
@@ -112,6 +96,20 @@ export default function AdminMission() {
       toast.success("Pillar created");
     }
     setEditing(null);
+    fetchPillars();
+  }
+
+  async function handleMove(pillar: MissionPillar, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = pillars.findIndex((p) => p.id === pillar.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= pillars.length) return;
+
+    const other = pillars[swapIdx];
+    await Promise.all([
+      supabase.from("mission_pillars").update({ display_order: other.display_order }).eq("id", pillar.id),
+      supabase.from("mission_pillars").update({ display_order: pillar.display_order }).eq("id", other.id),
+    ]);
     fetchPillars();
   }
 
@@ -144,6 +142,7 @@ export default function AdminMission() {
         data={pillars}
         onEdit={(p) => { setEditing(p); setIsModalOpen(true); }}
         onDelete={handleDelete}
+        onMove={handleMove}
       />
 
       <FormModal

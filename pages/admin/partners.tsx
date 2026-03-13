@@ -3,43 +3,13 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
-import { Plus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Partner } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
-  { key: "name", label: "Name", type: "text", required: true },
-  { key: "logo_url", label: "Logo", type: "image", bucket: "logos" },
-  { key: "website_url", label: "Website URL", type: "text" },
-  {
-    key: "tier",
-    label: "Tier",
-    type: "select",
-    options: [
-      { value: "gold", label: "Gold" },
-      { value: "silver", label: "Silver" },
-      { value: "partner", label: "Partner" },
-    ],
-  },
-  { key: "display_order", label: "Display Order", type: "number" },
-];
-
-const COLUMNS: Column<Partner>[] = [
-  { key: "name", label: "Name" },
-  { key: "website_url", label: "Website" },
-  {
-    key: "tier",
-    label: "Tier",
-    render: (p) => (
-      <span className={`text-xs font-medium ${
-        p.tier === "gold" ? "text-accent-gold" :
-        p.tier === "silver" ? "text-text-secondary" :
-        "text-text-muted"
-      }`}>
-        {p.tier}
-      </span>
-    ),
-  },
+  { key: "logo_url", label: "Logo", type: "image", bucket: "logos", required: true, noCrop: true },
+  { key: "website_url", label: "Link URL", type: "text", placeholder: "https://..." },
 ];
 
 export default function AdminPartners() {
@@ -65,23 +35,120 @@ export default function AdminPartners() {
     if (data) setPartners(data as Partner[]);
   }
 
-  async function handleSubmit(data: Record<string, unknown>) {
+  async function handleScale(partner: Partner, delta: number) {
     if (!supabase) return;
+    const current = partner.logo_scale ?? 1;
+    const next = Math.max(0.3, Math.min(3, +(current + delta).toFixed(1)));
+    // Optimistic update
+    setPartners((prev) => prev.map((p) => p.id === partner.id ? { ...p, logo_scale: next } : p));
+    await supabase.from("partners").update({ logo_scale: next }).eq("id", partner.id);
+  }
+
+  const COLUMNS: Column<Partner>[] = [
+    {
+      key: "logo_url",
+      label: "Logo",
+      render: (p) => p.logo_url ? (
+        <img src={p.logo_url} alt={p.name || "Partner"} className="h-8 max-w-[120px] object-contain" />
+      ) : (
+        <span className="text-xs text-text-muted">No logo</span>
+      ),
+    },
+    {
+      key: "logo_scale",
+      label: "Size",
+      render: (p) => (
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); handleScale(p, -0.2); }}
+            className="w-6 h-6 flex items-center justify-center rounded bg-bg-elevated hover:bg-bg-card-hover text-text-secondary"
+          >
+            <Minus size={12} />
+          </button>
+          <span className="text-xs font-mono text-text-primary w-8 text-center">{(p.logo_scale ?? 1).toFixed(1)}</span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); handleScale(p, 0.2); }}
+            className="w-6 h-6 flex items-center justify-center rounded bg-bg-elevated hover:bg-bg-card-hover text-text-secondary"
+          >
+            <Plus size={12} />
+          </button>
+        </div>
+      ),
+    },
+    {
+      key: "website_url",
+      label: "Link",
+      render: (p) => p.website_url ? (
+        <a href={p.website_url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-purple-light hover:underline truncate max-w-[200px] block">
+          {p.website_url}
+        </a>
+      ) : (
+        <span className="text-xs text-text-muted">—</span>
+      ),
+    },
+  ];
+
+  async function handleSubmit(raw: Record<string, unknown>) {
+    if (!supabase) return;
+
+    // Only send known fields
+    const data: Record<string, unknown> = {};
+    for (const f of FIELDS) {
+      if (f.key in raw) data[f.key] = raw[f.key];
+    }
+
     if (editing) {
-      const { error } = await supabase.from("partners").update(data).eq("id", editing.id);
+      const { data: updated, error } = await supabase
+        .from("partners")
+        .update(data)
+        .eq("id", editing.id)
+        .select();
       if (error) { toast.error(error.message); return; }
+      if (!updated || updated.length === 0) {
+        toast.error("Save failed — check RLS policies");
+        return;
+      }
       toast.success("Partner updated");
     } else {
-      const { error } = await supabase.from("partners").insert(data);
+      data.display_order = partners.length > 0
+        ? Math.max(...partners.map((p) => p.display_order ?? 0)) + 1
+        : 0;
+      data.name = "Partner";
+      data.logo_scale = 1.0;
+      const { data: inserted, error } = await supabase
+        .from("partners")
+        .insert(data)
+        .select();
       if (error) { toast.error(error.message); return; }
+      if (!inserted || inserted.length === 0) {
+        toast.error("Create failed — check RLS policies");
+        return;
+      }
       toast.success("Partner created");
     }
     setEditing(null);
     fetchPartners();
   }
 
+  async function handleMove(partner: Partner, direction: "up" | "down") {
+    if (!supabase) return;
+    const idx = partners.findIndex((p) => p.id === partner.id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= partners.length) return;
+    const other = partners[swapIdx];
+    const myOrder = (partner as unknown as Record<string, number>).display_order ?? idx;
+    const otherOrder = (other as unknown as Record<string, number>).display_order ?? swapIdx;
+    await Promise.all([
+      supabase.from("partners").update({ display_order: otherOrder }).eq("id", partner.id),
+      supabase.from("partners").update({ display_order: myOrder }).eq("id", other.id),
+    ]);
+    fetchPartners();
+  }
+
   async function handleDelete(partner: Partner) {
-    if (!confirm(`Delete "${partner.name}"?`)) return;
+    if (!confirm("Delete this partner?")) return;
     if (!supabase) return;
     const { error } = await supabase.from("partners").delete().eq("id", partner.id);
     if (error) { toast.error(error.message); return; }
@@ -102,7 +169,7 @@ export default function AdminPartners() {
         </button>
       </div>
 
-      <DataTable columns={COLUMNS} data={partners} onEdit={(p) => { setEditing(p); setIsModalOpen(true); }} onDelete={handleDelete} />
+      <DataTable columns={COLUMNS} data={partners} onEdit={(p) => { setEditing(p); setIsModalOpen(true); }} onDelete={handleDelete} onMove={handleMove} />
 
       <FormModal
         title={editing ? "Edit Partner" : "Add Partner"}

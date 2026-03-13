@@ -16,20 +16,18 @@ import {
   Sun,
   Moon,
   Target,
-  CalendarDays,
 } from "lucide-react";
 
 const SIDEBAR_LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/mission", label: "Mission", icon: Target },
-  { href: "/admin/events", label: "Events", icon: CalendarDays },
+  { href: "/admin/settings", label: "Results", icon: Settings },
   { href: "/admin/members", label: "Members", icon: Users },
-  { href: "/admin/partners", label: "Partners", icon: Handshake },
   { href: "/admin/testimonials", label: "Wall of Love", icon: MessageCircle },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 interface AdminLayoutProps {
