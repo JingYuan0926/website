@@ -16,12 +16,14 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isAdmin = router.pathname.startsWith("/admin");
   const isLanding = router.pathname === "/landing";
+  const isMembers = router.pathname === "/members";
+  const hideLayout = isAdmin || isLanding || isMembers;
 
   return (
     <div className={`${inter.variable} font-sans`}>
-      {!isAdmin && !isLanding && <Navbar />}
+      {!hideLayout && <Navbar />}
       <Component {...pageProps} />
-      {!isAdmin && !isLanding && <Footer />}
+      {!hideLayout && <Footer />}
       <Toaster
         position="bottom-right"
         toastOptions={{

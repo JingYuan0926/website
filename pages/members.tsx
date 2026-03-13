@@ -2,126 +2,311 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Archivo } from "next/font/google";
-import { Code2, Palette, Users, Shield, Star, ExternalLink } from "lucide-react";
+import { Search } from "lucide-react";
 
 const archivo = Archivo({ subsets: ["latin"], weight: ["900"], display: "swap" });
 
-/* ── types ─────────────────────────────────────────── */
-
-type MemberRole = "developer" | "designer" | "community" | "core";
-
-interface GridMember {
-  id: string;
-  name: string;
-  title: string;
-  bio: string;
-  role: MemberRole;
-  stars: 1 | 2 | 3;
-  avatar_url: string;
-  twitter_handle: string;
-  skills: string[];
-}
-
-/* ── role config ───────────────────────────────────── */
-
-const ROLE_CONFIG: Record<MemberRole, { label: string; icon: typeof Code2; color: string; border: string; bg: string }> = {
-  developer: { label: "Developer", icon: Code2, color: "#14F195", border: "border-[#14F195]/40", bg: "bg-[#14F195]/10" },
-  designer: { label: "Designer", icon: Palette, color: "#f472b6", border: "border-pink-400/40", bg: "bg-pink-400/10" },
-  community: { label: "Community", icon: Users, color: "#60a5fa", border: "border-blue-400/40", bg: "bg-blue-400/10" },
-  core: { label: "Core Team", icon: Shield, color: "#dea54b", border: "border-amber-500/40", bg: "bg-amber-500/10" },
-};
-
-/* ── mock data ─────────────────────────────────────── */
-
-const MEMBERS: GridMember[] = [
-  { id: "1", name: "Ahmad Rizal", title: "Full-Stack Developer", bio: "Building on Solana since 2022. Core contributor to multiple DeFi protocols and hackathon mentor.", role: "developer", stars: 3, avatar_url: "", twitter_handle: "ahmadrizal", skills: ["Rust", "TypeScript", "DeFi"] },
-  { id: "2", name: "Siti Nurhaliza", title: "UI/UX Designer", bio: "Designing intuitive Web3 experiences. Previously at a top fintech startup in KL.", role: "designer", stars: 3, avatar_url: "", twitter_handle: "sitinur_design", skills: ["Figma", "UI/UX", "Branding"] },
-  { id: "3", name: "Wei Chen", title: "Rust Engineer", bio: "Solana program developer. Hackathon winner. Open source contributor to Anchor framework.", role: "core", stars: 3, avatar_url: "", twitter_handle: "weichen_sol", skills: ["Rust", "Anchor", "Security"] },
-  { id: "4", name: "Priya Sharma", title: "Community Lead", bio: "Growing the Solana community in Malaysia. Events organizer and content creator.", role: "community", stars: 3, avatar_url: "", twitter_handle: "priya_sol", skills: ["Events", "Content", "Growth"] },
-  { id: "5", name: "Farid Hassan", title: "DeFi Researcher", bio: "Exploring decentralized finance protocols. Writing about Solana DeFi ecosystem.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "farid_defi", skills: ["DeFi", "Research", "Writing"] },
-  { id: "6", name: "Mei Ling Tan", title: "Frontend Developer", bio: "React & Next.js specialist. Building beautiful Web3 interfaces and dApps.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "meiling_dev", skills: ["React", "Next.js", "Web3"] },
-  { id: "7", name: "Kamal Ibrahim", title: "Smart Contract Dev", bio: "Anchor framework enthusiast. Building secure programs on Solana mainnet.", role: "developer", stars: 3, avatar_url: "", twitter_handle: "kamal_anchor", skills: ["Rust", "Anchor", "Solana"] },
-  { id: "8", name: "Nurul Aisyah", title: "Product Designer", bio: "Creating delightful user experiences for DeFi products and NFT platforms.", role: "designer", stars: 2, avatar_url: "", twitter_handle: "nurul_px", skills: ["Product", "UI/UX", "Figma"] },
-  { id: "9", name: "Raj Patel", title: "Backend Engineer", bio: "Building scalable infrastructure for Solana dApps. Previously at Grab.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "raj_backend", skills: ["Node.js", "Infra", "APIs"] },
-  { id: "10", name: "Lim Jia Wen", title: "Growth Lead", bio: "Helping Solana projects reach Malaysian audiences through strategic campaigns.", role: "community", stars: 2, avatar_url: "", twitter_handle: "jiawen_growth", skills: ["Marketing", "Growth", "Strategy"] },
-  { id: "11", name: "Aisha Rahman", title: "Content Creator", bio: "Creating educational content about Solana ecosystem in Bahasa Malaysia.", role: "community", stars: 2, avatar_url: "", twitter_handle: "aisha_web3", skills: ["Content", "Education", "Social"] },
-  { id: "12", name: "Daniel Tan", title: "Protocol Engineer", bio: "Working on cross-chain bridges and MEV solutions on Solana.", role: "core", stars: 3, avatar_url: "", twitter_handle: "dtan_crypto", skills: ["Rust", "Bridges", "MEV"] },
-  { id: "13", name: "Hafiz Zain", title: "Mobile Developer", bio: "Building Solana mobile experiences with React Native and Expo.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "hafiz_mobile", skills: ["React Native", "Mobile", "Web3"] },
-  { id: "14", name: "Chloe Wong", title: "Brand Designer", bio: "Crafting visual identities for Web3 startups. Logo, branding, and illustration.", role: "designer", stars: 2, avatar_url: "", twitter_handle: "chloe_brand", skills: ["Branding", "Illustration", "Design"] },
-  { id: "15", name: "Arjun Singh", title: "DevRel Engineer", bio: "Developer relations and technical writing. Making Solana accessible to all.", role: "core", stars: 2, avatar_url: "", twitter_handle: "arjun_devrel", skills: ["DevRel", "Docs", "Community"] },
-  { id: "16", name: "Tan Mei Xin", title: "NFT Artist", bio: "Generative art and NFT collections on Solana. Exploring digital art frontiers.", role: "designer", stars: 1, avatar_url: "", twitter_handle: "meixinart", skills: ["NFT", "Art", "Generative"] },
-  { id: "17", name: "Yusuf Ali", title: "Security Researcher", bio: "Auditing Solana programs. Helping projects ship secure smart contracts.", role: "developer", stars: 3, avatar_url: "", twitter_handle: "yusuf_sec", skills: ["Security", "Audit", "Rust"] },
-  { id: "18", name: "Kim Soo-jin", title: "Data Analyst", bio: "On-chain analytics and dashboards for Solana DeFi protocols.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "soojin_data", skills: ["Analytics", "Python", "Data"] },
-  { id: "19", name: "Zara Ismail", title: "Event Coordinator", bio: "Organizing hackathons and meetups across Malaysia for the Solana community.", role: "community", stars: 2, avatar_url: "", twitter_handle: "zara_events", skills: ["Events", "Logistics", "Community"] },
-  { id: "20", name: "Marcus Lee", title: "Fullstack Engineer", bio: "Building end-to-end dApps with Next.js and Anchor. Shipped 5 projects.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "marcus_dev", skills: ["Fullstack", "Next.js", "Anchor"] },
-  { id: "21", name: "Anita Krishnan", title: "Technical Writer", bio: "Documentation and tutorials for Solana developers. Clear, concise guides.", role: "community", stars: 1, avatar_url: "", twitter_handle: "anita_writes", skills: ["Docs", "Tutorials", "Education"] },
-  { id: "22", name: "Jason Ng", title: "Trading Bot Dev", bio: "Building automated trading systems on Jupiter and Raydium.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "jason_bot", skills: ["Bots", "DeFi", "TypeScript"] },
-  { id: "23", name: "Fatimah Zahra", title: "Motion Designer", bio: "Creating animations and motion graphics for Solana ecosystem projects.", role: "designer", stars: 1, avatar_url: "", twitter_handle: "fatimah_motion", skills: ["Motion", "After Effects", "3D"] },
-  { id: "24", name: "Ryan Loh", title: "Blockchain Engineer", bio: "Validator operations and infrastructure. Running Solana validators since genesis.", role: "core", stars: 3, avatar_url: "", twitter_handle: "ryan_validator", skills: ["Validator", "Infra", "DevOps"] },
-  { id: "25", name: "Shen Wei", title: "Frontend Dev", bio: "Specializing in wallet integrations and Solana Pay implementations.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "shenwei_fe", skills: ["React", "Wallet", "Solana Pay"] },
-  { id: "26", name: "Amira Yusof", title: "UX Researcher", bio: "User research for Web3 products. Making crypto intuitive for everyone.", role: "designer", stars: 2, avatar_url: "", twitter_handle: "amira_ux", skills: ["UX Research", "Testing", "Design"] },
-  { id: "27", name: "Vincent Chow", title: "Game Developer", bio: "Building on-chain games with Solana. Unity and Unreal Engine integration.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "vince_gamedev", skills: ["Gaming", "Unity", "Solana"] },
-  { id: "28", name: "Nadia Samad", title: "Social Media Lead", bio: "Managing Superteam Malaysia's social presence and community engagement.", role: "community", stars: 2, avatar_url: "", twitter_handle: "nadia_social", skills: ["Social", "Content", "Strategy"] },
-  { id: "29", name: "Adam Khalid", title: "Rust Developer", bio: "Contributing to Solana core libraries. Systems programming enthusiast.", role: "developer", stars: 3, avatar_url: "", twitter_handle: "adam_rust", skills: ["Rust", "Systems", "Open Source"] },
-  { id: "30", name: "Grace Teo", title: "Graphic Designer", bio: "Visual design for Web3 brands. From logos to landing pages.", role: "designer", stars: 1, avatar_url: "", twitter_handle: "grace_design", skills: ["Graphics", "Branding", "Web"] },
-  { id: "31", name: "Imran Shah", title: "QA Engineer", bio: "Testing Solana dApps end-to-end. Automated testing frameworks for Web3.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "imran_qa", skills: ["Testing", "QA", "Automation"] },
-  { id: "32", name: "Hannah Lim", title: "Partnership Lead", bio: "Building strategic partnerships between Solana projects and Malaysian companies.", role: "core", stars: 2, avatar_url: "", twitter_handle: "hannah_biz", skills: ["Partnerships", "BD", "Strategy"] },
-  { id: "33", name: "Ravi Kumar", title: "ML Engineer", bio: "Applying machine learning to on-chain data analysis on Solana.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "ravi_ml", skills: ["ML", "Python", "Data"] },
-  { id: "34", name: "Syafiqah Aziz", title: "Illustrator", bio: "Creating unique illustrations and visual assets for NFT collections.", role: "designer", stars: 1, avatar_url: "", twitter_handle: "syafiqah_art", skills: ["Illustration", "NFT", "Art"] },
-  { id: "35", name: "Tommy Ooi", title: "Cloud Architect", bio: "Designing cloud infrastructure for Solana RPC nodes and indexers.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "tommy_cloud", skills: ["AWS", "DevOps", "Infra"] },
-  { id: "36", name: "Rina Matsuda", title: "Community Mod", bio: "Moderating community channels and helping newcomers get started.", role: "community", stars: 1, avatar_url: "", twitter_handle: "rina_mod", skills: ["Moderation", "Support", "Community"] },
-  { id: "37", name: "Kelvin Yeoh", title: "Solidity & Rust Dev", bio: "Cross-chain developer. Porting EVM projects to Solana via Neon.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "kelvin_xchain", skills: ["Solidity", "Rust", "Cross-chain"] },
-  { id: "38", name: "Dewi Putri", title: "Video Producer", bio: "Creating video content and tutorials for the Solana ecosystem.", role: "community", stars: 1, avatar_url: "", twitter_handle: "dewi_video", skills: ["Video", "YouTube", "Editing"] },
-  { id: "39", name: "Alex Fong", title: "Tokenomics Designer", bio: "Designing sustainable token economics for Solana projects.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "alex_tokens", skills: ["Tokenomics", "Economics", "DeFi"] },
-  { id: "40", name: "Suraya Idris", title: "Operations Lead", bio: "Managing day-to-day operations of Superteam Malaysia chapter.", role: "core", stars: 3, avatar_url: "", twitter_handle: "suraya_ops", skills: ["Operations", "Management", "Strategy"] },
-  { id: "41", name: "Ben Tay", title: "SDK Developer", bio: "Building developer tools and SDKs for the Solana ecosystem.", role: "developer", stars: 2, avatar_url: "", twitter_handle: "ben_sdk", skills: ["SDK", "TypeScript", "Tools"] },
-  { id: "42", name: "Nur Hidayah", title: "3D Artist", bio: "Creating 3D assets and metaverse experiences on Solana.", role: "designer", stars: 1, avatar_url: "", twitter_handle: "hidayah_3d", skills: ["3D", "Blender", "Metaverse"] },
-  { id: "43", name: "Chris Kok", title: "DApp Developer", bio: "Shipping production dApps on Solana. Focus on lending protocols.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "chris_dapp", skills: ["DApp", "Lending", "React"] },
-  { id: "44", name: "Maya Abdullah", title: "PR & Comms", bio: "Public relations and communications for Superteam Malaysia.", role: "community", stars: 1, avatar_url: "", twitter_handle: "maya_pr", skills: ["PR", "Comms", "Media"] },
-  { id: "45", name: "Derek Liew", title: "Platform Engineer", bio: "Building the Superteam Malaysia platform. Infra and tooling.", role: "core", stars: 3, avatar_url: "", twitter_handle: "derekliew", skills: ["Platform", "Infra", "Next.js"] },
-  { id: "46", name: "Jing Yuan", title: "Full-Stack Dev", bio: "Shipping Web3 products end-to-end. React, Solana, and everything in between.", role: "developer", stars: 3, avatar_url: "", twitter_handle: "jingyuan", skills: ["Fullstack", "React", "Solana"] },
-  { id: "47", name: "Li Xin", title: "Data Engineer", bio: "Building data pipelines for Solana on-chain analytics.", role: "developer", stars: 1, avatar_url: "", twitter_handle: "lixin_data", skills: ["Data", "Pipeline", "Analytics"] },
-  { id: "48", name: "Faris Azman", title: "Podcast Host", bio: "Hosting the Solana Malaysia podcast. Interviewing builders weekly.", role: "community", stars: 1, avatar_url: "", twitter_handle: "faris_pod", skills: ["Podcast", "Content", "Interviews"] },
+const NAV_ITEMS = [
+  { label: "EVENTS", href: "/#events" },
+  { label: "MISSION", href: "/#mission" },
+  { label: "STATISTICS", href: "/#statistics" },
+  { label: "COMMUNITY", href: "/#community" },
+  { label: "TESTIMONIALS", href: "/#testimonials" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
-/* ── helpers ────────────────────────────────────────── */
+/* ── types ────────────────────────────────────────── */
+
+interface Member {
+  name: string;
+  title: string;
+  company: string;
+  avatar: string;
+  primaryRole: string;
+  secondaryRole?: string;
+  skills: string[];
+  twitter?: string;
+  bio: string;
+}
+
+/* ── color palette per skill ─────────────────────── */
+
+const SKILL_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  "All":       { bg: "rgba(153,69,255,0.15)", text: "#9945FF", border: "rgba(153,69,255,0.3)" },
+  "Core Team": { bg: "rgba(242,205,93,0.15)",  text: "#F2CD5D", border: "rgba(242,205,93,0.3)" },
+  "Rust":      { bg: "rgba(198,137,174,0.15)", text: "#C689AE", border: "rgba(198,137,174,0.3)" },
+  "Frontend":  { bg: "rgba(222,165,75,0.15)",  text: "#DEA54B", border: "rgba(222,165,75,0.3)" },
+  "Design":    { bg: "rgba(230,144,104,0.15)", text: "#E69068", border: "rgba(230,144,104,0.3)" },
+  "Content":   { bg: "rgba(237,123,132,0.15)", text: "#ED7B84", border: "rgba(237,123,132,0.3)" },
+  "Growth":    { bg: "rgba(210,145,146,0.15)", text: "#D29192", border: "rgba(210,145,146,0.3)" },
+  "Product":   { bg: "rgba(182,166,159,0.15)", text: "#B6A69F", border: "rgba(182,166,159,0.3)" },
+  "Community": { bg: "rgba(127,209,185,0.15)", text: "#7FD1B9", border: "rgba(127,209,185,0.3)" },
+};
+
+/* ── filter categories ───────────────────────────── */
+
+const SKILL_FILTERS = [
+  "All",
+  "Rust",
+  "Core Team",
+  "Frontend",
+  "Design",
+  "Content",
+  "Growth",
+  "Product",
+  "Community",
+] as const;
+
+/* ── mock members ────────────────────────────────── */
+
+const MEMBERS: Member[] = [
+  { name: "Aiman Rizq", title: "Full-Stack Developer", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=aiman", primaryRole: "Core Team", secondaryRole: "Rust", skills: ["Core Team", "Rust", "Frontend"], twitter: "https://x.com/", bio: "Building DeFi protocols on Solana since 2022. Passionate about open-source and decentralized systems." },
+  { name: "Mei Lin", title: "Smart Contract Engineer", company: "Helius", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=meilin", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "https://x.com/", bio: "Security-focused smart contract developer specializing in Anchor programs." },
+  { name: "Raj Kumar", title: "Frontend Engineer", company: "Jupiter", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=raj", primaryRole: "Frontend", secondaryRole: "Design", skills: ["Frontend", "Design"], twitter: "https://x.com/", bio: "Crafting beautiful Web3 user experiences with React and Tailwind." },
+  { name: "Siti Nurha", title: "Product Designer", company: "Phantom", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=siti", primaryRole: "Design", secondaryRole: "Product", skills: ["Design", "Product"], twitter: "https://x.com/", bio: "Designing intuitive interfaces for DeFi products used by millions." },
+  { name: "Wei Jie", title: "Protocol Engineer", company: "Jito", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=weijie", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "https://x.com/", bio: "Low-level protocol optimization and MEV research on Solana." },
+  { name: "Priya Devi", title: "DevRel Engineer", company: "Solana Foundation", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=priya", primaryRole: "Community", secondaryRole: "Content", skills: ["Community", "Content", "Growth"], twitter: "https://x.com/", bio: "Bridging developers and the Solana ecosystem through education." },
+  { name: "Hafiz Azman", title: "Backend Developer", company: "Drift", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=hafiz", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "https://x.com/", bio: "Infrastructure and indexing for on-chain data at scale." },
+  { name: "Yuki Tan", title: "Mobile Developer", company: "Backpack", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=yuki", primaryRole: "Frontend", secondaryRole: "Product", skills: ["Frontend", "Product"], twitter: "https://x.com/", bio: "Building mobile-first Solana wallets and dApps." },
+  { name: "Arjun Singh", title: "Data Scientist", company: "Pyth Network", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=arjun", primaryRole: "Product", secondaryRole: "Rust", skills: ["Product", "Rust"], bio: "On-chain data analytics and oracle research." },
+  { name: "Farah Amin", title: "Community Lead", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=farah", primaryRole: "Core Team", secondaryRole: "Community", skills: ["Core Team", "Community", "Growth"], twitter: "https://x.com/", bio: "Growing the Superteam MY community and organizing flagship events." },
+  { name: "Daniel Lim", title: "Security Researcher", company: "OtterSec", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=daniel", primaryRole: "Rust", skills: ["Rust"], twitter: "https://x.com/", bio: "Finding and fixing vulnerabilities in Solana programs." },
+  { name: "Aisyah Rani", title: "Technical Writer", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=aisyah", primaryRole: "Content", secondaryRole: "Community", skills: ["Content", "Community"], twitter: "https://x.com/", bio: "Making complex Solana concepts accessible to everyone." },
+  { name: "Zhen Wei", title: "Game Developer", company: "Star Atlas", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=zhenwei", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "https://x.com/", bio: "Building on-chain gaming experiences and NFT integrations." },
+  { name: "Kavitha Nair", title: "UI Engineer", company: "Tensor", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=kavitha", primaryRole: "Frontend", secondaryRole: "Design", skills: ["Frontend", "Design"], twitter: "https://x.com/", bio: "Creative coding meets blockchain — building interactive NFT experiences." },
+  { name: "Adam Hakim", title: "Blockchain Researcher", company: "Anza", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=adam", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], bio: "Researching zero-knowledge proofs and consensus on Solana." },
+  { name: "Li Wen", title: "DeFi Strategist", company: "Marinade", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=liwen", primaryRole: "Product", secondaryRole: "Growth", skills: ["Product", "Growth"], twitter: "https://x.com/", bio: "Designing sustainable DeFi mechanisms and tokenomics." },
+  { name: "Nurul Huda", title: "Content Creator", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=nurul", primaryRole: "Core Team", secondaryRole: "Content", skills: ["Core Team", "Content", "Growth"], twitter: "https://x.com/", bio: "Creating educational Solana content for the Malaysian community." },
+  { name: "Cheng Hao", title: "DevOps Engineer", company: "Helius", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=chenghao", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "https://x.com/", bio: "Running validator and RPC infrastructure for the Solana network." },
+  { name: "Amira Zainal", title: "Marketing Lead", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=amira", primaryRole: "Core Team", secondaryRole: "Growth", skills: ["Core Team", "Growth", "Community"], twitter: "https://x.com/", bio: "Scaling Web3 projects through strategic marketing and partnerships." },
+  { name: "Rizal Ahmad", title: "Full-Stack Developer", company: "Squads", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=rizal", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "https://x.com/", bio: "Shipping full-stack dApps from KL to the world." },
+];
+
+/* ── helpers ──────────────────────────────────────── */
 
 const ease = [0.25, 1, 0.5, 1] as const;
 
-function getInitials(name: string) {
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease, delay: i * 0.04 },
+  }),
+};
+
+function getSkillColor(skill: string) {
+  return SKILL_COLORS[skill] || SKILL_COLORS["Product"];
 }
 
-function getRoleColor(role: MemberRole) {
-  return ROLE_CONFIG[role].color;
+/* ── member card with flip ───────────────────────── */
+
+function MemberCard({ member, index }: { member: Member; index: number }) {
+  const [flipped, setFlipped] = useState(false);
+  const primaryColor = getSkillColor(member.primaryRole);
+  const secondaryColor = member.secondaryRole ? getSkillColor(member.secondaryRole) : primaryColor;
+  const isCoreTeam = member.skills.includes("Core Team");
+
+  return (
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      custom={index}
+      className="cursor-pointer"
+      style={{ perspective: "1000px" }}
+      onClick={() => setFlipped((f) => !f)}
+    >
+      <div
+        className="relative w-full transition-transform duration-500"
+        style={{
+          transformStyle: "preserve-3d",
+          transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
+      >
+        {/* ── Front ─────────────────────────────────── */}
+        <div
+          className={`relative rounded-2xl bg-[#111111] overflow-hidden ${isCoreTeam ? "border border-[#F2CD5D]/40" : "border border-[#1f1f1f]"}`}
+          style={{
+            backfaceVisibility: "hidden",
+            ...(isCoreTeam ? { boxShadow: "0 0 15px rgba(242,205,93,0.15), 0 0 30px rgba(242,205,93,0.08)" } : {}),
+          }}
+        >
+          {/* Skill pill */}
+          <div className="absolute top-4 left-4 z-10">
+            <span
+              className="px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+              style={{
+                backgroundColor: primaryColor.bg,
+                color: primaryColor.text,
+                border: `1px solid ${primaryColor.border}`,
+              }}
+            >
+              {member.primaryRole}
+            </span>
+          </div>
+
+          {/* Avatar */}
+          <div className="relative aspect-[4/5] bg-[#0a0a0a] overflow-hidden">
+            <img
+              src={member.avatar}
+              alt={member.name}
+              className="w-full h-full object-cover"
+            />
+
+            {/* Social link */}
+            {member.twitter && (
+              <a
+                href={member.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-3 right-3 z-10 w-8 h-8 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all duration-200"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="px-4 py-4">
+            <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+              {member.name}
+            </h3>
+            <p className="text-xs text-[#666] mt-0.5 font-medium uppercase tracking-wider">
+              {member.company}
+            </p>
+          </div>
+        </div>
+
+        {/* ── Back ──────────────────────────────────── */}
+        <div
+          className={`absolute inset-0 rounded-2xl overflow-hidden flex flex-col ${isCoreTeam ? "border border-[#F2CD5D]/40" : "border border-[#1f1f1f]"}`}
+          style={{
+            backfaceVisibility: "hidden",
+            ...(isCoreTeam ? { boxShadow: "0 0 15px rgba(242,205,93,0.15), 0 0 30px rgba(242,205,93,0.08)" } : {}),
+            transform: "rotateY(180deg)",
+            background: `linear-gradient(160deg, ${primaryColor.bg} 0%, ${secondaryColor.bg} 35%, #111111 65%, #111111 100%)`,
+          }}
+        >
+          {/* Top accent line */}
+          <div className="h-1 shrink-0" style={{ background: `linear-gradient(to right, ${primaryColor.text}, ${secondaryColor.text})` }} />
+
+          <div className="flex-1 flex flex-col p-5 min-h-0">
+            {/* Avatar + name */}
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border-2"
+                style={{ borderColor: primaryColor.border }}
+              >
+                <img
+                  src={member.avatar}
+                  alt={member.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-white tracking-wide uppercase truncate">
+                  {member.name}
+                </h3>
+                <p className="text-xs font-medium truncate" style={{ color: primaryColor.text }}>
+                  {member.title}
+                </p>
+              </div>
+            </div>
+
+            {/* Company */}
+            <div className="flex items-center gap-1.5 mb-3">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.5" className="shrink-0">
+                <path d="M3 21h18M3 7v14m6-14v14m6-14v14m6-14v14M6 7h12l-6-4-6 4z" />
+              </svg>
+              <span className="text-xs text-[#888]">{member.company}</span>
+            </div>
+
+            {/* Bio */}
+            <p className="text-xs text-[#999] leading-relaxed mb-4 line-clamp-3">
+              {member.bio}
+            </p>
+
+            {/* Skills */}
+            <div className="flex flex-wrap gap-1.5 mt-auto">
+              {member.skills.map((skill) => {
+                const sc = getSkillColor(skill);
+                return (
+                  <span
+                    key={skill}
+                    className="px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide"
+                    style={{
+                      backgroundColor: sc.bg,
+                      color: sc.text,
+                      border: `1px solid ${sc.border}`,
+                    }}
+                  >
+                    {skill}
+                  </span>
+                );
+              })}
+            </div>
+
+            {/* Social link */}
+            {member.twitter && (
+              <div className="mt-4 pt-3 border-t border-[#ffffff10]">
+                <a
+                  href={member.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs text-[#888] hover:text-white transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  Follow on X
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
-function getStarColor(stars: number) {
-  if (stars === 3) return "#dea54b";
-  if (stars === 2) return "#a0a0a0";
-  return "#6b5b3e";
-}
-
-/* ── page ──────────────────────────────────────────── */
+/* ── page ─────────────────────────────────────────── */
 
 export default function MembersPage() {
-  const [selectedId, setSelectedId] = useState<string | null>("3");
-  const [roleFilter, setRoleFilter] = useState<MemberRole | null>(null);
-  const [starFilter, setStarFilter] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+
   const filtered = useMemo(() => {
     let result = MEMBERS;
-    if (roleFilter) result = result.filter((m) => m.role === roleFilter);
-    if (starFilter) result = result.filter((m) => m.stars === starFilter);
-    return result;
-  }, [roleFilter, starFilter]);
 
-  const selected = MEMBERS.find((m) => m.id === selectedId) || null;
-  const roleConf = selected ? ROLE_CONFIG[selected.role] : null;
+    if (activeFilter !== "All") {
+      result = result.filter(
+        (m) => m.primaryRole === activeFilter || m.secondaryRole === activeFilter || m.skills.includes(activeFilter)
+      );
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (m) =>
+          m.name.toLowerCase().includes(q) ||
+          m.title.toLowerCase().includes(q) ||
+          m.company.toLowerCase().includes(q) ||
+          m.skills.some((s) => s.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [search, activeFilter]);
 
   return (
     <div className="bg-black min-h-screen">
       {/* Navigation */}
-      <header className="fixed left-0 right-0 z-50 top-0 bg-black/90 backdrop-blur-md border-b border-white/10">
+      <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo/stmy.svg" alt="Superteam" className="h-7 w-7 object-contain" />
@@ -131,359 +316,135 @@ export default function MembersPage() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
-            <Link href="/" className="px-3 py-1.5 text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors">
-              HOME
-            </Link>
-            <Link href="/members" className="px-3 py-1.5 text-xs font-semibold tracking-wider text-white transition-colors">
-              MEMBERS
-            </Link>
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="px-3 py-1.5 text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          <a
-            href="https://t.me/SuperteamMY"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
-          >
-            JOIN US
-          </a>
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/#cta"
+              className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
+            >
+              JOIN US
+            </Link>
+          </div>
+
+          <button className="md:hidden p-2 text-white/70" aria-label="Menu">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M4 8h16M4 16h16" />
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="pt-16">
-        <div
-          className="min-h-[calc(100dvh-64px)] px-4 sm:px-6 py-6 sm:py-8"
-          style={{
-            backgroundColor: "#0a0a0a",
-            backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        >
-          <div className="max-w-[1400px] mx-auto">
-            {/* Header */}
-            <div className="mb-6">
-              <h1
-                className="text-white font-semibold tracking-tight leading-[1.08]"
-                style={{ fontSize: "clamp(1.5rem, 1rem + 2vw, 2.25rem)" }}
-              >
-                Member Roster
-              </h1>
-              <p className="mt-2 text-[#a1a1aa] text-sm">
-                {filtered.length} hunter{filtered.length !== 1 ? "s" : ""} registered
-              </p>
-            </div>
+      {/* Content */}
+      <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-24">
+        {/* Title */}
+        <div className="mb-10">
+          <h1
+            className={`text-white font-black tracking-tight leading-[1.08] ${archivo.className}`}
+            style={{ fontSize: "clamp(2rem, 1.5rem + 2.5vw, 3.25rem)" }}
+          >
+            Our Members
+          </h1>
+          <p
+            className="mt-3 text-[#a1a1aa] leading-relaxed max-w-xl"
+            style={{ fontSize: "clamp(0.875rem, 0.8rem + 0.25vw, 1.05rem)" }}
+          >
+            Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3
+            landscape.
+          </p>
+        </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              {/* Role filters */}
-              {(Object.keys(ROLE_CONFIG) as MemberRole[]).map((role) => {
-                const conf = ROLE_CONFIG[role];
-                const Icon = conf.icon;
-                const isActive = roleFilter === role;
-                return (
-                  <button
-                    key={role}
-                    onClick={() => setRoleFilter(isActive ? null : role)}
-                    className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all duration-200 border ${
-                      isActive
-                        ? `${conf.bg} ${conf.border} text-white`
-                        : "bg-[#ffffff06] border-white/[0.08] text-[#666] hover:border-white/20 hover:text-white"
-                    }`}
-                    title={conf.label}
-                  >
-                    <Icon size={14} style={isActive ? { color: conf.color } : undefined} />
-                    <span className="hidden sm:inline">{conf.label}</span>
-                  </button>
-                );
-              })}
+        {/* Search + Filters */}
+        <div className="mb-10 space-y-5">
+          {/* Search bar */}
+          <div className="relative max-w-md">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" />
+            <input
+              type="text"
+              placeholder="Search by name, role, company, or skill..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-[#111] border border-[#222] text-sm text-white placeholder-[#555] outline-none focus:border-[#9945ff]/50 transition-colors"
+            />
+          </div>
 
-              {/* Divider */}
-              <div className="w-px h-6 bg-white/10 mx-1 hidden sm:block" />
-
-              {/* Star filters */}
-              {[1, 2, 3].map((s) => {
-                const isActive = starFilter === s;
-                return (
-                  <button
-                    key={s}
-                    onClick={() => setStarFilter(isActive ? null : s)}
-                    className={`flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${
-                      isActive
-                        ? "bg-amber-500/10 border-amber-500/40 text-amber-400"
-                        : "bg-[#ffffff06] border-white/[0.08] text-[#666] hover:border-white/20 hover:text-white"
-                    }`}
-                    title={`${s} star${s !== 1 ? "s" : ""}`}
-                  >
-                    {Array.from({ length: s }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        fill={isActive ? "#dea54b" : "transparent"}
-                        stroke={isActive ? "#dea54b" : "currentColor"}
-                      />
-                    ))}
-                  </button>
-                );
-              })}
-
-              {/* Reset */}
-              {(roleFilter || starFilter) && (
+          {/* Filter pills */}
+          <div className="flex flex-wrap gap-2">
+            {SKILL_FILTERS.map((filter) => {
+              const isActive = activeFilter === filter;
+              const color = SKILL_COLORS[filter];
+              return (
                 <button
-                  onClick={() => { setRoleFilter(null); setStarFilter(null); }}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-[#666] hover:text-white border border-transparent hover:border-white/20 transition-all"
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200"
+                  style={
+                    isActive
+                      ? { backgroundColor: color.text, color: "#111" }
+                      : {
+                          backgroundColor: "transparent",
+                          color: color.text,
+                          border: `1px solid ${color.border}`,
+                        }
+                  }
                 >
-                  Reset
+                  {filter}
                 </button>
-              )}
-            </div>
-
-            {/* Grid + Detail layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-              {/* Left — Member grid */}
-              <div
-                className="rounded-2xl border border-[#262626] bg-[#111111] p-3 sm:p-4 overflow-hidden"
-                style={{
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)",
-                }}
-              >
-                <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1.5 sm:gap-2">
-                  <AnimatePresence>
-                    {filtered.map((member, i) => {
-                      const isSelected = selectedId === member.id;
-                      const roleColor = getRoleColor(member.role);
-                      return (
-                        <motion.button
-                          key={member.id}
-                          layout
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.25, ease, delay: Math.min(i * 0.015, 0.3) }}
-                          onClick={() => setSelectedId(member.id)}
-                          className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 group ${
-                            isSelected
-                              ? "ring-2 ring-offset-1 ring-offset-[#111111] z-10"
-                              : "hover:ring-1 hover:ring-white/30"
-                          }`}
-                          style={isSelected ? { ["--tw-ring-color" as string]: roleColor, boxShadow: `0 0 12px ${roleColor}40` } : undefined}
-                          title={member.name}
-                        >
-                          {/* Avatar / Initials */}
-                          <div
-                            className="w-full h-full flex items-center justify-center text-[10px] sm:text-xs font-bold font-mono transition-all duration-200"
-                            style={{
-                              backgroundColor: isSelected ? `${roleColor}25` : "#1a1a1a",
-                              color: isSelected ? roleColor : "#555",
-                              border: `1px solid ${isSelected ? `${roleColor}60` : "#2a2a2a"}`,
-                              borderRadius: "8px",
-                            }}
-                          >
-                            {member.avatar_url ? (
-                              <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="group-hover:text-white transition-colors">
-                                {getInitials(member.name)}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Star indicator */}
-                          <div className="absolute bottom-0.5 right-0.5 flex gap-px">
-                            {Array.from({ length: member.stars }).map((_, si) => (
-                              <Star key={si} size={6} fill={getStarColor(member.stars)} stroke="none" />
-                            ))}
-                          </div>
-
-                          {/* Role dot */}
-                          <div
-                            className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full"
-                            style={{ backgroundColor: roleColor }}
-                          />
-                        </motion.button>
-                      );
-                    })}
-                  </AnimatePresence>
-
-                  {/* Empty slots to fill the grid */}
-                  {filtered.length === 0 && (
-                    <div className="col-span-full flex items-center justify-center py-20">
-                      <p className="text-[#555] text-sm font-mono">No members match your filters.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right — Detail card */}
-              <div className="lg:sticky lg:top-[88px] lg:self-start">
-                <AnimatePresence mode="wait">
-                  {selected ? (
-                    <motion.div
-                      key={selected.id}
-                      initial={{ opacity: 0, x: 12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -12 }}
-                      transition={{ duration: 0.25, ease }}
-                      className="rounded-2xl border overflow-hidden"
-                      style={{
-                        borderColor: `${getRoleColor(selected.role)}30`,
-                        background: "linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(15,15,15,0.98) 100%)",
-                        boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 40px ${getRoleColor(selected.role)}08`,
-                      }}
-                    >
-                      {/* Card header with role banner */}
-                      <div
-                        className="px-5 py-3 flex items-center justify-between"
-                        style={{ borderBottom: `1px solid ${getRoleColor(selected.role)}20` }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {roleConf && (
-                            <>
-                              <roleConf.icon size={14} style={{ color: roleConf.color }} />
-                              <span className="text-xs font-semibold tracking-wider uppercase" style={{ color: roleConf.color }}>
-                                {roleConf.label}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-0.5">
-                          {Array.from({ length: selected.stars }).map((_, i) => (
-                            <Star key={i} size={14} fill={getStarColor(selected.stars)} stroke="none" />
-                          ))}
-                          {Array.from({ length: 3 - selected.stars }).map((_, i) => (
-                            <Star key={i} size={14} fill="none" stroke="#333" strokeWidth={1.5} />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Avatar area */}
-                      <div className="px-5 pt-6 pb-4 flex items-start gap-5">
-                        <div
-                          className="w-24 h-24 shrink-0 rounded-xl flex items-center justify-center overflow-hidden"
-                          style={{
-                            border: `2px solid ${getRoleColor(selected.role)}40`,
-                            backgroundColor: `${getRoleColor(selected.role)}10`,
-                          }}
-                        >
-                          {selected.avatar_url ? (
-                            <img src={selected.avatar_url} alt={selected.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span
-                              className="text-2xl font-bold font-mono"
-                              style={{ color: getRoleColor(selected.role) }}
-                            >
-                              {getInitials(selected.name)}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <h2 className="text-white font-semibold text-lg tracking-tight leading-tight">
-                            {selected.name}
-                          </h2>
-                          <p className="text-[#888] text-sm mt-0.5">{selected.title}</p>
-
-                          {selected.twitter_handle && (
-                            <a
-                              href={`https://x.com/${selected.twitter_handle}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 mt-2 text-xs text-[#666] hover:text-white transition-colors"
-                            >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                              </svg>
-                              @{selected.twitter_handle}
-                              <ExternalLink size={10} />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Bio */}
-                      <div className="px-5 pb-4">
-                        <p className="text-sm text-[#a1a1aa] leading-relaxed">
-                          {selected.bio}
-                        </p>
-                      </div>
-
-                      {/* Skills */}
-                      <div className="px-5 pb-5">
-                        <p className="text-[10px] font-semibold tracking-widest uppercase text-[#555] mb-2">
-                          Skills
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {selected.skills.map((skill) => (
-                            <span
-                              key={skill}
-                              className="px-2.5 py-1 rounded text-[11px] font-medium"
-                              style={{
-                                backgroundColor: `${getRoleColor(selected.role)}12`,
-                                color: getRoleColor(selected.role),
-                                border: `1px solid ${getRoleColor(selected.role)}25`,
-                              }}
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Obtainable Materials style stats */}
-                      <div
-                        className="mx-5 mb-5 rounded-xl p-4"
-                        style={{
-                          backgroundColor: "#0a0a0a",
-                          border: "1px solid #1a1a1a",
-                        }}
-                      >
-                        <p className="text-[10px] font-semibold tracking-widest uppercase text-[#555] mb-3">
-                          Contributions
-                        </p>
-                        <div className="space-y-2">
-                          {[
-                            { label: "Events Attended", freq: selected.stars >= 2 ? 4 : 2 },
-                            { label: "Bounties Completed", freq: selected.stars >= 3 ? 5 : selected.stars >= 2 ? 3 : 1 },
-                            { label: "Projects Shipped", freq: selected.stars >= 3 ? 4 : selected.stars >= 2 ? 2 : 1 },
-                          ].map((stat) => (
-                            <div key={stat.label} className="flex items-center justify-between">
-                              <span className="text-xs text-[#888]">{stat.label}</span>
-                              <div className="flex gap-0.5">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    size={10}
-                                    fill={i < stat.freq ? "#dea54b" : "transparent"}
-                                    stroke={i < stat.freq ? "#dea54b" : "#333"}
-                                    strokeWidth={1.5}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="rounded-2xl border border-[#262626] bg-[#111] p-8 flex flex-col items-center justify-center min-h-[300px]"
-                    >
-                      <Users size={32} className="text-[#333] mb-3" />
-                      <p className="text-sm text-[#555] text-center">
-                        Select a member from the grid
-                        <br />
-                        to view their profile
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
-      </main>
+
+        {/* Results count */}
+        <div className="mb-6">
+          <p className="text-xs text-[#555] font-medium">
+            {filtered.length} member{filtered.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+
+        {/* Members grid */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${activeFilter}-${search}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-[#111] border border-[#222] flex items-center justify-center mb-4">
+                  <Search size={24} className="text-[#444]" />
+                </div>
+                <p className="text-sm text-[#666]">No members found</p>
+                <p className="text-xs text-[#444] mt-1">Try adjusting your search or filters</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+                {filtered.map((member, i) => (
+                  <MemberCard key={member.name} member={member} index={i} />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,9 @@
       "Bash(/opt/homebrew/bin/yt-dlp -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]\" \"https://www.youtube.com/watch?v=BG1WeGdCJQI\" -o \"/Users/derekliew/Developer/website/public/video-solana.mp4\" --merge-output-format mp4)",
       "Bash(ls -la /Users/derekliew/Developer/website/public/video-solana*)",
       "Bash(mv /Users/derekliew/Developer/website/public/video-solana.f137.mp4 /Users/derekliew/Developer/website/public/video-solana.mp4)",
-      "Bash(rm /Users/derekliew/Developer/website/public/video-solana.f140.m4a)"
+      "Bash(rm /Users/derekliew/Developer/website/public/video-solana.f140.m4a)",
+      "Bash(grep -r \"shadcn\\\\|magic-ui\\\\|magicui\" /Users/derekliew/Developer/website --include=*.json --include=*.tsx --include=*.ts -i)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
