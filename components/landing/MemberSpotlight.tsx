@@ -126,57 +126,79 @@ const OUTLINE_SET = new Set(ALL_OUTLINE.map(([r, c]) => `${r},${c}`));
 
 const CLEAR_ROWS = [0, VPAD + 3, VPAD + 7, TOTAL_ROWS - 1];
 
+// Card center rows (4th row of each 7×7 card)
+const RIGHT_CARD_ROW = 4;  // right card rows 1-7, middle
+const LEFT_CARD_ROW = 10;  // left card rows 7-13, center = 10
+const RIGHT_CARD_COL = 29; // left edge of right card (cols 29-35)
+const LEFT_CARD_COL = 9;   // right edge of left card (cols 3-9)
+
 function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string, number> {
   const path = new Map<string, number>();
   let idx = 0;
 
-  // Stop 4 cells past the logo edge into the padding
-  const stopCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
+  const targetRow = cardSide === "right" ? RIGHT_CARD_ROW : LEFT_CARD_ROW;
+  const stopCol = cardSide === "left" ? LEFT_CARD_COL : RIGHT_CARD_COL;
+  const logoEdge = cardSide === "left" ? PAD - 2 : PAD + LOGO_COLS + 1;
 
+  // Phase 1: Route horizontally from avatar toward logo edge
+  // Check if straight horizontal to logo edge is clear
+  let currentRow = r;
   let straightClear = true;
   if (cardSide === "left") {
-    for (let col = c - 1; col >= stopCol; col--) {
+    for (let col = c - 1; col >= logoEdge; col--) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   } else {
-    for (let col = c + 1; col <= stopCol; col++) {
+    for (let col = c + 1; col <= logoEdge; col++) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   }
 
-  if (straightClear) {
-    if (cardSide === "left") {
-      for (let col = c - 1; col >= stopCol; col--) path.set(`${r},${col}`, idx++);
-    } else {
-      for (let col = c + 1; col <= stopCol; col++) path.set(`${r},${col}`, idx++);
+  if (!straightClear) {
+    // Route through nearest clear row to get past logo
+    let bestRow = -1;
+    let bestDist = Infinity;
+    for (const cr of CLEAR_ROWS) {
+      const dist = Math.abs(r - cr);
+      if (dist >= bestDist) continue;
+      let blocked = false;
+      const dir = cr > r ? 1 : -1;
+      for (let row = r + dir; row !== cr + dir; row += dir) {
+        if (OUTLINE_SET.has(`${row},${c}`)) { blocked = true; break; }
+      }
+      if (!blocked) { bestDist = dist; bestRow = cr; }
     }
-    return path;
-  }
+    if (bestRow === -1) bestRow = CLEAR_ROWS[0];
 
-  let bestRow = -1;
-  let bestDist = Infinity;
-  for (const cr of CLEAR_ROWS) {
-    const dist = Math.abs(r - cr);
-    if (dist >= bestDist) continue;
-    let blocked = false;
-    const dir = cr > r ? 1 : -1;
-    for (let row = r + dir; row !== cr + dir; row += dir) {
-      if (OUTLINE_SET.has(`${row},${c}`)) { blocked = true; break; }
+    // Vertical to clear row
+    if (bestRow < r) {
+      for (let row = r - 1; row >= bestRow; row--) path.set(`${row},${c}`, idx++);
+    } else if (bestRow > r) {
+      for (let row = r + 1; row <= bestRow; row++) path.set(`${row},${c}`, idx++);
     }
-    if (!blocked) { bestDist = dist; bestRow = cr; }
-  }
-  if (bestRow === -1) bestRow = CLEAR_ROWS[0];
-
-  if (bestRow < r) {
-    for (let row = r - 1; row >= bestRow; row--) path.set(`${row},${c}`, idx++);
-  } else if (bestRow > r) {
-    for (let row = r + 1; row <= bestRow; row++) path.set(`${row},${c}`, idx++);
+    currentRow = bestRow;
   }
 
+  // Horizontal to logo edge
   if (cardSide === "left") {
-    for (let col = c - 1; col >= stopCol; col--) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c - 1; col >= logoEdge; col--) path.set(`${currentRow},${col}`, idx++);
   } else {
-    for (let col = c + 1; col <= stopCol; col++) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c + 1; col <= logoEdge; col++) path.set(`${currentRow},${col}`, idx++);
+  }
+  let currentCol = logoEdge;
+
+  // Phase 2: Route vertically to card center row
+  if (currentRow < targetRow) {
+    for (let row = currentRow + 1; row <= targetRow; row++) path.set(`${row},${currentCol}`, idx++);
+  } else if (currentRow > targetRow) {
+    for (let row = currentRow - 1; row >= targetRow; row--) path.set(`${row},${currentCol}`, idx++);
+  }
+
+  // Phase 3: Route horizontally to card edge
+  if (cardSide === "left") {
+    for (let col = currentCol - 1; col >= stopCol; col--) path.set(`${targetRow},${col}`, idx++);
+  } else {
+    for (let col = currentCol + 1; col <= stopCol; col++) path.set(`${targetRow},${col}`, idx++);
   }
 
   return path;
@@ -214,6 +236,57 @@ interface EcoSpawn {
   isCenter: boolean;
 }
 
+function DetailCardContent({ member }: { member: Member }) {
+  const isCoreTeam = member.skills.includes("Core Team");
+  return (
+    <div className="w-full h-full p-3 flex flex-col items-center justify-center pointer-events-auto">
+      {member.avatar_url ? (
+        <img
+          src={member.avatar_url}
+          alt={member.name}
+          className={`w-24 h-24 rounded-xl object-cover ring-2 ${
+            isCoreTeam ? "ring-amber-500/50" : "ring-[#FFB800]/40"
+          }`}
+        />
+      ) : (
+        <div className={`w-24 h-24 rounded-xl flex items-center justify-center font-bold text-3xl ${
+          isCoreTeam ? "bg-amber-500/10 text-amber-400" : "bg-brand-purple/15 text-brand-purple-light"
+        }`}>
+          {getInitials(member.name)}
+        </div>
+      )}
+      <h3 className={`text-xl font-bold mt-3 text-center leading-tight ${
+        isCoreTeam ? "text-amber-400" : "text-white"
+      }`}>
+        {member.name}
+      </h3>
+      <p className="text-base text-[#a1a1aa] mt-1 text-center">
+        {member.title}
+      </p>
+      {member.twitter_handle && (
+        <a
+          href={`https://x.com/${member.twitter_handle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 mt-2 text-sm text-[#666] hover:text-white transition-colors"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+          @{member.twitter_handle}
+        </a>
+      )}
+      {member.skills.length > 0 && (
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+          {member.skills.slice(0, 4).map((skill) => (
+            <SkillBadge key={skill} skill={skill} size="sm" golden={isCoreTeam} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const realMembers = members.filter((m) => m.is_spotlight);
   const spotlightMembers =
@@ -227,6 +300,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const [activeCardSide, setActiveCardSide] = useState<"left" | "right">("left");
   const [pathCells, setPathCells] = useState<Map<string, number>>(new Map());
   const [showCard, setShowCard] = useState(false);
+  const [locked, setLocked] = useState(false);
   const cardTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const logoMidCol = PAD + LOGO_COLS / 2;
@@ -307,33 +381,43 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
     };
   }, []);
 
-  function handleHover(member: Member, r: number, c: number) {
+  function activateMember(member: Member, r: number, c: number) {
     setActive(member);
     setActiveCol(c);
     setActiveRow(r);
     setShowCard(false);
 
-    // Force right only for the first row of avatars; all others use normal left/right logic
     const cardSide: "left" | "right" = r === VPAD ? "right" : c >= logoMidCol ? "right" : "left";
     setActiveCardSide(cardSide);
     const newPath = buildPath(r, c, cardSide);
     setPathCells(newPath);
 
-    // Show card once 4 golden cells enter the padding area past the logo edge
     if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
-    const triggerCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
-    let triggerDelay = newPath.size * 25; // fallback: full path
-    for (const [key, idx] of newPath) {
-      const col = parseInt(key.split(",")[1]);
-      if (cardSide === "left" ? col <= triggerCol : col >= triggerCol) {
-        triggerDelay = (idx + 1) * 25;
-        break;
-      }
-    }
+    const triggerDelay = newPath.size * 25;
     cardTimerRef.current = setTimeout(() => setShowCard(true), triggerDelay + 100);
   }
 
+  function handleHover(member: Member, r: number, c: number) {
+    if (locked) return;
+    activateMember(member, r, c);
+  }
+
+  function handleClick(member: Member, r: number, c: number) {
+    if (locked && active?.id === member.id) {
+      // Click same locked avatar → unlock
+      setLocked(false);
+      setActive(null);
+      setPathCells(new Map());
+      setShowCard(false);
+      if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+      return;
+    }
+    setLocked(true);
+    activateMember(member, r, c);
+  }
+
   function clearActive() {
+    if (locked) return;
     setActive(null);
     setPathCells(new Map());
     setShowCard(false);
@@ -353,6 +437,26 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           15% { opacity: 1; transform: scale(1); }
           75% { opacity: 1; transform: scale(1); }
           100% { opacity: 0; transform: scale(0.7); }
+        }
+        @keyframes pulseGoldBorder {
+          0%, 100% {
+            box-shadow: inset 0 0 10px rgba(255,184,0,0.5), 0 0 6px rgba(255,184,0,0.2);
+          }
+          50% {
+            box-shadow: inset 0 0 22px rgba(255,184,0,0.9), 0 0 16px rgba(255,184,0,0.5);
+          }
+        }
+        @keyframes beamPulse {
+          0%, 100% {
+            background-color: rgba(255, 184, 0, 0.15);
+            border-color: rgba(255, 184, 0, 0.25);
+            box-shadow: none;
+          }
+          50% {
+            background-color: rgba(255, 184, 0, 0.55);
+            border-color: rgba(255, 184, 0, 0.65);
+            box-shadow: inset 0 0 10px rgba(255,184,0,0.35);
+          }
         }
       `}</style>
 
@@ -400,7 +504,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                       <button
                         key={i}
                         onMouseEnter={() => handleHover(member, r, c)}
-                        onClick={() => handleHover(member, r, c)}
+                        onClick={() => handleClick(member, r, c)}
                         className={`relative rounded-[2px] overflow-hidden transition-all duration-150 group aspect-square ${
                           active?.id === member.id ? "z-10 scale-110" : "hover:scale-105"
                         }`}
@@ -411,9 +515,13 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                           className="w-full h-full object-cover"
                         />
                         <div
-                          className={`absolute inset-0 pointer-events-none border-2 border-[#FFB800] shadow-[inset_0_0_10px_rgba(255,184,0,0.5)] rounded-[2px] transition-opacity duration-150 ${
+                          className={`absolute inset-0 pointer-events-none border-2 border-[#FFB800] rounded-[2px] transition-opacity duration-150 ${
                             active?.id === member.id ? "opacity-100" : "opacity-0"
                           }`}
+                          style={{
+                            animation: active?.id === member.id && locked ? "pulseGoldBorder 1.5s ease-in-out infinite" : "none",
+                            boxShadow: active?.id === member.id && !locked ? "inset 0 0 10px rgba(255,184,0,0.5)" : undefined,
+                          }}
                         />
                       </button>
                     );
@@ -431,9 +539,14 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                   return (
                     <div
                       key={i}
-                      onMouseEnter={() => { if (!isOnPath) clearActive(); }}
+                      onMouseEnter={() => { if (!locked && !isOnPath) clearActive(); }}
                       className="rounded-[2px] relative aspect-square flex items-center justify-center"
-                      style={{
+                      style={isOnPath && locked ? {
+                        animation: "beamPulse 2s ease-in-out infinite",
+                        animationDelay: `${(pathDelay ?? 0) * 60}ms`,
+                        borderWidth: 1,
+                        borderStyle: "solid",
+                      } : {
                         backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
                         borderWidth: 1,
                         borderStyle: "solid",
@@ -443,7 +556,6 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                         transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
                       }}
                     >
-                      <span className="text-[6px] text-white/60 font-mono select-none pointer-events-none absolute">{r},{c}</span>
                       {showSpawn && spawn.isCenter && (
                         <div
                           key={spawn.id}
@@ -519,72 +631,42 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                 </Link>
               </div>
 
-              {/* Detail card — appears after path animation completes */}
+              {/* Right detail card — rows 1-7, cols 29-35 (7×7) */}
               <div
-                className={`absolute top-0 bottom-0 z-20 pointer-events-none transition-all duration-300 ${
-                  showCard && active ? "opacity-100" : "opacity-0"
+                className={`absolute bg-black z-20 pointer-events-none transition-all duration-300 ${
+                  showCard && active && activeCardSide === "right" ? "opacity-100" : "opacity-0"
+                } ${
+                  active?.skills.includes("Core Team")
+                    ? "border border-amber-500/40"
+                    : "border border-white/[0.06]"
                 }`}
                 style={{
-                  width: PAD * (34 + 2) - 4 * (34 + 2),
-                  ...(activeCardSide === "right"
-                    ? { right: 0 }
-                    : { left: 0 }),
+                  top: `${(1 / TOTAL_ROWS) * 100}%`,
+                  left: `${(29 / COLS) * 100}%`,
+                  width: `${(7 / COLS) * 100}%`,
+                  height: `${(7 / TOTAL_ROWS) * 100}%`,
                 }}
               >
-                {active && (
-                  <div className="pointer-events-auto w-full h-full bg-black p-6 flex flex-col items-center justify-center">
-                    {active.avatar_url ? (
-                      <img
-                        src={active.avatar_url}
-                        alt={active.name}
-                        className="w-16 h-16 rounded-xl object-cover ring-2 ring-[#FFB800]/40"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-xl bg-brand-purple/15 flex items-center justify-center text-brand-purple-light font-bold text-lg">
-                        {getInitials(active.name)}
-                      </div>
-                    )}
-                    <h3 className="text-base font-semibold text-text-primary mt-3">
-                      {active.name}
-                    </h3>
-                    <p className="text-sm text-text-secondary mt-0.5">
-                      {active.title}
-                    </p>
-                    {active.twitter_handle && (
-                      <a
-                        href={`https://x.com/${active.twitter_handle}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-1.5 text-xs text-text-muted hover:text-brand-purple-light transition-colors"
-                      >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                        </svg>
-                        @{active.twitter_handle}
-                      </a>
-                    )}
-                    {active.skills.length > 0 && (
-                      <div className="mt-3 flex flex-wrap justify-center gap-1">
-                        {active.skills.map((skill) => (
-                          <SkillBadge key={skill} skill={skill} size="sm" />
-                        ))}
-                      </div>
-                    )}
-                    {active.github_url && (
-                      <a
-                        href={active.github_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] text-text-secondary hover:text-text-primary transition-colors"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                        </svg>
-                        GitHub
-                      </a>
-                    )}
-                  </div>
-                )}
+                {active && <DetailCardContent member={active} />}
+              </div>
+
+              {/* Left detail card — rows 7-13, cols 3-9 (7×7) */}
+              <div
+                className={`absolute bg-black z-20 pointer-events-none transition-all duration-300 ${
+                  showCard && active && activeCardSide === "left" ? "opacity-100" : "opacity-0"
+                } ${
+                  active?.skills.includes("Core Team")
+                    ? "border border-amber-500/40"
+                    : "border border-white/[0.06]"
+                }`}
+                style={{
+                  top: `${(7 / TOTAL_ROWS) * 100}%`,
+                  left: `${(3 / COLS) * 100}%`,
+                  width: `${(7 / COLS) * 100}%`,
+                  height: `${(7 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                {active && <DetailCardContent member={active} />}
               </div>
             </div>
         </AnimatedSection>
