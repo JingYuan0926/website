@@ -146,105 +146,112 @@ export const getStaticProps: GetStaticProps<LandingProps> = async () => {
 
 /* ── particle hover effect ────────────────────────── */
 
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  content: React.ReactNode;
-  size: number;
-}
-
-function ParticleWord({
+function HighlightWord({
   children,
-  particles: particleContent,
+  color,
+  cursorUrl,
+  onClick,
 }: {
   children: React.ReactNode;
-  particles: React.ReactNode[];
+  color: string;
+  cursorUrl: string;
+  onClick?: () => void;
 }) {
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const idRef = useRef(0);
-  const spanRef = useRef<HTMLSpanElement>(null);
-
-  const spawnParticles = useCallback(
-    (e: React.MouseEvent) => {
-      const rect = spanRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const count = 3;
-      const newParticles: Particle[] = [];
-      for (let i = 0; i < count; i++) {
-        idRef.current += 1;
-        newParticles.push({
-          id: idRef.current,
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-          vx: (Math.random() - 0.5) * 6,
-          vy: -(Math.random() * 4 + 3),
-          life: 1,
-          content: particleContent[Math.floor(Math.random() * particleContent.length)],
-          size: Math.random() * 12 + 14,
-        });
-      }
-      setParticles((prev) => [...prev.slice(-40), ...newParticles]);
-    },
-    [particleContent]
-  );
+  const ref = useRef<HTMLSpanElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const [dims, setDims] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
-    if (particles.length === 0) return;
-    const frame = requestAnimationFrame(() => {
-      setParticles((prev) =>
-        prev
-          .map((p) => ({
-            ...p,
-            x: p.x + p.vx,
-            y: p.y + p.vy,
-            vy: p.vy + 0.15,
-            life: p.life - 0.02,
-          }))
-          .filter((p) => p.life > 0)
-      );
+    if (!ref.current) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setDims({ w: entry.contentRect.width, h: entry.contentRect.height });
     });
-    return () => cancelAnimationFrame(frame);
-  }, [particles]);
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Generate a hand-drawn underline path
+  const y = dims.h - 4;
+  const segments = 12;
+  const step = dims.w / segments;
+  let d = `M 0 ${y}`;
+  for (let i = 1; i <= segments; i++) {
+    const jitter = (Math.sin(i * 3.7) * 2.5);
+    d += ` Q ${i * step - step / 2} ${y + jitter} ${i * step} ${y + Math.sin(i * 2.1) * 1.5}`;
+  }
+
+  const pathLen = dims.w * 1.1;
+
+  const [cursorDataUrl, setCursorDataUrl] = useState("");
+
+  useEffect(() => {
+    if (cursorUrl.startsWith("emoji:")) {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='24' font-size='24'>${cursorUrl.slice(6)}</text></svg>`;
+      setCursorDataUrl(`url("data:image/svg+xml,${encodeURIComponent(svg)}") 16 16, pointer`);
+    } else {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 32, 32);
+          setCursorDataUrl(`url("${canvas.toDataURL("image/png")}") 16 16, pointer`);
+        }
+      };
+      img.src = cursorUrl;
+    }
+  }, [cursorUrl]);
+
+  const cursor = cursorDataUrl || "pointer";
 
   return (
     <span
-      ref={spanRef}
-      className="relative inline-block cursor-default"
-      onMouseMove={spawnParticles}
+      ref={ref}
+      className="relative inline-block"
+      style={{ cursor }}
+      onClick={onClick}
     >
       {children}
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: p.x,
-            top: p.y,
-            opacity: p.life,
-            fontSize: p.size,
-            transform: `translate(-50%, -50%) rotate(${p.vx * 10}deg)`,
-            transition: "none",
-          }}
+      {dims.w > 0 && (
+        <svg
+          className="absolute left-0 bottom-0 w-full pointer-events-none overflow-visible"
+          style={{ height: dims.h }}
+          preserveAspectRatio="none"
         >
-          {p.content}
-        </span>
-      ))}
+          <path
+            ref={pathRef}
+            d={d}
+            fill="none"
+            stroke={color}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray={pathLen}
+            strokeDashoffset={pathLen}
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from={pathLen}
+              to="0"
+              dur="1s"
+              fill="freeze"
+              begin="0.5s"
+            />
+          </path>
+        </svg>
+      )}
     </span>
   );
 }
-
-const SOLANA_PARTICLE = (
-  <img src="/logo/solana.png" alt="" width="1em" height="1em" style={{ width: "1em", height: "1em" }} draggable={false} />
-);
 
 /* ── page ──────────────────────────────────────────── */
 
 export default function Landing({ testimonials }: LandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [heroVideo, setHeroVideo] = useState<"malaysia" | "solana">("malaysia");
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -325,15 +332,22 @@ export default function Landing({ testimonials }: LandingProps) {
 
       {/* Hero section + logo loop */}
       <section className="relative flex flex-col overflow-hidden" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/video.mp4" type="video/mp4" />
-        </video>
+        <AnimatePresence mode="wait">
+          <motion.video
+            key={heroVideo}
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 w-full h-full object-cover"
+            src={heroVideo === "malaysia" ? "/video.mp4" : "/video-solana.mp4"}
+          />
+        </AnimatePresence>
 
         <div
           className="absolute inset-0 backdrop-blur-[2px]"
@@ -353,10 +367,14 @@ export default function Landing({ testimonials }: LandingProps) {
               style={{ fontSize: "clamp(3.5rem, 2.5rem + 5vw, 7rem)" }}
             >
               Empowering{" "}
-              <ParticleWord particles={[SOLANA_PARTICLE]}>Solana</ParticleWord>
+              <HighlightWord color="#9945ff" cursorUrl="/logo/solana.svg" onClick={() => setHeroVideo("solana")}>
+                Solana
+              </HighlightWord>
               <br />
               builders in{" "}
-              <ParticleWord particles={["🇲🇾"]}>Malaysia</ParticleWord>
+              <HighlightWord color="#ed7b84" cursorUrl="emoji:🇲🇾" onClick={() => setHeroVideo("malaysia")}>
+                Malaysia
+              </HighlightWord>
             </motion.h1>
 
             <motion.p
