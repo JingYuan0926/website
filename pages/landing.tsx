@@ -773,7 +773,7 @@ function EventsPane() {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90 lg:origin-top-right">
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90" style={{ transformOrigin: "center right" }}>
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
