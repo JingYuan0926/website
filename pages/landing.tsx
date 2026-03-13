@@ -1,5 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { Archivo } from "next/font/google";
+
+const archivo = Archivo({ subsets: ["latin"], weight: ["900"], display: "swap" });
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapPin, ExternalLink, Loader2, ChevronDown } from "lucide-react";
 import type { GetStaticProps } from "next";
@@ -12,12 +15,12 @@ import type { Testimonial } from "@/lib/types";
 /* ── constants ─────────────────────────────────────── */
 
 const NAV_ITEMS = [
-  "PRODUCTS",
-  "SOLUTIONS",
-  "RESOURCES",
-  "DOCS",
-  "ENTERPRISE",
-  "PRICING",
+  { label: "EVENTS", href: "#events" },
+  { label: "MISSION", href: "#mission" },
+  { label: "STATISTICS", href: "#statistics" },
+  { label: "COMMUNITY", href: "#community" },
+  { label: "TESTIMONIALS", href: "#testimonials" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const PARTNER_LOGOS = [
@@ -181,41 +184,30 @@ export default function Landing({ testimonials }: LandingProps) {
       >
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-white font-black text-xl tracking-tight">
-              Sanity
+            <img src="/logo/stmy.svg" alt="Superteam" className="h-7 w-7 object-contain" />
+            <span className={`text-white font-black text-xl tracking-tight ${archivo.className}`}>
+              superteam<sup className="text-[0.5em] align-super">MY</sup>
             </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="px-3 py-1.5 text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
             <a
-              href="#"
-              className="text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
-            >
-              LOG IN
-            </a>
-            <a
-              href="#"
-              className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full border border-white/40 text-white hover:bg-white/10 transition-colors"
-            >
-              CONTACT SALES
-            </a>
-            <a
-              href="#"
+              href="#cta"
               className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
             >
-              GET STARTED
+              JOIN US
             </a>
           </div>
 
@@ -319,6 +311,7 @@ export default function Landing({ testimonials }: LandingProps) {
 
       {/* Past Events section */}
       <section
+        id="events"
         className="relative px-6 flex items-center overflow-hidden"
         style={{
           minHeight: "85dvh",
@@ -338,7 +331,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <FeaturesSection />
 
       {/* Statistics section */}
-      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "85dvh", scrollSnapAlign: "start" }}>
+      <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "85dvh", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
@@ -401,16 +394,20 @@ export default function Landing({ testimonials }: LandingProps) {
       </section>
 
       {/* Member Spotlight */}
-      <MemberSpotlight members={[]} />
+      <div id="community">
+        <MemberSpotlight members={[]} />
+      </div>
 
       {/* Wall of Love */}
-      <WallOfLove testimonials={testimonials} />
+      <div id="testimonials">
+        <WallOfLove testimonials={testimonials} />
+      </div>
 
       {/* FAQ section */}
       <FAQSection />
 
       {/* Footer */}
-      <footer className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
+      <footer id="cta" className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
         {/* CTA banner */}
         <div
           className="relative overflow-hidden"
@@ -934,6 +931,7 @@ function FeaturesSection() {
 
   return (
     <section
+      id="mission"
       ref={containerRef}
       className="relative bg-black"
       style={{ height: `${FEATURES.length * 100}vh`, scrollSnapAlign: "start" }}
@@ -1146,6 +1144,7 @@ function FAQSection() {
 
   return (
     <section
+      id="faq"
       className="relative bg-black px-6 flex items-center overflow-hidden py-16 lg:py-0"
       style={{ minHeight: "100dvh", scrollSnapAlign: "start" }}
     >
