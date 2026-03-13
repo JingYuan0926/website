@@ -7,6 +7,8 @@ import type { Member } from "@/lib/types";
 
 interface MemberSpotlightProps {
   members: Member[];
+  content?: Record<string, string>;
+  projects?: { name: string; logo: string; link: string }[];
 }
 
 /* ── color palette (synced with members page) ──── */
@@ -64,25 +66,22 @@ const CANONICAL_MEMBERS: MemberData[] = [
 ];
 
 function generateMockMembers(count: number): Member[] {
-  return Array.from({ length: count }, (_, i) => {
-    const src = CANONICAL_MEMBERS[i % CANONICAL_MEMBERS.length];
-    return {
-      id: `mock-${i}`,
-      name: src.name,
-      title: src.title,
-      bio: src.bio,
-      avatar_url: src.avatar,
-      skills: src.skills,
-      twitter_handle: src.twitter || "",
-      github_url: "",
-      linkedin_url: "",
-      wallet_address: "",
-      is_spotlight: true,
-      display_order: i,
-      created_at: "",
-      updated_at: "",
-    };
-  });
+  return Array.from({ length: count }, (_, i) => ({
+    id: `mock-${i}`,
+    name: "You?",
+    title: "Be the Next Superteam Member",
+    bio: "",
+    avatar_url: `https://api.dicebear.com/9.x/notionists/svg?seed=mock${i}`,
+    skills: [],
+    twitter_handle: "",
+    github_url: "",
+    linkedin_url: "",
+    wallet_address: "",
+    is_spotlight: false,
+    display_order: i,
+    created_at: "",
+    updated_at: "",
+  }));
 }
 
 // --- Pixel Solana logo ---
@@ -211,31 +210,19 @@ function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string
 }
 
 // --- Solana ecosystem projects ---
-const ECOSYSTEM_PROJECTS = [
-  { name: "Solana", color: "#9945FF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" },
-  { name: "Jupiter", color: "#00D18C", logo: "https://static.jup.ag/jup/icon.png" },
-  { name: "Raydium", color: "#6C5CE7", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/logo.png" },
-  { name: "Bonk", color: "#F0A030", logo: "https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I" },
-  { name: "Jito", color: "#45B26B", logo: "https://metadata.jito.network/token/jto/icon.png" },
-  { name: "Pyth", color: "#7142CF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3/logo.png" },
-  { name: "Orca", color: "#FFDA44", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE/logo.png" },
-  { name: "Marinade", color: "#C1839F", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey/logo.png" },
-  { name: "Dogwifhat", color: "#E8A838", logo: "https://bafkreibk3covs5ltyqxa272uodhber5r6bq3tph3iyamkss33miq2wy7ae.ipfs.nftstorage.link" },
-  { name: "Helium", color: "#474DFF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux/logo.png" },
-  { name: "Tensor", color: "#FF6B6B", logo: "https://coin-images.coingecko.com/coins/images/35972/large/tensor.jpeg" },
-  { name: "Phantom", color: "#AB9FF2", logo: "https://play-lh.googleusercontent.com/obRvW02OTYLzJuvic1ZbVDVXLXzI0Vt_JGOjlxZ92XMdBF_i3kqU92u9SgHvJ5pySdM" },
-  { name: "mSOL", color: "#5BACBA", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png" },
-  { name: "Serum", color: "#4FC5E8", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png" },
-  { name: "Saber", color: "#6966FB", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1/logo.png" },
-  { name: "Mango", color: "#E54033", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac/token.png" },
-  { name: "SAMO", color: "#EECAB0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU/logo.png" },
-  { name: "Star Atlas", color: "#40E0D0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx/logo.png" },
-  { name: "STEPN", color: "#83CF6A", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png" },
-  { name: "Audius", color: "#CC0FE0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9LzCMqDgTKYz9Drzqnpgee3SGa89up3a247ypMj2xrqM/logo.png" },
+const DEFAULT_ECOSYSTEM_PROJECTS: EcoProject[] = [
+  { name: "Chaindex", color: "#4FC5E8", logo: "/community/chaindex.png", link: "https://chaindex.xyz/" },
+  { name: "Blox", color: "#FF6B6B", logo: "/community/blox.png", link: "https://x.com/blox_malaysia" },
+  { name: "Yields", color: "#45B26B", logo: "/community/yields.png", link: "https://yields.so/" },
+  { name: "Memoo AI", color: "#AB9FF2", logo: "/community/memooai.png", link: "https://memoo.ai/" },
+  { name: "CoinGecko", color: "#83CF6A", logo: "/community/coingecko.png", link: "https://coingecko.com/" },
+  { name: "MirrorFi", color: "#6C5CE7", logo: "/community/mirrorfi.png", link: "https://mirrorfi.xyz/" },
 ];
 
+interface EcoProject { name: string; color: string; logo: string; link?: string }
+
 interface EcoSpawn {
-  project: (typeof ECOSYSTEM_PROJECTS)[number];
+  project: EcoProject;
   delay: number;
   duration: number;
   id: number;
@@ -261,19 +248,11 @@ function DetailCardContent({ member }: { member: Member }) {
           background: `linear-gradient(160deg, ${primaryColor.bg} 0%, ${secondaryColor.bg} 35%, transparent 65%)`,
         }}
       >
-        {/* Name + title on top */}
-        <h3 className="text-sm font-bold text-white tracking-wide uppercase truncate w-full mt-1">
-          {member.name}
-        </h3>
-        <p className="text-[10px] text-[#999] leading-relaxed line-clamp-2 mt-1 px-1">
-          {member.bio}
-        </p>
-
-        {/* Large centered avatar */}
-        <div className="flex-1 flex items-center justify-center my-2">
+        {/* Centered avatar */}
+        <div className="flex-1 flex items-center justify-center my-1">
           {member.avatar_url ? (
             <div
-              className="w-48 h-48 rounded-xl overflow-hidden border-2"
+              className="w-32 h-32 rounded-xl overflow-hidden border-2"
               style={{ borderColor: primaryColor.border }}
             >
               <img
@@ -284,7 +263,7 @@ function DetailCardContent({ member }: { member: Member }) {
             </div>
           ) : (
             <div
-              className="w-48 h-48 rounded-xl flex items-center justify-center font-bold text-3xl border-2"
+              className="w-32 h-32 rounded-xl flex items-center justify-center font-bold text-2xl border-2"
               style={{ borderColor: primaryColor.border, backgroundColor: primaryColor.bg, color: primaryColor.text }}
             >
               {getInitials(member.name)}
@@ -292,14 +271,35 @@ function DetailCardContent({ member }: { member: Member }) {
           )}
         </div>
 
+        {/* Name + role + twitter */}
+        <h3 className="text-base font-bold text-white tracking-wide uppercase truncate w-full mt-2">
+          {member.name}
+        </h3>
+        {member.title && (
+          <p className="text-xs text-[#ccc] font-medium mt-1">{member.title}</p>
+        )}
+        {member.twitter_handle && (
+          <a
+            href={`https://x.com/${member.twitter_handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-[#888] hover:text-white transition-colors mt-1"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            @{member.twitter_handle}
+          </a>
+        )}
+
         {/* Skills */}
-        <div className="flex flex-wrap justify-center gap-1">
+        <div className="flex flex-wrap justify-center gap-1.5 mt-2">
           {member.skills.slice(0, 4).map((skill) => {
             const sc = getSkillColor(skill);
             return (
               <span
                 key={skill}
-                className="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide"
+                className="px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide"
                 style={{
                   backgroundColor: sc.bg,
                   color: sc.text,
@@ -312,33 +312,24 @@ function DetailCardContent({ member }: { member: Member }) {
           })}
         </div>
 
-        {/* Twitter */}
-        {member.twitter_handle && (
-          <div className="mt-1.5 pt-1.5 border-t border-[#ffffff10] w-full">
-            <a
-              href={`https://x.com/${member.twitter_handle}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[11px] text-[#888] hover:text-white transition-colors"
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              @{member.twitter_handle}
-            </a>
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
-export function MemberSpotlight({ members }: MemberSpotlightProps) {
+export function MemberSpotlight({ members, content = {}, projects: projectsProp = [] }: MemberSpotlightProps) {
+  const c = (key: string, fallback: string) => content[key] || fallback;
+  // Use DB projects if available, fallback to defaults
+  const ECOSYSTEM_PROJECTS: EcoProject[] = projectsProp.length > 0
+    ? projectsProp.map((p) => ({ name: p.name, color: "#9945FF", logo: p.logo, link: p.link }))
+    : DEFAULT_ECOSYSTEM_PROJECTS;
+
   const realMembers = members.filter((m) => m.is_spotlight);
-  const spotlightMembers =
-    realMembers.length >= ALL_OUTLINE.length
-      ? realMembers.slice(0, ALL_OUTLINE.length)
-      : generateMockMembers(ALL_OUTLINE.length);
+  const mockMembers = generateMockMembers(ALL_OUTLINE.length);
+  // Use real members first, fill remaining slots with mock/hardcoded
+  const spotlightMembers = realMembers.length > 0
+    ? [...realMembers.slice(0, ALL_OUTLINE.length), ...mockMembers].slice(0, ALL_OUTLINE.length)
+    : mockMembers;
 
   const [active, setActive] = useState<Member | null>(null);
   const [activeCol, setActiveCol] = useState<number>(0);
@@ -470,7 +461,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
     if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
   }
 
-  const activeSide = active ? (activeCol < logoMidCol ? "left" : "right") : null;
+  const activeSide = showCard && active ? activeCardSide : null;
 
   return (
     <section
@@ -607,7 +598,8 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                           key={spawn.id}
                           onMouseEnter={() => setHoveredSpawnId(spawn.id)}
                           onMouseLeave={() => setHoveredSpawnId(null)}
-                          className="rounded-sm cursor-default overflow-hidden"
+                          onClick={() => { if (spawn.project.link) window.open(spawn.project.link, "_blank"); }}
+                          className={`rounded-sm overflow-hidden ${spawn.project.link ? "cursor-pointer" : "cursor-default"}`}
                           style={{
                             position: "absolute",
                             top: "calc(-100% - 2px)",
@@ -651,10 +643,10 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                   className="text-white font-semibold tracking-tight leading-[1.1]"
                   style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
                 >
-                  Meet the community
+                  {c("community.title", "Meet the community")}
                 </h2>
                 <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
-                  Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
+                  {c("community.description", "Talented builders, designers, and creators shaping Malaysia\u2019s Web3 landscape.")}
                 </p>
               </div>
 

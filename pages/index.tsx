@@ -10,7 +10,7 @@ import { MemberSpotlight } from "@/components/landing/MemberSpotlight";
 import { WallOfLove } from "@/components/landing/WallOfLove";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { SAMPLE_TESTIMONIALS } from "@/lib/constants";
-import type { Testimonial, MissionPillar, Announcement, Partner } from "@/lib/types";
+import type { Testimonial, MissionPillar, Announcement, Partner, Member } from "@/lib/types";
 
 /* ── constants ─────────────────────────────────────── */
 
@@ -129,27 +129,44 @@ interface StatItem {
   desc: string;
 }
 
+interface ContentMap { [key: string]: string }
+
 interface LandingProps {
   testimonials: Testimonial[];
   missionPillars: MissionPillar[];
   announcements: Announcement[];
   partners: Partner[];
   stats: StatItem[];
+  content: ContentMap;
+  faqItems: { question: string; answer: string; category: string }[];
+  spotlightMembers: Member[];
+  communityProjects: { name: string; logo: string; link: string }[];
 }
 
 export const getStaticProps: GetStaticProps<LandingProps> = async () => {
   if (isSupabaseConfigured() && supabase) {
-    const [testimonialsRes, missionRes, announcementsRes, partnersRes, statsRes] = await Promise.all([
+    const [testimonialsRes, missionRes, announcementsRes, partnersRes, statsRes, contentRes, faqRes, membersRes, projectsRes] = await Promise.all([
       supabase.from("testimonials").select("*").order("display_order"),
       supabase.from("mission_pillars").select("*").order("display_order"),
       supabase.from("announcements").select("*").eq("is_published", true).order("published_at", { ascending: false }).limit(5),
       supabase.from("partners").select("*").order("display_order"),
       supabase.from("site_stats").select("stats_json").limit(1).single(),
+      supabase.from("site_content").select("section, key, value"),
+      supabase.from("faq_items").select("question, answer, image_url").order("display_order"),
+      supabase.from("members").select("*").eq("is_spotlight", true).order("display_order"),
+      supabase.from("community_projects").select("name, logo_url, website_url").order("display_order"),
     ]);
 
     let stats: StatItem[] = [];
     if (statsRes.data?.stats_json) {
       try { stats = JSON.parse(statsRes.data.stats_json); } catch { /* use default */ }
+    }
+
+    const content: ContentMap = {};
+    if (contentRes.data) {
+      for (const row of contentRes.data as { section: string; key: string; value: string }[]) {
+        content[`${row.section}.${row.key}`] = row.value;
+      }
     }
 
     return {
@@ -159,6 +176,16 @@ export const getStaticProps: GetStaticProps<LandingProps> = async () => {
         announcements: (announcementsRes.data as Announcement[]) || [],
         partners: (partnersRes.data as Partner[]) || [],
         stats,
+        content,
+        spotlightMembers: (membersRes.data as Member[]) || [],
+        communityProjects: (projectsRes.data || []).map((p: { name: string; logo_url: string; website_url: string }) => ({
+          name: p.name, logo: p.logo_url, link: p.website_url,
+        })),
+        faqItems: (faqRes.data || []).map((f: { question: string; answer: string; image_url: string }) => ({
+          question: f.question,
+          answer: f.answer,
+          category: f.image_url || "General",
+        })),
       },
       revalidate: 3600,
     };
@@ -171,6 +198,10 @@ export const getStaticProps: GetStaticProps<LandingProps> = async () => {
       announcements: [],
       partners: [],
       stats: [],
+      content: {},
+      faqItems: [],
+      spotlightMembers: [],
+      communityProjects: [],
     },
   };
 };
@@ -287,7 +318,8 @@ const DEFAULT_STATS: StatItem[] = [
   { value: "5,000+", label: "Community Reach", desc: "People reached across social media and event attendance." },
 ];
 
-export default function Landing({ testimonials, missionPillars, announcements, partners, stats }: LandingProps) {
+export default function Landing({ testimonials, missionPillars, announcements, partners, stats, content, faqItems, spotlightMembers, communityProjects }: LandingProps) {
+  const c = (key: string, fallback: string) => content[key] || fallback;
   const [isScrolled, setIsScrolled] = useState(false);
   const [heroVideo, setHeroVideo] = useState<"malaysia" | "solana">("malaysia");
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -451,8 +483,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
               className="mt-6 text-white/80 max-w-4xl leading-relaxed"
               style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem)" }}
             >
-              Join our community of developers, designers, and creators or explore bounties, grants,
-              and opportunities to build on Solana from Malaysia to the world.
+              {c("hero.description", "Join our community of developers, designers, and creators or explore bounties, grants, and opportunities to build on Solana from Malaysia to the world.")}
             </motion.p>
           </div>
         </div>
@@ -506,12 +537,12 @@ export default function Landing({ testimonials, missionPillars, announcements, p
         }}
       >
         <div className="max-w-[1200px] mx-auto w-full py-10">
-          <EventsPane />
+          <EventsPane content={content} />
         </div>
       </section>
 
       {/* Features section */}
-      <FeaturesSection pillars={missionPillars} />
+      <FeaturesSection pillars={missionPillars} content={content} />
 
       {/* Statistics section */}
       <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "calc(100dvh - 60px)", scrollSnapAlign: "start" }}>
@@ -625,10 +656,10 @@ export default function Landing({ testimonials, missionPillars, announcements, p
                 className="text-white font-semibold tracking-tight leading-[1.08]"
                 style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
               >
-                We only deliver results.
+                {c("results.title", "We only deliver results.")}
               </h2>
               <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed">
-                Building the strongest Solana community in Malaysia.
+                {c("results.description", "Building the strongest Solana community in Malaysia.")}
               </p>
             </div>
 
@@ -657,16 +688,16 @@ export default function Landing({ testimonials, missionPillars, announcements, p
 
       {/* Member Spotlight */}
       <div id="community">
-        <MemberSpotlight members={[]} />
+        <MemberSpotlight members={spotlightMembers} content={content} projects={communityProjects} />
       </div>
 
       {/* Wall of Love */}
       <div id="testimonials">
-        <WallOfLove testimonials={testimonials} />
+        <WallOfLove testimonials={testimonials} content={content} />
       </div>
 
       {/* FAQ section */}
-      <FAQSection />
+      <FAQSection faqItems={faqItems} content={content} />
 
       {/* Footer */}
       <footer id="cta" className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
@@ -688,14 +719,14 @@ export default function Landing({ testimonials, missionPillars, announcements, p
               className="text-white font-semibold tracking-tight leading-[1.08]"
               style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
             >
-              Ready to build with us?
+              {c("join_cta.headline", "Ready to build with us?")}
             </h2>
             <p className="mt-4 text-white/70 text-sm max-w-lg mx-auto leading-relaxed">
-              Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.
+              {c("join_cta.description", "Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.")}
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href="https://t.me/SuperteamMY"
+                href={c("join_cta.telegram_url", "https://t.me/SuperteamMY")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors"
@@ -706,7 +737,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
                 Join Telegram
               </a>
               <a
-                href="https://x.com/SuperteamMY"
+                href={c("join_cta.twitter_url", "https://x.com/SuperteamMY")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/40 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
@@ -737,7 +768,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
               </p>
               <div className="flex items-center gap-4 mt-6">
                 <a
-                  href="https://x.com/SuperteamMY"
+                  href={c("join_cta.twitter_url", "https://x.com/SuperteamMY")}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Twitter / X"
@@ -748,7 +779,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
                   </svg>
                 </a>
                 <a
-                  href="https://t.me/SuperteamMY"
+                  href={c("join_cta.telegram_url", "https://t.me/SuperteamMY")}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Telegram"
@@ -844,7 +875,8 @@ export default function Landing({ testimonials, missionPillars, announcements, p
 
 /* ── events pane ──────────────────────────────────── */
 
-function EventsPane() {
+function EventsPane({ content = {} }: { content?: ContentMap }) {
+  const c = (key: string, fallback: string) => content[key] || fallback;
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const [events, setEvents] = useState<LumaEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -923,34 +955,32 @@ function EventsPane() {
           className="text-white font-semibold tracking-tight leading-[1.08]"
           style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
         >
-          Moments that built
-          <br />
-          our community
+          {c("events.title", "Moments that built our community").split(/(our community)/g).map((part, i) =>
+            part === "our community" ? <span key={i}><br />our community</span> : <span key={i}>{part}</span>
+          )}
         </h2>
 
         <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed max-w-lg">
-          Find your tribe and ignite your passion. We&rsquo;re here to support
-          your journey in the Solana ecosystem. Our events are the best place to
-          learn more.
+          {c("events.description", "Find your tribe and ignite your passion. We're here to support your journey in the Solana ecosystem. Our events are the best place to learn more.")}
         </p>
 
         <div className="flex flex-wrap items-center gap-3 mt-8">
           <a
-            href="https://luma.com/create?calendar=cal-sZfiZHfUS5piycU"
+            href={c("events.submit_url", "https://luma.com/create?calendar=cal-sZfiZHfUS5piycU")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white text-white text-sm font-semibold hover:bg-white/10 transition-colors"
           >
-            Submit your event
+            {c("events.submit_label", "Submit your event")}
             <ExternalLink size={14} />
           </a>
           <a
-            href={LUMA_CALENDAR_URL}
+            href={c("events.luma_url", LUMA_CALENDAR_URL)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors"
           >
-            View all on Luma
+            {c("events.luma_label", "View all on Luma")}
             <ExternalLink size={14} />
           </a>
         </div>
@@ -1161,7 +1191,8 @@ const FEATURES: { label: string; title: string; description: string; bullets: st
   },
 ];
 
-function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
+function FeaturesSection({ pillars, content = {} }: { pillars?: MissionPillar[]; content?: ContentMap }) {
+  const c = (key: string, fallback: string) => content[key] || fallback;
   // Use DB data if available, otherwise fall back to hardcoded FEATURES
   const features = pillars && pillars.length > 0
     ? pillars.map((p) => ({
@@ -1222,10 +1253,10 @@ function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
             className="text-white font-semibold tracking-tight leading-[1.08]"
             style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
           >
-            Our Mission
+            {c("mission.title", "Our Mission")}
           </h3>
           <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
-            Everything we do to empower Solana builders in Malaysia.
+            {c("mission.description", "Everything we do to empower Solana builders in Malaysia.")}
           </p>
         </div>
         <div className="max-w-[1200px] mx-auto w-full grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-8 lg:gap-12">
@@ -1421,11 +1452,20 @@ const FAQ_CATEGORIES = [
   },
 ];
 
-function FAQSection() {
+function FAQSection({ faqItems = [], content = {} }: { faqItems?: { question: string; answer: string; category: string }[]; content?: ContentMap }) {
   const [activeCategory, setActiveCategory] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const category = FAQ_CATEGORIES[activeCategory];
+  // Build categories from DB data, fallback to hardcoded
+  const categories = faqItems.length > 0
+    ? [...new Set(faqItems.map((f) => f.category))].map((cat) => ({
+        label: cat,
+        image: content[`faq.image_${cat.toLowerCase()}`] || `/faq/${cat.toLowerCase()}.png`,
+        questions: faqItems.filter((f) => f.category === cat).map((f) => ({ q: f.question, a: f.answer })),
+      }))
+    : FAQ_CATEGORIES;
+
+  const category = categories[activeCategory];
 
   return (
     <section
@@ -1461,7 +1501,7 @@ function FAQSection() {
             </h2>
 
             <div className="mt-8 flex items-center gap-6">
-              {FAQ_CATEGORIES.map((cat, i) => (
+              {categories.map((cat, i) => (
                 <button
                   key={cat.label}
                   onClick={() => {
@@ -1494,7 +1534,8 @@ function FAQSection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="hidden lg:flex mt-8 flex-1 min-h-0 rounded-xl border border-dashed border-[#333] bg-[#0a0a0a] overflow-hidden items-center justify-center"
+                className="hidden lg:flex mt-8 rounded-xl border border-dashed border-[#333] bg-[#0a0a0a] overflow-hidden items-center justify-center"
+                style={{ height: 280 }}
               >
                 <img
                   src={category.image}

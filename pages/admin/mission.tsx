@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { supabase } from "@/lib/supabase";
@@ -124,6 +125,11 @@ export default function AdminMission() {
 
   return (
     <AdminLayout title="Mission Pillars">
+      <SectionContent
+        section="mission"
+        keyOrder={["title", "description"]}
+        labels={{ title: "Section Title", description: "Section Description" }}
+      />
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-text-secondary">
           {pillars.length} pillar{pillars.length !== 1 ? "s" : ""}

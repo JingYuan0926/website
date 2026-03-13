@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { SectionContent } from "@/components/admin/SectionContent";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -81,6 +82,11 @@ export default function AdminSettings() {
   return (
     <AdminLayout title="Results">
       <div className="max-w-2xl">
+        <SectionContent
+          section="results"
+          keyOrder={["title", "description"]}
+          labels={{ title: "Section Title", description: "Section Description" }}
+        />
         <p className="text-xs text-text-secondary mb-6">
           These stats are displayed on the landing page. Edit the number, label, and description for each.
         </p>

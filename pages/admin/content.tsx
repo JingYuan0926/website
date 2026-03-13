@@ -15,11 +15,19 @@ interface ContentGroup {
 
 const SECTION_LABELS: Record<string, string> = {
   hero: "Hero Section",
+  events: "Events Section",
   mission: "Mission Section",
-  join_cta: "Join CTA Section",
+  join_cta: "Join CTA / Footer",
 };
 
-const SECTION_ORDER = ["hero", "mission", "join_cta"];
+const SECTION_ORDER = ["hero", "events", "mission", "join_cta"];
+
+const KEY_ORDER: Record<string, string[]> = {
+  hero: ["headline", "description"],
+  events: ["title", "description", "submit_label", "submit_url", "luma_label", "luma_url"],
+  mission: ["title", "description"],
+  join_cta: ["headline", "description", "telegram_url", "twitter_url"],
+};
 
 export default function AdminContent() {
   const [content, setContent] = useState<SiteContent[]>([]);
@@ -63,11 +71,16 @@ export default function AdminContent() {
   }
 
   const groups: ContentGroup[] = SECTION_ORDER
-    .map((section) => ({
-      section,
-      label: SECTION_LABELS[section] || section,
-      items: content.filter((c) => c.section === section),
-    }))
+    .map((section) => {
+      const items = content.filter((c) => c.section === section);
+      const order = KEY_ORDER[section] || [];
+      items.sort((a, b) => {
+        const ai = order.indexOf(a.key);
+        const bi = order.indexOf(b.key);
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      });
+      return { section, label: SECTION_LABELS[section] || section, items };
+    })
     .filter((g) => g.items.length > 0);
 
   // Include any sections not in SECTION_ORDER

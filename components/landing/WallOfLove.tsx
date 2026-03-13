@@ -6,6 +6,7 @@ import type { Testimonial } from "@/lib/types";
 
 interface WallOfLoveProps {
   testimonials: Testimonial[];
+  content?: Record<string, string>;
 }
 
 const ReactTweet = dynamic(
@@ -95,7 +96,8 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
   );
 }
 
-export function WallOfLove({ testimonials }: WallOfLoveProps) {
+export function WallOfLove({ testimonials, content = {} }: WallOfLoveProps) {
+  const c = (key: string, fallback: string) => content[key] || fallback;
   if (!testimonials?.length) return null;
 
   return (
@@ -109,10 +111,10 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
             className="text-white font-semibold tracking-tight leading-[1.1]"
             style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
           >
-            Wall of love
+            {c("testimonials.title", "Wall of love")}
           </h2>
           <p className="mt-3 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
-            Hear from builders and ecosystem leaders in our community.
+            {c("testimonials.description", "Hear from builders and ecosystem leaders in our community.")}
           </p>
         </div>
 

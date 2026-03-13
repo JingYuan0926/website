@@ -4,7 +4,7 @@ import { Pencil, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 export interface Column<T> {
   key: keyof T | string;
   label: string;
-  render?: (item: T) => React.ReactNode;
+  render?: (item: T, index?: number) => React.ReactNode;
 }
 
 interface DataTableProps<T extends { id: string }> {
@@ -102,7 +102,7 @@ export function DataTable<T extends { id: string }>({
                     className="px-4 py-3 text-text-secondary"
                   >
                     {col.render
-                      ? col.render(item)
+                      ? col.render(item, idx)
                       : String((item as Record<string, unknown>)[col.key as string] ?? "")}
                   </td>
                 ))}
