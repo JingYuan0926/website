@@ -337,6 +337,15 @@ export function ImageUpload({ value, onChange, bucket, folder, noCrop, scaleValu
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
       </div>
 
+      {/* Paste URL input — always visible */}
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Or paste image URL..."
+        className="w-full px-3 py-2 text-xs bg-bg border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-purple/50"
+      />
+
       {/* Logo Editor Modal (noCrop mode) */}
       {editorOpen && editorSrc && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
