@@ -123,7 +123,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
+    <div className="bg-black" style={{ scrollSnapType: "y proximity" }}>
       {/* Navigation */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
@@ -187,8 +187,8 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero section */}
-      <section className="relative flex-1 flex items-end overflow-hidden">
+      {/* Hero section + logo loop */}
+      <section className="relative flex flex-col overflow-hidden" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
         <video
           autoPlay
           loop
@@ -207,78 +207,82 @@ export default function Landing() {
           }}
         />
 
-        <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 pb-20 lg:pb-28 pt-32">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease, delay: 0.1 }}
-            className="text-white font-semibold tracking-tight leading-[1.05]"
-            style={{ fontSize: "clamp(3rem, 2rem + 5vw, 6.5rem)" }}
-          >
-            Structure powers
-            <br />
-            intelligence
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease, delay: 0.2 }}
-            className="mt-6 text-white/80 max-w-2xl leading-relaxed"
-            style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.8vw, 1.5rem)" }}
-          >
-            The back-end built for AI content operations. Power web, mobile, and
-            agentic applications at scale.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease, delay: 0.3 }}
-            className="mt-10 flex flex-wrap items-center gap-4"
-          >
-            <a
-              href="#"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#9945ff] text-white text-base font-semibold hover:bg-[#8a3ae6] transition-colors duration-150"
+        <div className="relative z-10 flex-1 flex items-end w-full max-w-[1400px] mx-auto px-6 pb-8 lg:pb-12 pt-32">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease, delay: 0.1 }}
+              className="text-white font-semibold tracking-tight leading-[1.05]"
+              style={{ fontSize: "clamp(3rem, 2rem + 5vw, 6.5rem)" }}
             >
-              Start building
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/40 text-white text-base font-medium hover:bg-white/10 transition-colors duration-150"
+              Structure powers
+              <br />
+              intelligence
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease, delay: 0.2 }}
+              className="mt-6 text-white/80 max-w-2xl leading-relaxed"
+              style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.8vw, 1.5rem)" }}
             >
-              Get a demo
-            </a>
-          </motion.div>
+              The back-end built for AI content operations. Power web, mobile, and
+              agentic applications at scale.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease, delay: 0.3 }}
+              className="mt-10 flex flex-wrap items-center gap-4"
+            >
+              <a
+                href="#"
+                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#9945ff] text-white text-base font-semibold hover:bg-[#8a3ae6] transition-colors duration-150"
+              >
+                Start building
+              </a>
+              <a
+                href="#"
+                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/40 text-white text-base font-medium hover:bg-white/10 transition-colors duration-150"
+              >
+                Get a demo
+              </a>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Logo loop — inside hero */}
+        <div className="relative z-10 bg-[#9945ff] py-5 overflow-hidden shrink-0">
+          <div className="flex animate-[scroll_20s_linear_infinite]">
+            {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((name, i) => (
+              <span
+                key={i}
+                className="shrink-0 mx-8 text-white font-bold text-lg tracking-tight whitespace-nowrap opacity-90"
+                style={{ fontFamily: "var(--font-sans)" }}
+              >
+                {name}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Logo loop */}
-      <div className="bg-[#9945ff] py-5 overflow-hidden shrink-0">
-        <div className="flex animate-[scroll_20s_linear_infinite]">
-          {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((name, i) => (
-            <span
-              key={i}
-              className="shrink-0 mx-8 text-white font-bold text-lg tracking-tight whitespace-nowrap opacity-90"
-              style={{ fontFamily: "var(--font-sans)" }}
-            >
-              {name}
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* Past Events section */}
       <section
-        className="relative px-6 min-h-screen flex items-center"
+        className="relative px-6 flex items-center overflow-hidden"
         style={{
+          height: "100dvh",
+          scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
             "radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
         }}
       >
-        <div className="max-w-[1100px] mx-auto w-full py-20">
+        <div className="max-w-[1100px] mx-auto w-full py-10">
           <EventsPane />
         </div>
       </section>
@@ -287,7 +291,7 @@ export default function Landing() {
       <FeaturesSection />
 
       {/* Statistics section */}
-      <section className="relative py-28 lg:py-36 px-6 overflow-hidden bg-black">
+      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
@@ -346,61 +350,9 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA section */}
-      <section className="bg-black py-24 lg:py-32 px-6">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="relative rounded-2xl overflow-hidden" style={{
-            background: "#ffffff08",
-            border: "1px solid #ffffff15",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-          }}>
-            {/* Glow effects */}
-            <div className="absolute -top-1/2 -right-1/4 w-[60vw] h-[60vw] rounded-full bg-[#9945ff]/8 blur-[100px] pointer-events-none" />
-            <div className="absolute -bottom-1/2 -left-1/4 w-[40vw] h-[40vw] rounded-full bg-[#14F195]/5 blur-[80px] pointer-events-none" />
-
-            <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center">
-              <h2
-                className="text-white font-bold tracking-tight leading-[1.1]"
-                style={{ fontSize: "clamp(1.5rem, 1rem + 2vw, 2.25rem)" }}
-              >
-                Ready to build with us?
-              </h2>
-              <p className="mt-4 text-[#a1a1aa] text-base lg:text-lg max-w-lg mx-auto leading-relaxed">
-                Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.
-              </p>
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                  href="https://t.me/SuperteamMY"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
-                  </svg>
-                  Join Telegram
-                </a>
-                <a
-                  href="https://x.com/SuperteamMY"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#ffffff26] text-white font-semibold text-sm hover:bg-[#ffffff0a] transition-colors"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                  Follow on X
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="border-t border-[#ffffff15] bg-black">
-        {/* Newsletter banner */}
+      <footer className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
+        {/* CTA banner */}
         <div
           className="relative overflow-hidden"
           style={{
@@ -413,29 +365,39 @@ export default function Landing() {
           <div className="absolute top-0 right-1/4 w-[500px] h-[300px] rounded-full blur-[150px] bg-[#14F195]/15 pointer-events-none" />
           <div className="absolute bottom-0 left-1/4 w-[400px] h-[250px] rounded-full blur-[120px] bg-[#14F195]/10 pointer-events-none" />
 
-          <div className="relative max-w-[1200px] mx-auto px-6 py-16 lg:py-20 flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="relative max-w-[1200px] mx-auto px-6 py-16 lg:py-20 text-center">
             <h2
-              className="text-white font-bold tracking-tight leading-[1.1] max-w-lg"
+              className="text-white font-bold tracking-tight leading-[1.1]"
               style={{ fontSize: "clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem)" }}
             >
-              Get our beautiful newsletter straight to your inbox.
+              Ready to build with us?
             </h2>
-
-            <div className="flex items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-3 flex-1 lg:flex-initial bg-white/95 rounded-full px-5 py-3 min-w-0 lg:min-w-[340px]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5" className="shrink-0">
-                  <rect x="2" y="4" width="20" height="16" rx="3" />
-                  <path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
+            <p className="mt-4 text-white/70 text-base lg:text-lg max-w-lg mx-auto leading-relaxed">
+              Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://t.me/SuperteamMY"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
                 </svg>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="bg-transparent outline-none text-[#333] placeholder-[#aaa] text-sm font-medium flex-1 min-w-0"
-                />
-              </div>
-              <button className="shrink-0 px-6 py-3 rounded-full bg-black text-white text-sm font-semibold hover:bg-black/80 transition-colors">
-                Subscribe
-              </button>
+                Join Telegram
+              </a>
+              <a
+                href="https://x.com/SuperteamMY"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/40 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Follow on X
+              </a>
             </div>
           </div>
         </div>
@@ -444,7 +406,7 @@ export default function Landing() {
         <div className="max-w-[1200px] mx-auto px-6 py-16 lg:py-20">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
             {/* Brand */}
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-8 h-8 rounded-lg bg-[#9945ff] flex items-center justify-center font-bold text-sm text-white">
                   ST
@@ -485,7 +447,7 @@ export default function Landing() {
             </div>
 
             {/* Navigate */}
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
               <h3 className="text-xs font-semibold tracking-widest uppercase text-[#71717a] mb-4">
                 Navigate
               </h3>
@@ -497,7 +459,7 @@ export default function Landing() {
             </div>
 
             {/* Community */}
-            <div className="md:col-span-4">
+            <div className="md:col-span-2">
               <h3 className="text-xs font-semibold tracking-widest uppercase text-[#71717a] mb-4">
                 Community
               </h3>
@@ -506,6 +468,26 @@ export default function Landing() {
                 <li><a href="https://t.me/SuperteamMY" target="_blank" rel="noopener noreferrer" className="text-sm text-[#a1a1aa] hover:text-white transition-colors">Telegram</a></li>
                 <li><a href="https://superteam.fun" target="_blank" rel="noopener noreferrer" className="text-sm text-[#a1a1aa] hover:text-white transition-colors">Superteam Global</a></li>
               </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div className="md:col-span-4">
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#71717a] mb-4">
+                Newsletter
+              </h3>
+              <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4">
+                Get the latest updates straight to your inbox.
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 min-w-0 bg-[#ffffff0a] border border-[#ffffff15] rounded-lg px-3 py-2 text-sm text-white placeholder-[#555] outline-none focus:border-[#9945ff] transition-colors"
+                />
+                <button className="shrink-0 px-4 py-2 rounded-lg bg-[#9945ff] text-white text-sm font-semibold hover:bg-[#8a3ae6] transition-colors">
+                  Subscribe
+                </button>
+              </div>
             </div>
           </div>
 
@@ -887,7 +869,7 @@ function FeaturesSection() {
     <section
       ref={containerRef}
       className="relative bg-black"
-      style={{ height: `${FEATURES.length * 100}vh` }}
+      style={{ height: `${FEATURES.length * 100}vh`, scrollSnapAlign: "start" }}
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 h-screen flex items-center px-6">
