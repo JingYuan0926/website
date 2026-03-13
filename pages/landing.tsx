@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapPin, ExternalLink, Loader2 } from "lucide-react";
+import { MemberSpotlight } from "@/components/landing/MemberSpotlight";
 
 /* ── constants ─────────────────────────────────────── */
 
@@ -289,6 +290,11 @@ export default function Landing() {
 
       {/* Features section */}
       <FeaturesSection />
+
+      {/* Member Spotlight */}
+      <section className="bg-black" style={{ scrollSnapAlign: "start" }}>
+        <MemberSpotlight members={[]} />
+      </section>
 
       {/* Statistics section */}
       <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
