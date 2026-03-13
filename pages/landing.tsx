@@ -321,7 +321,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <section
         className="relative px-6 flex items-center overflow-hidden"
         style={{
-          minHeight: "85dvh",
+          minHeight: "100dvh",
           scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
@@ -694,7 +694,7 @@ function EventsPane() {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90 lg:origin-top-right">
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto">
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
@@ -722,7 +722,7 @@ function EventsPane() {
         {/* Scrollable event list */}
         <div
           ref={scrollRef}
-          className="max-h-[calc(85vh-280px)] overflow-y-auto p-4 scrollbar-thin"
+          className="max-h-[calc(85vh-80px)] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
             <div className="flex justify-center py-16">
