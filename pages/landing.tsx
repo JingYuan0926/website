@@ -1,5 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { Archivo } from "next/font/google";
+
+const archivo = Archivo({ subsets: ["latin"], weight: ["900"], display: "swap" });
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapPin, ExternalLink, Loader2, ChevronDown } from "lucide-react";
 import type { GetStaticProps } from "next";
@@ -12,12 +15,12 @@ import type { Testimonial } from "@/lib/types";
 /* ── constants ─────────────────────────────────────── */
 
 const NAV_ITEMS = [
-  "PRODUCTS",
-  "SOLUTIONS",
-  "RESOURCES",
-  "DOCS",
-  "ENTERPRISE",
-  "PRICING",
+  { label: "EVENTS", href: "#events" },
+  { label: "MISSION", href: "#mission" },
+  { label: "STATISTICS", href: "#statistics" },
+  { label: "COMMUNITY", href: "#community" },
+  { label: "TESTIMONIALS", href: "#testimonials" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const PARTNER_LOGOS = [
@@ -181,41 +184,30 @@ export default function Landing({ testimonials }: LandingProps) {
       >
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-white font-black text-xl tracking-tight">
-              Sanity
+            <img src="/logo/stmy.svg" alt="Superteam" className="h-7 w-7 object-contain" />
+            <span className={`text-white font-black text-xl tracking-tight ${archivo.className}`}>
+              superteam<sup className="text-[0.5em] align-super">MY</sup>
             </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="px-3 py-1.5 text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
             <a
-              href="#"
-              className="text-xs font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
-            >
-              LOG IN
-            </a>
-            <a
-              href="#"
-              className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full border border-white/40 text-white hover:bg-white/10 transition-colors"
-            >
-              CONTACT SALES
-            </a>
-            <a
-              href="#"
+              href="#cta"
               className="text-xs font-semibold tracking-wider px-5 py-2 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
             >
-              GET STARTED
+              JOIN US
             </a>
           </div>
 
@@ -319,6 +311,7 @@ export default function Landing({ testimonials }: LandingProps) {
 
       {/* Past Events section */}
       <section
+        id="events"
         className="relative px-6 flex items-center overflow-hidden"
         style={{
           minHeight: "100dvh",
@@ -338,13 +331,98 @@ export default function Landing({ testimonials }: LandingProps) {
       <FeaturesSection />
 
       {/* Statistics section */}
-      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "calc(100dvh - 60px)", scrollSnapAlign: "start" }}>
+      <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "calc(100dvh - 60px)", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
         }} />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[200px] bg-[#6a2ec0]/25" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[160px] bg-[#4a1a8a]/20" />
+
+        {/* Decorative trophy/achievement icons */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          {/* Row 1 - top */}
+          <svg className="absolute top-[4%] left-[3%] opacity-[0.18]" width="120" height="120" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-15deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[6%] left-[20%] opacity-[0.12]" width="50" height="50" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(25deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[3%] left-[38%] opacity-[0.10]" width="80" height="80" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-25deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[8%] left-[55%] opacity-[0.14]" width="45" height="45" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(8deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[5%] left-[70%] opacity-[0.16]" width="100" height="100" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(18deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[10%] right-[5%] opacity-[0.15]" width="70" height="70" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-10deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+
+          {/* Row 2 - upper middle */}
+          <svg className="absolute top-[25%] left-[1%] opacity-[0.11]" width="55" height="55" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(30deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[22%] left-[18%] opacity-[0.13]" width="90" height="90" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-20deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[28%] right-[15%] opacity-[0.12]" width="65" height="65" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(15deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[20%] right-[2%] opacity-[0.15]" width="110" height="110" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(25deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+
+          {/* Row 3 - middle */}
+          <svg className="absolute top-[42%] left-[5%] opacity-[0.14]" width="95" height="95" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(10deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[45%] left-[30%] opacity-[0.10]" width="40" height="40" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-35deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[40%] right-[8%] opacity-[0.16]" width="85" height="85" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-12deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[48%] right-[25%] opacity-[0.11]" width="55" height="55" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(20deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+
+          {/* Row 4 - lower middle */}
+          <svg className="absolute top-[60%] left-[10%] opacity-[0.13]" width="60" height="60" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-22deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[62%] left-[28%] opacity-[0.15]" width="105" height="105" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(8deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[58%] right-[5%] opacity-[0.12]" width="50" height="50" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(35deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[65%] right-[18%] opacity-[0.14]" width="75" height="75" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-18deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+
+          {/* Row 5 - bottom */}
+          <svg className="absolute bottom-[12%] left-[2%] opacity-[0.16]" width="130" height="130" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(22deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[15%] left-[22%] opacity-[0.11]" width="45" height="45" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-30deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute bottom-[5%] left-[42%] opacity-[0.13]" width="70" height="70" viewBox="0 0 24 24" fill="#dea54b">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute bottom-[8%] left-[60%] opacity-[0.15]" width="100" height="100" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-5deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[10%] right-[3%] opacity-[0.17]" width="140" height="140" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(15deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[18%] right-[30%] opacity-[0.10]" width="35" height="35" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(40deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        </div>
 
         <div className="relative max-w-[1200px] mx-auto">
           {/* Glass card */}
@@ -401,16 +479,20 @@ export default function Landing({ testimonials }: LandingProps) {
       </section>
 
       {/* Member Spotlight */}
-      <MemberSpotlight members={[]} />
+      <div id="community">
+        <MemberSpotlight members={[]} />
+      </div>
 
       {/* Wall of Love */}
-      <WallOfLove testimonials={testimonials} />
+      <div id="testimonials">
+        <WallOfLove testimonials={testimonials} />
+      </div>
 
       {/* FAQ section */}
       <FAQSection />
 
       {/* Footer */}
-      <footer className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
+      <footer id="cta" className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
         {/* CTA banner */}
         <div
           className="relative overflow-hidden"
@@ -466,13 +548,10 @@ export default function Landing({ testimonials }: LandingProps) {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
             {/* Brand */}
             <div className="md:col-span-4">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#9945ff] flex items-center justify-center font-bold text-sm text-white">
-                  ST
-                </div>
-                <span className="font-semibold text-white text-sm tracking-tight">
-                  Superteam{" "}
-                  <span className="text-[#b77dff]">Malaysia</span>
+              <div className="flex items-center gap-2 mb-5">
+                <img src="/logo/stmy.svg" alt="Superteam" className="h-7 w-7 object-contain" />
+                <span className={`text-white font-black text-xl tracking-tight ${archivo.className}`}>
+                  superteam<sup className="text-[0.5em] align-super">MY</sup>
                 </span>
               </div>
               <p className="text-[#a1a1aa] text-sm leading-relaxed max-w-sm">
@@ -945,6 +1024,7 @@ function FeaturesSection() {
 
   return (
     <section
+      id="mission"
       ref={containerRef}
       className="relative bg-black"
       style={{ height: `${FEATURES.length * 100}vh`, scrollSnapAlign: "start" }}
@@ -1157,10 +1237,25 @@ function FAQSection() {
 
   return (
     <section
-      className="relative bg-black px-6 flex items-center overflow-hidden py-16 lg:py-0"
-      style={{ minHeight: "100dvh", scrollSnapAlign: "start" }}
+      id="faq"
+      className="relative px-6 flex items-center overflow-hidden py-16 lg:py-0"
+      style={{ minHeight: "85dvh", scrollSnapAlign: "start", backgroundColor: "#0a0a0a" }}
     >
-      <div className="max-w-[1200px] mx-auto w-full">
+      {/* City skyline background */}
+      <div
+        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        style={{
+          height: "60%",
+          backgroundImage: "url(/city.svg)",
+          backgroundRepeat: "repeat-x",
+          backgroundPosition: "bottom center",
+          backgroundSize: "100vw auto",
+          opacity: 0.15,
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+        }}
+      />
+      <div className="relative max-w-[1200px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-20">
           {/* Left side */}
           <div className="flex flex-col">
