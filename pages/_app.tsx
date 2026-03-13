@@ -2,6 +2,9 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { useRouter } from "next/router";
+import { AdminAuthProvider, useAdminAuth } from "@/lib/adminAuth";
+import { AdminLogin } from "@/components/admin/AdminLogin";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,10 +12,27 @@ const inter = Inter({
   display: "swap",
 });
 
+function AdminGuard({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn } = useAdminAuth();
+  if (!isLoggedIn) return <AdminLogin />;
+  return <>{children}</>;
+}
+
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const isAdmin = router.pathname.startsWith("/admin");
+
   return (
     <div className={`${inter.variable} font-sans`}>
-      <Component {...pageProps} />
+      {isAdmin ? (
+        <AdminAuthProvider>
+          <AdminGuard>
+            <Component {...pageProps} />
+          </AdminGuard>
+        </AdminAuthProvider>
+      ) : (
+        <Component {...pageProps} />
+      )}
       <Toaster
         position="bottom-right"
         toastOptions={{

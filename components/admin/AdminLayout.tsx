@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
+import { useAdminAuth } from "@/lib/adminAuth";
 import {
   Users,
   Handshake,
@@ -29,6 +30,18 @@ const SIDEBAR_LINKS = [
   { href: "/admin/testimonials", label: "Wall of Love", icon: MessageCircle },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
 ];
+
+function LogoutButton() {
+  const { logout } = useAdminAuth();
+  return (
+    <button
+      onClick={logout}
+      className="w-full text-left text-xs text-text-muted hover:text-error transition-colors"
+    >
+      Sign out
+    </button>
+  );
+}
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -105,17 +118,20 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border-subtle flex items-center justify-between">
-          <Link href="/" className="text-xs text-text-muted hover:text-brand-purple-light transition-colors">
-            &larr; Back to site
-          </Link>
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
+        <div className="p-4 border-t border-border-subtle space-y-2">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-xs text-text-muted hover:text-brand-purple-light transition-colors">
+              &larr; Back to site
+            </Link>
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+          </div>
+          <LogoutButton />
         </div>
       </aside>
 

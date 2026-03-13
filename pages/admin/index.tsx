@@ -21,10 +21,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!supabase) return;
-
     Promise.all([
       supabase.from("members").select("id", { count: "exact", head: true }),
-      supabase.from("events").select("id", { count: "exact", head: true }),
+      supabase.from("luma_events").select("id", { count: "exact", head: true }).gte("start_at", new Date().toISOString()),
       supabase.from("partners").select("id", { count: "exact", head: true }),
       supabase.from("testimonials").select("id", { count: "exact", head: true }),
     ]).then(([m, e, p, t]) => {
