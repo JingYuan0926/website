@@ -1,5 +1,3 @@
-import { AnimatedSection, AnimatedItem } from "@/components/shared/AnimatedSection";
-import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Markdown } from "@/components/shared/Markdown";
 import { getInitials } from "@/lib/utils";
 import type { Testimonial } from "@/lib/types";
@@ -200,7 +198,7 @@ const MOCK_TWEETS: Testimonial[] = [
   },
 ];
 
-function TweetCard({ testimonial }: { testimonial: Testimonial }) {
+function TweetCard({ testimonial, compact }: { testimonial: Testimonial; compact?: boolean }) {
   const processedContent = linkifyContent(testimonial.content);
   const hasLink = !!testimonial.twitter_url;
   const displayHandle =
@@ -208,7 +206,7 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
 
   return (
     <div
-      className={`break-inside-avoid tweet-card rounded-2xl p-4 transition-colors ${hasLink ? "cursor-pointer" : ""}`}
+      className={`break-inside-avoid tweet-card rounded-xl p-3 transition-colors h-full flex flex-col ${hasLink ? "cursor-pointer" : ""}`}
       onClick={
         hasLink
           ? () => window.open(testimonial.twitter_url, "_blank", "noopener")
@@ -216,26 +214,26 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
       }
     >
       {/* Header */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-2">
         {testimonial.author_avatar_url ? (
           <img
             src={testimonial.author_avatar_url}
             alt={testimonial.author_name}
-            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-brand-purple/20 flex items-center justify-center text-brand-purple-light font-bold text-xs flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-brand-purple/20 flex items-center justify-center text-brand-purple-light font-bold text-[10px] flex-shrink-0">
             {getInitials(testimonial.author_name)}
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center justify-between gap-1">
             <div className="min-w-0">
-              <p className="text-[15px] font-bold text-white leading-5 truncate">
+              <p className="text-sm font-bold text-white leading-5 truncate">
                 {testimonial.author_name}
               </p>
               {displayHandle && (
-                <p className="text-[13px] text-[#71767b] leading-5 truncate">
+                <p className="text-xs text-[#71767b] leading-4 truncate">
                   {displayHandle}
                 </p>
               )}
@@ -243,7 +241,7 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
             {hasLink && (
               <svg
                 viewBox="0 0 24 24"
-                className="w-[18px] h-[18px] text-[#71767b] flex-shrink-0 mt-0.5"
+                className="w-3.5 h-3.5 text-[#71767b] flex-shrink-0"
                 fill="currentColor"
               >
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -254,17 +252,17 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
       </div>
 
       {/* Content */}
-      <div className="mt-3 text-[15px] text-[#d7dbdc] leading-[1.55]">
+      <div className="mt-2 text-[13px] text-[#d7dbdc] leading-[1.55] flex-1 overflow-hidden">
         <Markdown content={processedContent} className="tweet-prose" />
       </div>
 
       {/* Image */}
       {testimonial.image_url && (
-        <div className="mt-3 rounded-2xl overflow-hidden border border-[#2f3336]">
+        <div className="mt-2 rounded-lg overflow-hidden border border-[#2f3336] flex-shrink-0 aspect-video">
           <img
             src={testimonial.image_url}
             alt=""
-            className="w-full object-cover max-h-[300px]"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
@@ -272,31 +270,80 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
   );
 }
 
+/**
+ * Build a 4-column, 2-row layout:
+ * - Image tweets → span 2 rows (fill a whole column)
+ * - Text-only tweets → 1 row each (2 stack in a column)
+ * Returns an array of { tweet, rowSpan } in column-major order.
+ */
+function buildGrid(data: Testimonial[]): { tweet: Testimonial; rowSpan: number }[] {
+  const withImage = data.filter((t) => !!t.image_url);
+  const textOnly = data.filter((t) => !t.image_url);
+
+  const grid: { tweet: Testimonial; rowSpan: number }[] = [];
+  let imgIdx = 0;
+  let txtIdx = 0;
+
+  for (let col = 0; col < 4; col++) {
+    // Alternate: even cols get text pairs, odd cols get image tweets
+    if (col % 2 === 0 && txtIdx + 1 < textOnly.length) {
+      grid.push({ tweet: textOnly[txtIdx++], rowSpan: 1 });
+      grid.push({ tweet: textOnly[txtIdx++], rowSpan: 1 });
+    } else if (imgIdx < withImage.length) {
+      grid.push({ tweet: withImage[imgIdx++], rowSpan: 2 });
+    } else if (txtIdx + 1 < textOnly.length) {
+      grid.push({ tweet: textOnly[txtIdx++], rowSpan: 1 });
+      grid.push({ tweet: textOnly[txtIdx++], rowSpan: 1 });
+    } else if (txtIdx < textOnly.length) {
+      grid.push({ tweet: textOnly[txtIdx++], rowSpan: 1 });
+    }
+  }
+
+  return grid;
+}
+
 export function WallOfLove({ testimonials }: WallOfLoveProps) {
   const data = testimonials.length >= 3 ? testimonials : MOCK_TWEETS;
+  const grid = buildGrid(data);
 
   return (
-    <section className="py-24 lg:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <AnimatedSection>
-          <SectionHeading
-            label="Community"
-            title="Wall of love"
-            description="Hear from builders and ecosystem leaders in our community."
-            align="center"
-          />
-        </AnimatedSection>
+    <section
+      className="relative bg-black flex flex-col justify-center px-6 overflow-hidden"
+      style={{ height: "100dvh", scrollSnapAlign: "start" }}
+    >
+      <div className="max-w-[1400px] mx-auto w-full" style={{ maxHeight: "80vh" }}>
+        <div className="mb-6">
+          <h2
+            className="text-white font-semibold tracking-tight leading-[1.1]"
+            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+          >
+            Wall of love
+          </h2>
+          <p className="mt-3 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
+            Hear from builders and ecosystem leaders in our community.
+          </p>
+        </div>
 
-        <AnimatedSection
-          stagger
-          className="mt-14 columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
+        <div
+          className="grid gap-3"
+          style={{
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateRows: "1fr 1fr",
+            gridAutoFlow: "column",
+            height: "60vh",
+          }}
         >
-          {data.map((testimonial) => (
-            <AnimatedItem key={testimonial.id}>
-              <TweetCard testimonial={testimonial} />
-            </AnimatedItem>
+          {grid.map(({ tweet, rowSpan }) => (
+            <div
+              key={tweet.id}
+              style={{ gridRow: rowSpan === 2 ? "span 2" : undefined, minHeight: 0 }}
+            >
+              <div className="h-full overflow-hidden rounded-xl border border-[#1a1a1a] bg-[#0a0a0a]">
+                <TweetCard testimonial={tweet} compact={rowSpan === 1} />
+              </div>
+            </div>
           ))}
-        </AnimatedSection>
+        </div>
       </div>
     </section>
   );

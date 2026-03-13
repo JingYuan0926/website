@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapPin, ExternalLink, Loader2 } from "lucide-react";
 import { MemberSpotlight } from "@/components/landing/MemberSpotlight";
+import { WallOfLove } from "@/components/landing/WallOfLove";
 
 /* ── constants ─────────────────────────────────────── */
 
@@ -293,6 +294,9 @@ export default function Landing() {
 
       {/* Member Spotlight */}
       <MemberSpotlight members={[]} />
+
+      {/* Wall of Love */}
+      <WallOfLove testimonials={[]} />
 
       {/* Statistics section */}
       <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
