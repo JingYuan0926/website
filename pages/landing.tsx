@@ -304,7 +304,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <section
         className="relative px-6 flex items-center overflow-hidden"
         style={{
-          height: "100dvh",
+          height: "85dvh",
           scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
@@ -312,7 +312,7 @@ export default function Landing({ testimonials }: LandingProps) {
           backgroundSize: "24px 24px",
         }}
       >
-        <div className="max-w-[1100px] mx-auto w-full py-10">
+        <div className="max-w-[1200px] mx-auto w-full py-10">
           <EventsPane />
         </div>
       </section>
@@ -320,17 +320,8 @@ export default function Landing({ testimonials }: LandingProps) {
       {/* Features section */}
       <FeaturesSection />
 
-      {/* Member Spotlight */}
-      <MemberSpotlight members={[]} />
-
-      {/* Wall of Love */}
-      <WallOfLove testimonials={testimonials} />
-
-      {/* FAQ section */}
-      <FAQSection />
-
       {/* Statistics section */}
-      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
+      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "85dvh", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
@@ -352,10 +343,13 @@ export default function Landing({ testimonials }: LandingProps) {
           >
             {/* Header row */}
             <div className="mb-12">
-              <h2 className="text-white font-semibold text-2xl lg:text-3xl tracking-tight">
+              <h2
+                className="text-white font-semibold tracking-tight leading-[1.08]"
+                style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+              >
                 We only deliver results.
               </h2>
-              <p className="mt-2 text-[#a1a1aa] text-base lg:text-lg">
+              <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed">
                 Building the strongest Solana community in Malaysia.
               </p>
             </div>
@@ -389,6 +383,15 @@ export default function Landing({ testimonials }: LandingProps) {
         </div>
       </section>
 
+      {/* Member Spotlight */}
+      <MemberSpotlight members={[]} />
+
+      {/* Wall of Love */}
+      <WallOfLove testimonials={testimonials} />
+
+      {/* FAQ section */}
+      <FAQSection />
+
       {/* Footer */}
       <footer className="border-t border-[#ffffff15] bg-black" style={{ scrollSnapAlign: "start" }}>
         {/* CTA banner */}
@@ -406,12 +409,12 @@ export default function Landing({ testimonials }: LandingProps) {
 
           <div className="relative max-w-[1200px] mx-auto px-6 py-16 lg:py-20 text-center">
             <h2
-              className="text-white font-bold tracking-tight leading-[1.1]"
-              style={{ fontSize: "clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem)" }}
+              className="text-white font-semibold tracking-tight leading-[1.08]"
+              style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
             >
               Ready to build with us?
             </h2>
-            <p className="mt-4 text-white/70 text-base lg:text-lg max-w-lg mx-auto leading-relaxed">
+            <p className="mt-4 text-white/70 text-sm max-w-lg mx-auto leading-relaxed">
               Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -636,19 +639,19 @@ function EventsPane() {
   }, [loadMore]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 lg:gap-16 items-center">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-24 items-center">
       {/* Left — heading + description */}
       <div>
         <h2
           className="text-white font-semibold tracking-tight leading-[1.08]"
-          style={{ fontSize: "clamp(2.25rem, 1.5rem + 3vw, 4rem)", whiteSpace: "nowrap" }}
+          style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)", whiteSpace: "nowrap" }}
         >
           Moments that built
           <br />
           our community
         </h2>
 
-        <p className="mt-6 text-[#a1a1aa] text-xl leading-relaxed max-w-lg">
+        <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed max-w-lg">
           Find your tribe and ignite your passion. We&rsquo;re here to support
           your journey in the Solana ecosystem. Our events are the best place to
           learn more.
@@ -666,7 +669,7 @@ function EventsPane() {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden">
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden max-w-[480px] lg:ml-auto" style={{ transform: "scale(0.9)", transformOrigin: "top right" }}>
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
@@ -694,7 +697,7 @@ function EventsPane() {
         {/* Scrollable event list */}
         <div
           ref={scrollRef}
-          className="max-h-[calc(100vh-280px)] overflow-y-auto p-4 scrollbar-thin"
+          className="max-h-[calc(85vh-280px)] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
             <div className="flex justify-center py-16">
@@ -911,7 +914,18 @@ function FeaturesSection() {
       style={{ height: `${FEATURES.length * 100}vh`, scrollSnapAlign: "start" }}
     >
       {/* Sticky viewport */}
-      <div className="sticky top-0 h-screen flex items-center px-6">
+      <div className="sticky top-0 h-screen flex flex-col justify-center px-6">
+        <div className="max-w-[1200px] mx-auto w-full mb-8">
+          <h3
+            className="text-white font-semibold tracking-tight leading-[1.08]"
+            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+          >
+            Our Mission
+          </h3>
+          <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
+            Everything we do to empower Solana builders in Malaysia.
+          </p>
+        </div>
         <div className="max-w-[1200px] mx-auto w-full grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-8 lg:gap-12">
           {/* Left — numbered nav */}
           <div className="hidden lg:block">
@@ -973,12 +987,12 @@ function FeaturesSection() {
               >
                 <h3
                   className="text-white font-semibold tracking-tight leading-[1.1]"
-                  style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+                  style={{ fontSize: "clamp(1.25rem, 1rem + 1.5vw, 2rem)" }}
                 >
                   {feat.title}
                 </h3>
 
-                <p className="mt-5 text-[#a1a1aa] text-base leading-relaxed max-w-md">
+                <p className="mt-4 text-[#a1a1aa] text-sm leading-relaxed max-w-md">
                   {feat.description}
                 </p>
 
