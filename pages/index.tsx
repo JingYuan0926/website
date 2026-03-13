@@ -471,7 +471,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
               </HighlightWord>
               <br />
               builders in{" "}
-              <HighlightWord color="#ed7b84" cursorUrl="emoji:🇲🇾" onClick={() => setHeroVideo("malaysia")}>
+              <HighlightWord color="#ed7b84" cursorUrl="/logo/stmy.svg" onClick={() => setHeroVideo("malaysia")}>
                 Malaysia
               </HighlightWord>
             </motion.h1>
@@ -987,7 +987,7 @@ function EventsPane({ content = {} }: { content?: ContentMap }) {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90" style={{ transformOrigin: "center right" }}>
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90 min-h-[520px]" style={{ transformOrigin: "center right" }}>
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
@@ -1018,7 +1018,7 @@ function EventsPane({ content = {} }: { content?: ContentMap }) {
           className="max-h-[calc(85vh-80px)] min-h-[400px] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
-            <div className="flex justify-center py-16">
+            <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 size={24} className="animate-spin text-[#666]" />
             </div>
           )}
