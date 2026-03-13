@@ -20,7 +20,7 @@ import {
   SAMPLE_TESTIMONIALS,
   FAQ_DEFAULT,
 } from "@/lib/constants";
-import type { Member, Partner, Testimonial, FAQItem, SiteContent, Announcement } from "@/lib/types";
+import type { Member, Partner, Testimonial, FAQItem, SiteContent, Announcement, MissionPillar } from "@/lib/types";
 
 interface HomePageProps {
   members: Member[];
@@ -36,11 +36,12 @@ interface HomePageProps {
   faqItems: FAQItem[];
   siteContent: Record<string, Record<string, string>>;
   announcements: Announcement[];
+  missionPillars: MissionPillar[];
 }
 
 export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
   if (isSupabaseConfigured() && supabase) {
-    const [membersRes, statsRes, partnersRes, testimonialsRes, faqRes, contentRes, announcementsRes] =
+    const [membersRes, statsRes, partnersRes, testimonialsRes, faqRes, contentRes, announcementsRes, missionRes] =
       await Promise.all([
         supabase.from("members").select("*").eq("is_spotlight", true).order("display_order"),
         supabase.from("site_stats").select("*").limit(1).single(),
@@ -49,6 +50,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
         supabase.from("faq_items").select("*").order("display_order"),
         supabase.from("site_content").select("*"),
         supabase.from("announcements").select("*").eq("is_published", true).order("published_at", { ascending: false }).limit(5),
+        supabase.from("mission_pillars").select("*").order("display_order"),
       ]);
 
     // Group site_content into { section: { key: value } }
@@ -69,6 +71,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
         faqItems: (faqRes.data as FAQItem[]) || [],
         siteContent,
         announcements: (announcementsRes.data as Announcement[]) || [],
+        missionPillars: (missionRes.data as MissionPillar[]) || [],
       },
       revalidate: 3600,
     };
@@ -90,6 +93,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
       })),
       siteContent: {},
       announcements: [],
+      missionPillars: [],
     },
   };
 };
@@ -102,6 +106,7 @@ export default function Home({
   faqItems,
   siteContent,
   announcements,
+  missionPillars,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
@@ -117,7 +122,7 @@ export default function Home({
 
       <main>
         <HeroSection content={siteContent?.hero} />
-        <MissionSection content={siteContent?.mission} />
+        <MissionSection content={siteContent?.mission} pillars={missionPillars} />
         <StatsSection stats={stats} />
         <EventsSection />
         <MemberSpotlight members={members} />

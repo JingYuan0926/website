@@ -35,35 +35,59 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
 export const MISSION_PILLARS = [
   {
     title: "Builder Support",
-    description: "Mentorship, resources, and technical guidance for Solana developers in Malaysia.",
+    heading: "Hands-on mentorship for builders",
+    description: "Get paired with experienced mentors who guide you through building on Solana. From architecture reviews to go-to-market strategy.",
+    bullets: ["1-on-1 mentor matching", "Technical architecture reviews", "Go-to-market guidance", "Community feedback loops"],
     icon: "code",
+    cta_text: "Find a Mentor",
+    cta_url: "/members",
   },
   {
     title: "Events & Hackathons",
-    description: "Regular meetups, workshops, and hackathons to connect and learn.",
+    heading: "Learn, build, and connect IRL",
+    description: "Regular meetups, workshops, and hackathons bringing the Malaysian Solana community together.",
+    bullets: ["Monthly builder meetups", "Hackathon organization", "Workshop series", "Networking events"],
     icon: "calendar",
+    cta_text: "View Events",
+    cta_url: "#events",
   },
   {
     title: "Grants & Funding",
+    heading: "Fuel your project's growth",
     description: "Access to grants, accelerators, and funding opportunities in the Solana ecosystem.",
+    bullets: ["Superteam Grants", "Ecosystem fund introductions", "Pitch preparation support", "Milestone-based funding"],
     icon: "coins",
+    cta_text: "Apply for Grants",
+    cta_url: "https://earn.superteam.fun",
   },
   {
     title: "Jobs & Bounties",
+    heading: "Earn while you build",
     description: "Find high-quality opportunities through Superteam Earn and partner projects.",
+    bullets: ["Full-time roles at Solana projects", "Freelance bounties", "Design & content gigs", "Open-source contributions"],
     icon: "briefcase",
+    cta_text: "Browse Opportunities",
+    cta_url: "https://earn.superteam.fun",
   },
   {
     title: "Education",
-    description: "Workshops, bootcamps, and learning resources to level up your Web3 skills.",
+    heading: "Level up your Web3 skills",
+    description: "Workshops, bootcamps, and learning resources to accelerate your blockchain development journey.",
+    bullets: ["Solana development bootcamps", "Smart contract workshops", "DeFi masterclasses", "Security best practices"],
     icon: "graduation-cap",
+    cta_text: "Start Learning",
+    cta_url: "#",
   },
   {
     title: "Ecosystem Growth",
-    description: "Connecting Malaysian talent to the global Solana ecosystem.",
+    heading: "Grow the Malaysian Solana scene",
+    description: "Connecting Malaysian talent to the global Solana ecosystem and driving local adoption.",
+    bullets: ["Regional partnerships", "University outreach", "Ecosystem project support", "Global Superteam network"],
     icon: "globe",
+    cta_text: "Get Involved",
+    cta_url: "https://t.me/SuperteamMY",
   },
-] as const;
+];
 
 export const FAQ_DEFAULT = [
   {

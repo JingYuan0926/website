@@ -10,6 +10,7 @@ import type { FAQItem } from "@/lib/types";
 const FIELDS: FieldDef[] = [
   { key: "question", label: "Question", type: "text", required: true },
   { key: "answer", label: "Answer", type: "markdown", required: true },
+  { key: "image_url", label: "Image", type: "image", bucket: "general" },
   { key: "display_order", label: "Display Order", type: "number" },
 ];
 

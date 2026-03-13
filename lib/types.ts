@@ -57,6 +57,21 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
+  image_url: string;
+  display_order: number;
+  created_at: string;
+}
+
+export interface MissionPillar {
+  id: string;
+  title: string;
+  heading: string;
+  description: string;
+  bullets: string[];
+  icon: string;
+  image_url: string;
+  cta_text: string;
+  cta_url: string;
   display_order: number;
   created_at: string;
 }

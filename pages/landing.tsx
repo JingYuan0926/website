@@ -10,7 +10,7 @@ import { MemberSpotlight } from "@/components/landing/MemberSpotlight";
 import { WallOfLove } from "@/components/landing/WallOfLove";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { SAMPLE_TESTIMONIALS } from "@/lib/constants";
-import type { Testimonial } from "@/lib/types";
+import type { Testimonial, MissionPillar, Announcement } from "@/lib/types";
 
 /* ── constants ─────────────────────────────────────── */
 
@@ -124,29 +124,40 @@ const groupVariants = {
 
 interface LandingProps {
   testimonials: Testimonial[];
+  missionPillars: MissionPillar[];
+  announcements: Announcement[];
 }
 
 export const getStaticProps: GetStaticProps<LandingProps> = async () => {
   if (isSupabaseConfigured() && supabase) {
-    const { data } = await supabase
-      .from("testimonials")
-      .select("*")
-      .order("display_order");
+    const [testimonialsRes, missionRes, announcementsRes] = await Promise.all([
+      supabase.from("testimonials").select("*").order("display_order"),
+      supabase.from("mission_pillars").select("*").order("display_order"),
+      supabase.from("announcements").select("*").eq("is_published", true).order("published_at", { ascending: false }).limit(5),
+    ]);
 
     return {
-      props: { testimonials: (data as Testimonial[]) || [] },
+      props: {
+        testimonials: (testimonialsRes.data as Testimonial[]) || [],
+        missionPillars: (missionRes.data as MissionPillar[]) || [],
+        announcements: (announcementsRes.data as Announcement[]) || [],
+      },
       revalidate: 3600,
     };
   }
 
   return {
-    props: { testimonials: SAMPLE_TESTIMONIALS as unknown as Testimonial[] },
+    props: {
+      testimonials: SAMPLE_TESTIMONIALS as unknown as Testimonial[],
+      missionPillars: [],
+      announcements: [],
+    },
   };
 };
 
 /* ── page ──────────────────────────────────────────── */
 
-export default function Landing({ testimonials }: LandingProps) {
+export default function Landing({ testimonials, missionPillars, announcements }: LandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -158,21 +169,34 @@ export default function Landing({ testimonials }: LandingProps) {
   return (
     <div className="bg-black" style={{ scrollSnapType: "y proximity" }}>
       {/* Announcement bar */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-[60] bg-[#7fd189] overflow-hidden transition-all duration-300 ${
-          isScrolled ? "h-0 opacity-0" : "h-8 opacity-100"
-        }`}
-      >
-        <div className="h-full flex items-center">
-          <div className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap">
-            {[...Array(2)].map((_, i) => (
-              <span key={i} className="text-xs font-medium text-black mx-8">
-                AI agents need structure. Build the foundation now &rarr;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AI agents need structure. Build the foundation now &rarr;
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+      {(() => {
+        const bannerText = announcements.length > 0
+          ? announcements.map((a) => a.title).join("  \u00b7  ")
+          : "AI agents need structure. Build the foundation now";
+        const bannerLink = announcements.length === 1 && announcements[0].link_url
+          ? announcements[0].link_url
+          : undefined;
+        const Wrapper = bannerLink ? "a" : "div";
+        const wrapperProps = bannerLink ? { href: bannerLink, target: "_blank", rel: "noopener noreferrer" } : {};
+        return (
+          <Wrapper
+            {...wrapperProps as React.AnchorHTMLAttributes<HTMLAnchorElement>}
+            className={`fixed top-0 left-0 right-0 z-[60] bg-[#7fd189] overflow-hidden transition-all duration-300 ${
+              isScrolled ? "h-0 opacity-0" : "h-8 opacity-100"
+            } ${bannerLink ? "cursor-pointer" : ""}`}
+          >
+            <div className="h-full flex items-center">
+              <div className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap">
+                {[...Array(2)].map((_, i) => (
+                  <span key={i} className="text-xs font-medium text-black mx-8">
+                    {bannerText} &rarr;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{bannerText} &rarr;
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Wrapper>
+        );
+      })()}
 
       {/* Navigation */}
       <header
@@ -328,7 +352,7 @@ export default function Landing({ testimonials }: LandingProps) {
       </section>
 
       {/* Features section */}
-      <FeaturesSection />
+      <FeaturesSection pillars={missionPillars} />
 
       {/* Statistics section */}
       <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "calc(100dvh - 60px)", scrollSnapAlign: "start" }}>
@@ -988,7 +1012,19 @@ const FEATURES = [
   },
 ];
 
-function FeaturesSection() {
+function FeaturesSection({ pillars }: { pillars?: MissionPillar[] }) {
+  // Use DB data if available, otherwise fall back to hardcoded FEATURES
+  const features = pillars && pillars.length > 0
+    ? pillars.map((p) => ({
+        label: p.title.toUpperCase(),
+        title: p.heading || p.title,
+        description: p.description,
+        bullets: p.bullets || [],
+        cta: p.cta_text || "",
+        ctaUrl: p.cta_url || "#",
+      }))
+    : FEATURES;
+
   const [active, setActive] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -1009,8 +1045,8 @@ function FeaturesSection() {
 
       const progress = Math.min(scrolled / scrollableHeight, 1);
       const index = Math.min(
-        Math.floor(progress * FEATURES.length),
-        FEATURES.length - 1
+        Math.floor(progress * features.length),
+        features.length - 1
       );
       setActive(index);
     };
@@ -1018,16 +1054,16 @@ function FeaturesSection() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [features.length]);
 
-  const feat = FEATURES[active];
+  const feat = features[active];
 
   return (
     <section
       id="mission"
       ref={containerRef}
       className="relative bg-black"
-      style={{ height: `${FEATURES.length * 100}vh`, scrollSnapAlign: "start" }}
+      style={{ height: `${features.length * 100}vh`, scrollSnapAlign: "start" }}
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 h-screen flex flex-col justify-center px-6">
@@ -1051,7 +1087,7 @@ function FeaturesSection() {
                 aria-hidden="true"
               />
               <div className="space-y-0">
-                {FEATURES.map((f, i) => (
+                {features.map((f, i) => (
                   <button
                     key={i}
                     onClick={() => {
@@ -1060,7 +1096,7 @@ function FeaturesSection() {
                       const scrollableHeight = sectionHeight - window.innerHeight;
                       const targetScroll =
                         containerRef.current.offsetTop +
-                        (i / FEATURES.length) * scrollableHeight;
+                        (i / features.length) * scrollableHeight;
                       window.scrollTo({ top: targetScroll, behavior: "smooth" });
                     }}
                     className={`relative flex items-center gap-3 py-3 w-full text-left transition-all duration-300 ${
@@ -1127,12 +1163,14 @@ function FeaturesSection() {
                   ))}
                 </ul>
 
+                {feat.cta && (
                 <a
-                  href="#"
+                  href={feat.ctaUrl || "#"}
                   className="inline-flex items-center justify-center mt-8 px-5 py-2.5 rounded-full border border-white/30 text-white text-sm font-semibold hover:bg-white/10 transition-colors"
                 >
                   {feat.cta}
                 </a>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>

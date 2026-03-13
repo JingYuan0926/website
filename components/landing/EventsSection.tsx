@@ -268,7 +268,7 @@ export function EventsSection() {
               className="max-h-[520px] overflow-y-auto p-5 scrollbar-thin"
             >
               {initialLoading && (
-                <div className="flex justify-center py-12">
+                <div className="flex items-center justify-center min-h-[520px]">
                   <Loader2 size={24} className="animate-spin text-text-muted" />
                 </div>
               )}

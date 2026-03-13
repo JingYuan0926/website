@@ -39,6 +39,13 @@ function AccordionItem({ item }: { item: FAQItem }) {
       >
         <div className="overflow-hidden">
           <div className="pb-5 text-sm text-text-secondary leading-relaxed pr-8">
+            {item.image_url && (
+              <img
+                src={item.image_url}
+                alt=""
+                className="w-full max-w-md rounded-lg mb-3 border border-border-subtle"
+              />
+            )}
             <Markdown content={item.answer} />
           </div>
         </div>

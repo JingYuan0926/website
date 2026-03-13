@@ -8,19 +8,19 @@ import toast from "react-hot-toast";
 import type { Announcement } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
-  { key: "title", label: "Title", type: "text", required: true },
-  { key: "content", label: "Content", type: "markdown", required: true },
-  { key: "image_url", label: "Banner Image", type: "image", bucket: "general", folder: "announcements" },
+  { key: "title", label: "Banner Text", type: "text", required: true, placeholder: "e.g. AI agents need structure. Build the foundation now" },
   { key: "link_url", label: "Link URL", type: "text", placeholder: "https://..." },
   { key: "is_published", label: "Published", type: "toggle" },
 ];
 
 const COLUMNS: Column<Announcement>[] = [
-  { key: "title", label: "Title" },
+  { key: "title", label: "Banner Text" },
   {
-    key: "content",
-    label: "Content",
-    render: (a) => <span className="text-xs line-clamp-2 max-w-xs">{a.content}</span>,
+    key: "link_url",
+    label: "URL",
+    render: (a) => (
+      <span className="text-xs text-text-muted line-clamp-1 max-w-xs">{a.link_url || "—"}</span>
+    ),
   },
   {
     key: "is_published",

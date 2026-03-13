@@ -6,7 +6,7 @@ import { Markdown } from "@/components/shared/Markdown";
 export interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags" | "checkboxes" | "image" | "markdown";
+  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags" | "checkboxes" | "image" | "markdown" | "bulletlist";
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
@@ -43,7 +43,7 @@ export function FormModal({
       fields.forEach((f) => {
         if (f.type === "toggle") defaults[f.key] = false;
         else if (f.type === "number") defaults[f.key] = 0;
-        else if (f.type === "tags" || f.type === "checkboxes") defaults[f.key] = [];
+        else if (f.type === "tags" || f.type === "checkboxes" || f.type === "bulletlist") defaults[f.key] = [];
         else if (f.type === "select" && f.options?.length) defaults[f.key] = f.options[0].value;
         else defaults[f.key] = "";
       });
@@ -252,6 +252,47 @@ export function FormModal({
                       </button>
                     );
                   })}
+                </div>
+              )}
+
+              {field.type === "bulletlist" && (
+                <div className="space-y-2">
+                  {((formData[field.key] as string[]) || []).map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-text-muted text-xs select-none">•</span>
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) => {
+                          const current = [...((formData[field.key] as string[]) || [])];
+                          current[idx] = e.target.value;
+                          updateField(field.key, current);
+                        }}
+                        className="flex-1 px-3 py-2 text-sm bg-bg border border-border-subtle rounded-lg text-text-primary focus:outline-none focus:border-brand-purple/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current = [...((formData[field.key] as string[]) || [])];
+                          current.splice(idx, 1);
+                          updateField(field.key, current);
+                        }}
+                        className="p-1.5 text-text-muted hover:text-error transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = (formData[field.key] as string[]) || [];
+                      updateField(field.key, [...current, ""]);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-purple-light bg-brand-purple/10 rounded-lg hover:bg-brand-purple/15 transition-colors"
+                  >
+                    + Add bullet point
+                  </button>
                 </div>
               )}
 
