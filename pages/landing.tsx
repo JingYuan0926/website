@@ -292,9 +292,7 @@ export default function Landing() {
       <FeaturesSection />
 
       {/* Member Spotlight */}
-      <section className="bg-black" style={{ scrollSnapAlign: "start" }}>
-        <MemberSpotlight members={[]} />
-      </section>
+      <MemberSpotlight members={[]} />
 
       {/* Statistics section */}
       <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
