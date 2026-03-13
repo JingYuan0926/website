@@ -53,7 +53,7 @@ export default function AdminFAQ() {
         fetchItems();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase?.removeChannel(channel); };
   }, []);
 
   async function fetchItems() {

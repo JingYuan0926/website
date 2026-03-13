@@ -26,7 +26,7 @@ export default function AdminPartners() {
         fetchPartners();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase?.removeChannel(channel); };
   }, []);
 
   async function fetchPartners() {

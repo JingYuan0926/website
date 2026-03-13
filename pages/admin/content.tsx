@@ -42,7 +42,7 @@ export default function AdminContent() {
         fetchContent();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase?.removeChannel(channel); };
   }, []);
 
   async function fetchContent() {

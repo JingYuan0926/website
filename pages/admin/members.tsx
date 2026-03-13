@@ -94,7 +94,7 @@ export default function AdminMembers() {
     if (!supabase) return;
     const ch1 = supabase.channel("members-changes").on("postgres_changes", { event: "*", schema: "public", table: "members" }, () => fetchMembers()).subscribe();
     const ch2 = supabase.channel("projects-changes").on("postgres_changes", { event: "*", schema: "public", table: "community_projects" }, () => fetchProjects()).subscribe();
-    return () => { supabase.removeChannel(ch1); supabase.removeChannel(ch2); };
+    return () => { supabase?.removeChannel(ch1); supabase?.removeChannel(ch2); };
   }, []);
 
   async function fetchMembers() {

@@ -338,7 +338,7 @@ export function MemberSpotlight({ members, content = {}, projects: projectsProp 
   const [pathCells, setPathCells] = useState<Map<string, number>>(new Map());
   const [showCard, setShowCard] = useState(false);
   const [locked, setLocked] = useState(false);
-  const cardTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const cardTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const logoMidCol = PAD + LOGO_COLS / 2;
 

@@ -346,7 +346,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
         const half = [...items, ...items, ...items, ...items, ...items, ...items];
         return (
           <Wrapper
-            {...wrapperProps as React.AnchorHTMLAttributes<HTMLAnchorElement>}
+            {...(wrapperProps as Record<string, unknown>)}
             className={`fixed top-0 left-0 right-0 z-[60] bg-[#7fd189] overflow-hidden transition-all duration-300 ${
               isScrolled ? "h-0 opacity-0" : "h-8 opacity-100"
             } ${bannerLink ? "cursor-pointer" : ""}`}

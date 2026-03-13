@@ -70,7 +70,7 @@ export default function AdminEvents() {
         fetchEvents();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase?.removeChannel(channel); };
   }, []);
 
   async function fetchEvents() {

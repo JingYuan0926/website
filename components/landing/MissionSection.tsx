@@ -126,7 +126,7 @@ export function MissionSection({ content, pillars }: MissionSectionProps) {
           {/* Right: Card preview */}
           <div className="hidden lg:flex items-center justify-center">
             <div className="w-full aspect-square max-w-[280px] rounded-2xl border border-white/[0.06] bg-[#0a0a0a] flex flex-col items-center justify-center gap-4 overflow-hidden">
-              {active.image_url ? (
+              {"image_url" in active && active.image_url ? (
                 <img
                   src={active.image_url}
                   alt={active.title}

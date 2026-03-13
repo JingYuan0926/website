@@ -53,7 +53,7 @@ export default function AdminAnnouncements() {
         fetchAnnouncements();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase?.removeChannel(channel); };
   }, []);
 
   async function fetchAnnouncements() {
