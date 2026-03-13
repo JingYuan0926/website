@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
-import { SectionHeading } from "@/components/shared/SectionHeading";
 import { SkillBadge } from "@/components/shared/SkillBadge";
 import { getInitials } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
@@ -100,7 +99,7 @@ const SOLANA_SHAPE: number[][] = [
   [0,0,1,1,1,1,1,1,1,1,1,1],
 ];
 
-const VPAD = 1;
+const VPAD = 2;
 const TOTAL_ROWS = ROWS + VPAD * 2;
 
 function cellInShape(r: number, c: number): boolean {
@@ -220,6 +219,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const [active, setActive] = useState<Member | null>(null);
   const [activeCol, setActiveCol] = useState<number>(0);
   const [activeRow, setActiveRow] = useState<number>(0);
+  const [activeCardSide, setActiveCardSide] = useState<"left" | "right">("left");
   const [pathCells, setPathCells] = useState<Map<string, number>>(new Map());
   const [showCard, setShowCard] = useState(false);
   const cardTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -275,10 +275,10 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         return map;
       }
 
-      // Left: centers row 1..11, col 2..PAD-3
-      const newLeft = placeBlocks(1, TOTAL_ROWS - 2, 2, PAD - 3, 2 + Math.floor(Math.random() * 2));
-      // Right: centers row 1..11, col PAD+LOGO_COLS+3..COLS-3
-      const newRight = placeBlocks(1, TOTAL_ROWS - 2, PAD + LOGO_COLS + 3, COLS - 3, 2 + Math.floor(Math.random() * 2));
+      // Left: centers row 6..TOTAL_ROWS-3 (avoids first/last row + heading area), col 2..PAD-3
+      const newLeft = placeBlocks(6, TOTAL_ROWS - 3, 2, PAD - 3, 2 + Math.floor(Math.random() * 2));
+      // Right: centers row 2..TOTAL_ROWS-3, col PAD+LOGO_COLS+3..COLS-3
+      const newRight = placeBlocks(2, TOTAL_ROWS - 3, PAD + LOGO_COLS + 3, COLS - 3, 2 + Math.floor(Math.random() * 2));
       setLeftSpawns(newLeft);
       setRightSpawns(newRight);
     };
@@ -300,7 +300,9 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
     setActiveRow(r);
     setShowCard(false);
 
-    const cardSide: "left" | "right" = c < logoMidCol ? "left" : "right";
+    // Force right only for the first row of avatars; all others use normal left/right logic
+    const cardSide: "left" | "right" = r === VPAD ? "right" : c >= logoMidCol ? "right" : "left";
+    setActiveCardSide(cardSide);
     const newPath = buildPath(r, c, cardSide);
     setPathCells(newPath);
 
@@ -328,7 +330,10 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const activeSide = active ? (activeCol < logoMidCol ? "left" : "right") : null;
 
   return (
-    <section className="py-24 lg:py-32">
+    <section
+      className="relative overflow-hidden bg-black flex flex-col items-center justify-center"
+      style={{ height: "100dvh", scrollSnapAlign: "start" }}
+    >
       <style>{`
         @keyframes ecoFade {
           0% { opacity: 0; transform: scale(0.7); }
@@ -337,34 +342,43 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           100% { opacity: 0; transform: scale(0.7); }
         }
       `}</style>
-      <div className="max-w-[1200px] mx-auto px-6">
-        <AnimatedSection>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
-            <SectionHeading
-              label="Our Builders"
-              title="Meet the community"
-              description="Talented builders, designers, and creators shaping Malaysia's Web3 landscape."
-            />
-            <Link
-              href="/members"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors inline-flex items-center gap-1.5 shrink-0"
-            >
-              View all members
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-        </AnimatedSection>
 
+      {/* Heading — top left at 5% from top */}
+      <div className="absolute left-0 right-0 z-20 px-10 lg:px-16 pointer-events-none" style={{ top: "15%" }}>
+        <div className="max-w-md">
+          <h2
+            className="text-white font-semibold tracking-tight leading-[1.1]"
+            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+          >
+            Meet the community
+          </h2>
+          <p className="mt-5 text-[#a1a1aa] text-base leading-relaxed">
+            Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
+          </p>
+        </div>
+      </div>
+
+      {/* View all members — bottom right at 5% from bottom */}
+      <div className="absolute right-0 z-20 px-10 lg:px-16" style={{ bottom: "15%" }}>
+        <Link
+          href="/members"
+          className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
+        >
+          View all members
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+
+      {/* Full-width grid */}
+      <div className="relative z-10 w-screen">
         <AnimatedSection>
-          <div className="flex justify-center">
-            <div className="relative" onMouseLeave={clearActive}>
-              <div
-                className="grid gap-[2px]"
-                style={{
-                  gridTemplateColumns: `repeat(${COLS}, 34px)`,
-                  gridTemplateRows: `repeat(${TOTAL_ROWS}, 34px)`,
-                }}
-              >
+          <div className="relative" onMouseLeave={clearActive}>
+            <div
+              className="grid gap-[2px]"
+              style={{
+                gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+              }}
+            >
                 {Array.from({ length: TOTAL_ROWS * COLS }).map((_, i) => {
                   const r = Math.floor(i / COLS);
                   const c = i % COLS;
@@ -381,7 +395,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                         key={i}
                         onMouseEnter={() => handleHover(member, r, c)}
                         onClick={() => handleHover(member, r, c)}
-                        className={`relative rounded-[2px] overflow-hidden transition-all duration-150 group ${
+                        className={`relative rounded-[2px] overflow-hidden transition-all duration-150 group aspect-square ${
                           active?.id === member.id ? "z-10 scale-110" : "hover:scale-105"
                         }`}
                       >
@@ -412,7 +426,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                     <div
                       key={i}
                       onMouseEnter={() => { if (!isOnPath) clearActive(); }}
-                      className="rounded-[2px] relative"
+                      className="rounded-[2px] relative aspect-square"
                       style={{
                         backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
                         borderWidth: 1,
@@ -470,7 +484,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                 }`}
                 style={{
                   width: PAD * (34 + 2) - 4 * (34 + 2),
-                  ...(activeCol >= logoMidCol
+                  ...(activeCardSide === "right"
                     ? { right: 0 }
                     : { left: 0 }),
                 }}
@@ -531,9 +545,12 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                 )}
               </div>
             </div>
-          </div>
         </AnimatedSection>
       </div>
+
+      {/* Fade overlays to blend grid edges */}
+      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none" />
     </section>
   );
 }
