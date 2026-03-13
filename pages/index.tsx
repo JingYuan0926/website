@@ -451,7 +451,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
         </div>
 
         {/* Logo loop — inside hero */}
-        <div className="relative z-10 bg-[#9945ff] py-5 overflow-hidden shrink-0">
+        <div className="relative z-10 bg-[#9945ff] h-16 overflow-hidden shrink-0">
           {(() => {
             const logos = partners.length > 0
               ? partners.map((p) => ({ name: p.name, logo: p.logo_url, url: p.website_url, scale: p.logo_scale ?? 1 }))
@@ -462,17 +462,17 @@ export default function Landing({ testimonials, missionPillars, announcements, p
                   src={p.logo}
                   alt={p.name}
                   className="object-contain brightness-0 invert opacity-90"
-                  style={{ height: `${1.75 * p.scale}rem`, maxWidth: `${120 * p.scale}px` }}
+                  style={{ transform: `scale(${p.scale})`, height: "1.75rem", maxWidth: "120px" }}
                 />
               ) : (
                 <span className="text-white font-bold text-lg tracking-tight opacity-90">{p.name}</span>
               );
               return p.url ? (
-                <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="shrink-0 mx-8 flex items-center whitespace-nowrap hover:opacity-100 transition-opacity">
+                <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="shrink-0 mx-8 flex items-center justify-center h-16 whitespace-nowrap hover:opacity-100 transition-opacity">
                   {inner}
                 </a>
               ) : (
-                <span key={i} className="shrink-0 mx-8 flex items-center whitespace-nowrap">{inner}</span>
+                <span key={i} className="shrink-0 mx-8 flex items-center justify-center h-16 whitespace-nowrap">{inner}</span>
               );
             };
             return (
