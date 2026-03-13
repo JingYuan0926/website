@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/solana-sol-icon.png\" -o /Users/derekliew/Developer/website/public/logo/solana.png)"
+    ]
+  }
+}

@@ -144,6 +144,103 @@ export const getStaticProps: GetStaticProps<LandingProps> = async () => {
   };
 };
 
+/* ── particle hover effect ────────────────────────── */
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  content: React.ReactNode;
+  size: number;
+}
+
+function ParticleWord({
+  children,
+  particles: particleContent,
+}: {
+  children: React.ReactNode;
+  particles: React.ReactNode[];
+}) {
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const idRef = useRef(0);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  const spawnParticles = useCallback(
+    (e: React.MouseEvent) => {
+      const rect = spanRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const count = 3;
+      const newParticles: Particle[] = [];
+      for (let i = 0; i < count; i++) {
+        idRef.current += 1;
+        newParticles.push({
+          id: idRef.current,
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+          vx: (Math.random() - 0.5) * 6,
+          vy: -(Math.random() * 4 + 3),
+          life: 1,
+          content: particleContent[Math.floor(Math.random() * particleContent.length)],
+          size: Math.random() * 12 + 14,
+        });
+      }
+      setParticles((prev) => [...prev.slice(-40), ...newParticles]);
+    },
+    [particleContent]
+  );
+
+  useEffect(() => {
+    if (particles.length === 0) return;
+    const frame = requestAnimationFrame(() => {
+      setParticles((prev) =>
+        prev
+          .map((p) => ({
+            ...p,
+            x: p.x + p.vx,
+            y: p.y + p.vy,
+            vy: p.vy + 0.15,
+            life: p.life - 0.02,
+          }))
+          .filter((p) => p.life > 0)
+      );
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [particles]);
+
+  return (
+    <span
+      ref={spanRef}
+      className="relative inline-block cursor-default"
+      onMouseMove={spawnParticles}
+    >
+      {children}
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: p.x,
+            top: p.y,
+            opacity: p.life,
+            fontSize: p.size,
+            transform: `translate(-50%, -50%) rotate(${p.vx * 10}deg)`,
+            transition: "none",
+          }}
+        >
+          {p.content}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+const SOLANA_PARTICLE = (
+  <img src="/logo/solana.png" alt="" width="1em" height="1em" style={{ width: "1em", height: "1em" }} draggable={false} />
+);
+
 /* ── page ──────────────────────────────────────────── */
 
 export default function Landing({ testimonials }: LandingProps) {
@@ -246,50 +343,32 @@ export default function Landing({ testimonials }: LandingProps) {
           }}
         />
 
-        <div className="relative z-10 flex-1 flex items-end w-full max-w-[1400px] mx-auto px-6 pb-8 lg:pb-12 pt-32">
+        <div className="relative z-10 flex-1 flex items-end w-full max-w-[1400px] mx-auto px-6 pb-16 lg:pb-24 pt-32">
           <div>
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease, delay: 0.1 }}
-              className="text-white font-semibold tracking-tight leading-[1.05]"
-              style={{ fontSize: "clamp(3rem, 2rem + 5vw, 6.5rem)" }}
+              className="text-white font-black tracking-tight leading-[1.02]"
+              style={{ fontSize: "clamp(3.5rem, 2.5rem + 5vw, 7rem)" }}
             >
-              Structure powers
+              Empowering{" "}
+              <ParticleWord particles={[SOLANA_PARTICLE]}>Solana</ParticleWord>
               <br />
-              intelligence
+              builders in{" "}
+              <ParticleWord particles={["🇲🇾"]}>Malaysia</ParticleWord>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease, delay: 0.2 }}
-              className="mt-6 text-white/80 max-w-2xl leading-relaxed"
-              style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.8vw, 1.5rem)" }}
+              className="mt-6 text-white/80 max-w-4xl leading-relaxed"
+              style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem)" }}
             >
-              The back-end built for AI content operations. Power web, mobile, and
-              agentic applications at scale.
+              Join our community of developers, designers, and creators or explore bounties, grants,
+              and opportunities to build on Solana from Malaysia to the world.
             </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease, delay: 0.3 }}
-              className="mt-10 flex flex-wrap items-center gap-4"
-            >
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#9945ff] text-white text-base font-semibold hover:bg-[#8a3ae6] transition-colors duration-150"
-              >
-                Start building
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/40 text-white text-base font-medium hover:bg-white/10 transition-colors duration-150"
-              >
-                Get a demo
-              </a>
-            </motion.div>
           </div>
         </div>
 
@@ -636,11 +715,7 @@ export default function Landing({ testimonials }: LandingProps) {
             </p>
             <div className="flex items-center gap-2 text-xs text-[#71717a]">
               <span>Powered by</span>
-              <svg width="16" height="12" viewBox="0 0 397.7 311.7" className="inline-block">
-                <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="#14F195" />
-                <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="#14F195" />
-                <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="#14F195" />
-              </svg>
+              <img src="/logo/solana.png" alt="Solana" className="inline-block w-4 h-4 object-contain" />
               <span>Solana</span>
             </div>
           </div>
