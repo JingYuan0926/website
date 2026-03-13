@@ -173,22 +173,22 @@ html.light .glass-card:hover {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: var(--color-border-hover); }
 .scrollbar-thin { scrollbar-width: thin; scrollbar-color: var(--color-border-subtle) transparent; }
 
-/* Tweet-style cards */
+/* Tweet-style cards — matches react-tweet dark theme */
 .tweet-card {
-  background: #16181c;
-  border: 1px solid #2f3336;
+  background: rgb(21, 32, 43);
+  border: 1px solid rgb(56, 68, 77);
 }
 .tweet-card:hover {
-  background: #1d1f23;
-  border-color: #3a3f44;
+  background: rgb(30, 39, 50);
+  border-color: rgb(66, 78, 90);
 }
 html.light .tweet-card {
   background: #ffffff;
-  border-color: #e1e8ed;
+  border-color: #cfd9de;
 }
 html.light .tweet-card:hover {
   background: #f7f9fa;
-  border-color: #cfd9de;
+  border-color: #bbc5cc;
 }
 
 /* Tweet card markdown link color */
@@ -197,3 +197,12 @@ html.light .tweet-card:hover {
 .tweet-prose p { margin-bottom: 0.25rem; }
 .tweet-prose p:last-child { margin-bottom: 0; }
 html.light .tweet-prose a { color: #1d9bf0 !important; }
+
+/* react-tweet embed overrides for masonry layout */
+.tweet-embed {
+  --tweet-container-margin: 0;
+}
+.tweet-embed > div {
+  margin: 0 !important;
+  max-width: 100% !important;
+}
