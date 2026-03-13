@@ -339,6 +339,91 @@ export default function Landing({ testimonials }: LandingProps) {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[200px] bg-[#6a2ec0]/25" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[160px] bg-[#4a1a8a]/20" />
 
+        {/* Decorative trophy/achievement icons */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          {/* Row 1 - top */}
+          <svg className="absolute top-[4%] left-[3%] opacity-[0.18]" width="120" height="120" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-15deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[6%] left-[20%] opacity-[0.12]" width="50" height="50" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(25deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[3%] left-[38%] opacity-[0.10]" width="80" height="80" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-25deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[8%] left-[55%] opacity-[0.14]" width="45" height="45" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(8deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[5%] left-[70%] opacity-[0.16]" width="100" height="100" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(18deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[10%] right-[5%] opacity-[0.15]" width="70" height="70" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-10deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+
+          {/* Row 2 - upper middle */}
+          <svg className="absolute top-[25%] left-[1%] opacity-[0.11]" width="55" height="55" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(30deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[22%] left-[18%] opacity-[0.13]" width="90" height="90" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-20deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[28%] right-[15%] opacity-[0.12]" width="65" height="65" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(15deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[20%] right-[2%] opacity-[0.15]" width="110" height="110" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(25deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+
+          {/* Row 3 - middle */}
+          <svg className="absolute top-[42%] left-[5%] opacity-[0.14]" width="95" height="95" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(10deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[45%] left-[30%] opacity-[0.10]" width="40" height="40" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-35deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[40%] right-[8%] opacity-[0.16]" width="85" height="85" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-12deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[48%] right-[25%] opacity-[0.11]" width="55" height="55" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(20deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+
+          {/* Row 4 - lower middle */}
+          <svg className="absolute top-[60%] left-[10%] opacity-[0.13]" width="60" height="60" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-22deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[62%] left-[28%] opacity-[0.15]" width="105" height="105" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(8deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute top-[58%] right-[5%] opacity-[0.12]" width="50" height="50" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(35deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute top-[65%] right-[18%] opacity-[0.14]" width="75" height="75" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-18deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+
+          {/* Row 5 - bottom */}
+          <svg className="absolute bottom-[12%] left-[2%] opacity-[0.16]" width="130" height="130" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(22deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[15%] left-[22%] opacity-[0.11]" width="45" height="45" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-30deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute bottom-[5%] left-[42%] opacity-[0.13]" width="70" height="70" viewBox="0 0 24 24" fill="#dea54b">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <svg className="absolute bottom-[8%] left-[60%] opacity-[0.15]" width="100" height="100" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(-5deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[10%] right-[3%] opacity-[0.17]" width="140" height="140" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(15deg)" }}>
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+          </svg>
+          <svg className="absolute bottom-[18%] right-[30%] opacity-[0.10]" width="35" height="35" viewBox="0 0 24 24" fill="#dea54b" style={{ transform: "rotate(40deg)" }}>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        </div>
+
         <div className="relative max-w-[1200px] mx-auto">
           {/* Glass card */}
           <div
