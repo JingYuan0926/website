@@ -31,7 +31,11 @@ INSERT INTO site_content (section, key, value, type) VALUES
   ('join_cta', 'twitter_url', 'https://x.com/SuperteamMY', 'url')
 ON CONFLICT (section, key) DO NOTHING;
 
--- 2. Announcements table
+-- 2. Testimonial enhancements (tweet-style cards)
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS image_url text DEFAULT '';
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS author_handle text DEFAULT '';
+
+-- 3. Announcements table
 CREATE TABLE IF NOT EXISTS announcements (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   title text NOT NULL,
