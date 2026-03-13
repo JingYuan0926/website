@@ -184,21 +184,26 @@ function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string
 
 // --- Solana ecosystem projects ---
 const ECOSYSTEM_PROJECTS = [
-  { name: "Jupiter", abbr: "JUP", color: "#00D18C", domain: "jup.ag" },
-  { name: "Raydium", abbr: "RAY", color: "#6C5CE7", domain: "raydium.io" },
-  { name: "Tensor", abbr: "TNS", color: "#FF6B6B", domain: "tensor.trade" },
-  { name: "Jito", abbr: "JTO", color: "#45B26B", domain: "jito.network" },
-  { name: "Phantom", abbr: "PHM", color: "#AB9FF2", domain: "phantom.app" },
-  { name: "Magic Eden", abbr: "ME", color: "#E42575", domain: "magiceden.io" },
-  { name: "Helius", abbr: "HEL", color: "#E97A28", domain: "helius.dev" },
-  { name: "Orca", abbr: "ORC", color: "#FFDA44", domain: "orca.so" },
-  { name: "Drift", abbr: "DFT", color: "#FF6142", domain: "drift.trade" },
-  { name: "Pyth", abbr: "PTH", color: "#7142CF", domain: "pyth.network" },
-  { name: "Bonk", abbr: "BNK", color: "#F0A030", domain: "bonkcoin.com" },
-  { name: "Helium", abbr: "HNT", color: "#474DFF", domain: "helium.com" },
-  { name: "Wormhole", abbr: "WH", color: "#00D4FF", domain: "wormhole.com" },
-  { name: "Meteora", abbr: "MTR", color: "#3EECAC", domain: "meteora.ag" },
-  { name: "Marinade", abbr: "MND", color: "#C1839F", domain: "marinade.finance" },
+  { name: "Solana", color: "#9945FF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" },
+  { name: "Jupiter", color: "#00D18C", logo: "https://static.jup.ag/jup/icon.png" },
+  { name: "Raydium", color: "#6C5CE7", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/logo.png" },
+  { name: "Bonk", color: "#F0A030", logo: "https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I" },
+  { name: "Jito", color: "#45B26B", logo: "https://metadata.jito.network/token/jto/icon.png" },
+  { name: "Pyth", color: "#7142CF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3/logo.png" },
+  { name: "Orca", color: "#FFDA44", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE/logo.png" },
+  { name: "Marinade", color: "#C1839F", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey/logo.png" },
+  { name: "Dogwifhat", color: "#E8A838", logo: "https://bafkreibk3covs5ltyqxa272uodhber5r6bq3tph3iyamkss33miq2wy7ae.ipfs.nftstorage.link" },
+  { name: "Helium", color: "#474DFF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux/logo.png" },
+  { name: "Tensor", color: "#FF6B6B", logo: "https://coin-images.coingecko.com/coins/images/35972/large/tensor.jpeg" },
+  { name: "Phantom", color: "#AB9FF2", logo: "https://play-lh.googleusercontent.com/obRvW02OTYLzJuvic1ZbVDVXLXzI0Vt_JGOjlxZ92XMdBF_i3kqU92u9SgHvJ5pySdM" },
+  { name: "mSOL", color: "#5BACBA", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png" },
+  { name: "Serum", color: "#4FC5E8", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png" },
+  { name: "Saber", color: "#6966FB", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1/logo.png" },
+  { name: "Mango", color: "#E54033", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac/token.png" },
+  { name: "SAMO", color: "#EECAB0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU/logo.png" },
+  { name: "Star Atlas", color: "#40E0D0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx/logo.png" },
+  { name: "STEPN", color: "#83CF6A", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png" },
+  { name: "Audius", color: "#CC0FE0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9LzCMqDgTKYz9Drzqnpgee3SGa89up3a247ypMj2xrqM/logo.png" },
 ];
 
 interface EcoSpawn {
@@ -238,6 +243,13 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
       let pi = 0;
       const occupied = new Set<string>();
 
+      // Exclusion zones with 1-cell buffer so 3×3 spawns don't get clipped by panes
+      function inExclusion(r: number, c: number): boolean {
+        if (r >= 0 && r <= 7 && c >= 0 && c <= 14) return true;
+        if (r >= 10 && r <= 14 && c >= 31 && c <= 39) return true;
+        return false;
+      }
+
       function placeBlocks(
         minR: number, maxR: number, minC: number, maxC: number, count: number
       ): Map<string, EcoSpawn> {
@@ -253,7 +265,8 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           let ok = true;
           for (let dr = -1; dr <= 1 && ok; dr++) {
             for (let dc = -1; dc <= 1 && ok; dc++) {
-              if (occupied.has(`${cr + dr},${cc + dc}`)) ok = false;
+              const key = `${cr + dr},${cc + dc}`;
+              if (occupied.has(key) || inExclusion(cr + dr, cc + dc)) ok = false;
             }
           }
           if (!ok) continue;
@@ -275,10 +288,10 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         return map;
       }
 
-      // Left: centers row 6..TOTAL_ROWS-3 (avoids first/last row + heading area), col 2..PAD-3
-      const newLeft = placeBlocks(6, TOTAL_ROWS - 3, 2, PAD - 3, 2 + Math.floor(Math.random() * 2));
-      // Right: centers row 2..TOTAL_ROWS-3, col PAD+LOGO_COLS+3..COLS-3
-      const newRight = placeBlocks(2, TOTAL_ROWS - 3, PAD + LOGO_COLS + 3, COLS - 3, 2 + Math.floor(Math.random() * 2));
+      // Left: centers row 2..TOTAL_ROWS-3, col 2..PAD-3 (exclusion zones filter out heading area)
+      const newLeft = placeBlocks(2, TOTAL_ROWS - 3, 2, PAD - 3, 3 + Math.floor(Math.random() * 2));
+      // Right: centers row 2..TOTAL_ROWS-3, col PAD+LOGO_COLS+3..COLS-3 (exclusion zones filter out button area)
+      const newRight = placeBlocks(2, TOTAL_ROWS - 3, PAD + LOGO_COLS + 3, COLS - 3, 3 + Math.floor(Math.random() * 2));
       setLeftSpawns(newLeft);
       setRightSpawns(newRight);
     };
@@ -343,31 +356,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         }
       `}</style>
 
-      {/* Heading — top left at 5% from top */}
-      <div className="absolute left-0 right-0 z-20 px-6 lg:px-16 pointer-events-none" style={{ top: "15%" }}>
-        <div className="max-w-md">
-          <h2
-            className="text-white font-semibold tracking-tight leading-[1.1]"
-            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
-          >
-            Meet the community
-          </h2>
-          <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
-            Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
-          </p>
-        </div>
-      </div>
-
-      {/* View all members — bottom right at 5% from bottom */}
-      <div className="absolute right-0 z-20 px-6 lg:px-16" style={{ bottom: "15%" }}>
-        <Link
-          href="/members"
-          className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
-        >
-          View all members
-          <ArrowRight size={14} />
-        </Link>
-      </div>
+{/* Heading + View all members are now grid-placed below */}
 
       {/* Mobile: scrollable avatar grid */}
       <div className="lg:hidden relative z-10 w-full px-6 mt-[45%]">
@@ -443,55 +432,91 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                     <div
                       key={i}
                       onMouseEnter={() => { if (!isOnPath) clearActive(); }}
-                      className="rounded-[2px] relative aspect-square"
+                      className="rounded-[2px] relative aspect-square flex items-center justify-center"
                       style={{
                         backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
                         borderWidth: 1,
                         borderStyle: "solid",
-                        borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.06)",
+                        borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.3)",
                         boxShadow: isOnPath ? "inset 0 0 8px rgba(255,184,0,0.2)" : "none",
                         transition: "background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease",
                         transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
                       }}
                     >
+                      <span className="text-[6px] text-white/60 font-mono select-none pointer-events-none absolute">{r},{c}</span>
                       {showSpawn && spawn.isCenter && (
                         <div
                           key={spawn.id}
                           onMouseEnter={() => setHoveredSpawnId(spawn.id)}
                           onMouseLeave={() => setHoveredSpawnId(null)}
-                          className="flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-default"
+                          className="rounded-sm cursor-default overflow-hidden"
                           style={{
                             position: "absolute",
-                            top: -36,
-                            left: -36,
-                            width: 106,
-                            height: 106,
+                            top: "calc(-100% - 2px)",
+                            left: "calc(-100% - 2px)",
+                            width: "calc(300% + 4px)",
+                            height: "calc(300% + 4px)",
                             zIndex: 5,
                             animation: `ecoFade ${spawn.duration}ms ease both`,
                             animationDelay: `${spawn.delay}ms`,
                             animationPlayState: hoveredSpawnId === spawn.id ? "paused" : "running",
-                            backgroundColor: `${spawn.project.color}18`,
+                            backgroundColor: `black`,
                             border: `1px solid ${spawn.project.color}40`,
                             boxShadow: `inset 0 0 14px ${spawn.project.color}25`,
                           }}
                         >
                           <img
-                            src={`https://www.google.com/s2/favicons?domain=${spawn.project.domain}&sz=128`}
+                            src={spawn.project.logo}
                             alt={spawn.project.name}
-                            className="w-10 h-10 rounded-md object-contain"
+                            className="w-full h-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                           />
-                          <span
-                            className="text-[8px] font-bold leading-none select-none"
-                            style={{ color: `${spawn.project.color}DD` }}
-                          >
-                            {spawn.project.name}
-                          </span>
                         </div>
                       )}
                     </div>
                   );
                 })}
+
+              </div>
+
+              {/* Heading pane — rows 0-5, cols 1-12 (absolute overlay) */}
+              <div
+                className="absolute bg-black z-10 flex flex-col justify-center px-6"
+                style={{
+                  top: `${(0 / TOTAL_ROWS) * 100}%`,
+                  left: `${(1 / COLS) * 100}%`,
+                  width: `${(12 / COLS) * 100}%`,
+                  height: `${(6 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                <h2
+                  className="text-white font-semibold tracking-tight leading-[1.1]"
+                  style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+                >
+                  Meet the community
+                </h2>
+                <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
+                  Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
+                </p>
+              </div>
+
+              {/* View all members pane — rows 12-13, cols 33-38 (absolute overlay) */}
+              <div
+                className="absolute bg-black z-10 flex items-center justify-center"
+                style={{
+                  top: `${(12 / TOTAL_ROWS) * 100}%`,
+                  left: `${(33 / COLS) * 100}%`,
+                  width: `${(6 / COLS) * 100}%`,
+                  height: `${(2 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                <Link
+                  href="/members"
+                  className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
+                >
+                  View all members
+                  <ArrowRight size={14} />
+                </Link>
               </div>
 
               {/* Detail card — appears after path animation completes */}
@@ -568,6 +593,8 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
       {/* Fade overlays to blend grid edges */}
       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
     </section>
   );
 }
