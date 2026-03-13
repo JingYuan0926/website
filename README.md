@@ -362,6 +362,178 @@ Ensure all environment variables are configured in your hosting platform's setti
 
 ---
 
+## Architecture
+
+### System Overview
+
+```mermaid
+graph TB
+    subgraph Client["Browser"]
+        LP["Landing Page<br/>(SSG + ISR)"]
+        MP["Members Page<br/>(Static)"]
+        AD["Admin Dashboard<br/>(Client-side)"]
+    end
+
+    subgraph Vercel["Vercel Edge Network"]
+        CDN["CDN Cache"]
+        ISR_R["ISR Revalidation<br/>(every 1 hour)"]
+        API["API Routes"]
+    end
+
+    subgraph Supabase["Supabase"]
+        DB["PostgreSQL Database"]
+        ST["Storage Buckets<br/>(avatars, logos, events, general)"]
+        RLS["Row Level Security"]
+    end
+
+    subgraph External["External Services"]
+        LUMA["Luma Calendar API"]
+    end
+
+    LP -->|"Static HTML + hydration"| CDN
+    MP -->|"Static HTML"| CDN
+    AD -->|"CRUD operations"| DB
+    AD -->|"Image uploads"| ST
+    ISR_R -->|"Rebuild pages"| DB
+    API -->|"GET /api/luma-events"| DB
+    API -->|"POST /api/sync-luma-events"| LUMA
+    LUMA -->|"Events data"| DB
+
+    style Client fill:#1a1a2e,stroke:#9945ff,color:#fff
+    style Vercel fill:#0a0a0a,stroke:#14F195,color:#fff
+    style Supabase fill:#1a1a2e,stroke:#3ecf8e,color:#fff
+    style External fill:#1a1a2e,stroke:#f0a050,color:#fff
+```
+
+### Data Flow
+
+```mermaid
+flowchart LR
+    subgraph CMS["Admin CMS"]
+        E1["Edit Content"]
+        E2["Upload Images"]
+        E3["Manage Members"]
+    end
+
+    subgraph DB["Supabase DB"]
+        T1["site_content"]
+        T2["members"]
+        T3["partners"]
+        T4["testimonials"]
+        T5["mission_pillars"]
+        T6["faq_items"]
+        T7["luma_events"]
+        T8["community_projects"]
+    end
+
+    subgraph Build["Next.js ISR"]
+        GSP["getStaticProps<br/>(revalidate: 3600)"]
+    end
+
+    subgraph Pages["Public Pages"]
+        P1["Landing Page"]
+        P2["Members Page"]
+    end
+
+    CMS -->|"Supabase Client"| DB
+    DB -->|"Parallel queries"| GSP
+    GSP -->|"Props"| Pages
+
+    style CMS fill:#2d1b4e,stroke:#9945ff,color:#fff
+    style DB fill:#1a2e1a,stroke:#3ecf8e,color:#fff
+    style Build fill:#1a1a2e,stroke:#14F195,color:#fff
+    style Pages fill:#0a0a0a,stroke:#fff,color:#fff
+```
+
+### Component Architecture
+
+```mermaid
+graph TD
+    subgraph Pages["Pages"]
+        INDEX["pages/index.tsx"]
+        MEMBERS["pages/members.tsx"]
+        ADMIN["pages/admin/*"]
+    end
+
+    subgraph Landing["Landing Components"]
+        HERO["Hero Section<br/>(Video + HighlightWord)"]
+        MARQUEE["PartnerMarquee"]
+        EVENTS["EventsPane<br/>(Luma Integration)"]
+        MISSION["FeaturesSection<br/>(Scroll-driven)"]
+        STATS["Stats Section"]
+        SPOTLIGHT["MemberSpotlight<br/>(Pixel Grid)"]
+        WOL["WallOfLove<br/>(Tweet Embeds)"]
+        FAQ["FAQSection<br/>(Accordion)"]
+        CTA["Join CTA + Footer"]
+    end
+
+    subgraph Admin["Admin Components"]
+        LAYOUT["AdminLayout<br/>(Sidebar)"]
+        DT["DataTable<br/>(CRUD)"]
+        FM["FormModal<br/>(Fields)"]
+        IU["ImageUpload<br/>(Crop + BG Remove)"]
+        SC["SectionContent<br/>(Inline Editor)"]
+        AUTH["AdminAuth<br/>(Session)"]
+    end
+
+    subgraph Shared["Shared"]
+        BADGE["SkillBadge"]
+        ANIM["AnimatedSection"]
+        MD["Markdown"]
+    end
+
+    INDEX --> HERO
+    INDEX --> MARQUEE
+    INDEX --> EVENTS
+    INDEX --> MISSION
+    INDEX --> STATS
+    INDEX --> SPOTLIGHT
+    INDEX --> WOL
+    INDEX --> FAQ
+    INDEX --> CTA
+
+    ADMIN --> LAYOUT
+    ADMIN --> DT
+    ADMIN --> FM
+    ADMIN --> SC
+    FM --> IU
+    ADMIN --> AUTH
+
+    MEMBERS --> BADGE
+    SPOTLIGHT --> BADGE
+
+    style Pages fill:#1a1a2e,stroke:#9945ff,color:#fff
+    style Landing fill:#0a0a0a,stroke:#14F195,color:#fff
+    style Admin fill:#0a0a0a,stroke:#f0a050,color:#fff
+    style Shared fill:#0a0a0a,stroke:#888,color:#fff
+```
+
+### Luma Events Sync Pipeline
+
+```mermaid
+sequenceDiagram
+    participant Cron as Cron Job
+    participant API as /api/sync-luma-events
+    participant Luma as Luma API
+    participant DB as Supabase DB
+    participant Cache as luma_sync_meta
+    participant Page as Landing Page
+
+    Cron->>API: POST (Bearer token)
+    API->>Cache: Get last sync cursor
+    API->>Luma: Fetch events (cursor)
+    Luma-->>API: Events + next cursor
+    API->>DB: Upsert into luma_events
+    API->>Cache: Save new cursor
+    Note over Page: User visits site
+    Page->>API: GET /api/luma-events?period=future
+    API->>DB: SELECT from luma_events
+    DB-->>API: Cached events
+    API-->>Page: JSON response
+```
+
+---
+
 ## Design Decisions
 
 - **CMS follows frontend** — all CMS fields mirror the actual landing page content. Admins edit what they see.
