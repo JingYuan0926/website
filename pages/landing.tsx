@@ -463,13 +463,10 @@ export default function Landing({ testimonials }: LandingProps) {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
             {/* Brand */}
             <div className="md:col-span-4">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#9945ff] flex items-center justify-center font-bold text-sm text-white">
-                  ST
-                </div>
-                <span className="font-semibold text-white text-sm tracking-tight">
-                  Superteam{" "}
-                  <span className="text-[#b77dff]">Malaysia</span>
+              <div className="flex items-center gap-2 mb-5">
+                <img src="/logo/stmy.svg" alt="Superteam" className="h-7 w-7 object-contain" />
+                <span className={`text-white font-black text-xl tracking-tight ${archivo.className}`}>
+                  superteam<sup className="text-[0.5em] align-super">MY</sup>
                 </span>
               </div>
               <p className="text-[#a1a1aa] text-sm leading-relaxed max-w-sm">
