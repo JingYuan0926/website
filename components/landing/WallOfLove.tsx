@@ -344,6 +344,17 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
             </div>
           ))}
         </div>
+
+        <div className="flex justify-end mt-3">
+          <a
+            href="https://x.com/SuperteamMY"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-m font-bold text-[#ffffff] underline hover:text-white transition-colors"
+          >
+            View All...
+          </a>
+        </div>
       </div>
     </section>
   );
