@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
-import { SkillBadge } from "@/components/shared/SkillBadge";
 import { getInitials } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import type { Member } from "@/lib/types";
@@ -10,73 +9,80 @@ interface MemberSpotlightProps {
   members: Member[];
 }
 
-function mockAvatar(i: number): string {
-  const gender = i % 2 === 0 ? "men" : "women";
-  const id = ((i * 7 + 3) % 99) + 1;
-  return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`;
+/* ── color palette (synced with members page) ──── */
+
+const SKILL_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  "Core Team": { bg: "rgba(242,205,93,0.15)",  text: "#F2CD5D", border: "rgba(242,205,93,0.3)" },
+  "Rust":      { bg: "rgba(198,137,174,0.15)", text: "#C689AE", border: "rgba(198,137,174,0.3)" },
+  "Frontend":  { bg: "rgba(222,165,75,0.15)",  text: "#DEA54B", border: "rgba(222,165,75,0.3)" },
+  "Design":    { bg: "rgba(230,144,104,0.15)", text: "#E69068", border: "rgba(230,144,104,0.3)" },
+  "Content":   { bg: "rgba(237,123,132,0.15)", text: "#ED7B84", border: "rgba(237,123,132,0.3)" },
+  "Growth":    { bg: "rgba(210,145,146,0.15)", text: "#D29192", border: "rgba(210,145,146,0.3)" },
+  "Product":   { bg: "rgba(182,166,159,0.15)", text: "#B6A69F", border: "rgba(182,166,159,0.3)" },
+  "Community": { bg: "rgba(127,209,185,0.15)", text: "#7FD1B9", border: "rgba(127,209,185,0.3)" },
+};
+
+function getSkillColor(skill: string) {
+  return SKILL_COLORS[skill] || SKILL_COLORS["Product"];
 }
 
-const FIRST_NAMES = [
-  "Alex","Sarah","Rizal","Wei","Amir","Priya","Jun","Nurul","David","Mei",
-  "Farhan","Jade","Arjun","Siti","Marcus","Hana","Ravi","Aisyah","Brandon","Yuki",
-  "Liam","Sofia","Kai","Nina","Omar","Chloe","Zain","Aisha","Ethan","Mira",
-  "Hafiz","Luna","Raj","Farah","Dani","Ivy","Samir","Tina","Leon","Amy",
-  "Nate","Zara","Joel","Mia","Fikri","Rose","Adam","Lily","Tariq","Emi",
-  "Yusuf","Rina","Aiden","Maya","Imran","Nora","Leo","Dina","Ryan","Kira",
-  "Zack","Sera","Adi","Jia","Erik","Suki","Faris","Lena","Max","Yuna",
-  "Dex","Vera","Ali","Anya",
-];
-const LAST_NAMES = [
-  "Chen","Lim","Ahmad","Ling","Hassan","Sharma","Kai","Aina","Tan","Xin",
-  "Yusof","Wong","Nair","Fatimah","Lee","Kimura","Kumar","Malik","Ong","Tanaka",
-  "Park","Silva","Nakamura","Patel","Osman","Dubois","Karim","Ibrahim","Moore","Das",
-  "Razak","Torres","Gupta","Hasan","Kim","Flores","Shah","Costa","Wu","Reed",
-  "Ismail","Zhou","Santos","Lopez","Aziz","Rivera","Khan","Yang","Mahdi","Sato",
-  "Ali","Cheng","Nash","Lin","Rossi","Berg","Cho","Diaz","Fong","Cruz",
-  "Bakar","Roy","Hafiz","Sun","Holm","Mori","Idris","Koh","Stone","Ito",
-  "Cole","Nova","Reza","Devi",
-];
-const TITLES = [
-  "Full-Stack Dev","Smart Contract Eng","UI/UX Designer","Community Lead","DeFi Researcher",
-  "Frontend Dev","Blockchain Dev","Product Designer","DevRel Engineer","Data Analyst",
-  "Rust Developer","Mobile Dev","Protocol Engineer","Graphic Designer","Backend Dev",
-  "Web3 Educator","Security Researcher","NFT Artist","Growth Lead","Solana Dev",
-  "Token Engineer","ZK Researcher","Infra Lead","Content Creator","DAO Contributor",
-  "Game Dev","Bridge Engineer","Analytics Lead","Tech Writer","Validator Ops",
-  "SDK Developer","MEV Researcher","Wallet Dev","DePIN Builder","AI × Crypto",
-  "Grants Lead","Ecosystem Dev","Payments Dev","Identity Eng","NFT Dev",
-  "Staking Ops","Oracle Dev","Liquidity Eng","Compliance Eng","Marketing Lead",
-  "Onchain Analyst","RWA Engineer","Social Layer Dev","Governance Lead","Cross-chain Dev",
-  "Perp Dev","Lending Protocol","AMM Designer","Indexer Dev","Explorer Dev",
-  "Privacy Eng","Consensus Dev","Runtime Dev","Tooling Dev","Security Auditor",
-  "Farcaster Dev","Blinks Dev","cNFT Dev","Token-2022 Dev","SPL Dev",
-  "Anchor Dev","Seahorse Dev","Clockwork Dev","Helius Dev","Metaplex Dev",
-  "Jupiter Dev","Marinade Dev","Raydium Dev","Tensor Dev",
-];
-const SKILL_SETS = [
-  ["React","TypeScript","Solana"],["Rust","Anchor","Solana"],["Figma","CSS","Design"],
-  ["Community","Events"],["DeFi","Tokenomics"],["Next.js","Tailwind"],
-  ["Solidity","Rust"],["UI/UX","Branding"],["Docs","APIs"],
-  ["Python","SQL"],["Rust","Systems"],["React Native","Mobile"],
+/* ── canonical member data (synced with members page) */
+
+interface MemberData {
+  name: string;
+  title: string;
+  company: string;
+  avatar: string;
+  primaryRole: string;
+  secondaryRole?: string;
+  skills: string[];
+  twitter?: string;
+  bio: string;
+}
+
+const CANONICAL_MEMBERS: MemberData[] = [
+  { name: "Aiman Rizq", title: "Full-Stack Developer", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=aiman", primaryRole: "Core Team", secondaryRole: "Rust", skills: ["Core Team", "Rust", "Frontend"], twitter: "aimanrizq", bio: "Building DeFi protocols on Solana since 2022." },
+  { name: "Mei Lin", title: "Smart Contract Engineer", company: "Helius", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=meilin", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "meilin", bio: "Security-focused smart contract developer." },
+  { name: "Raj Kumar", title: "Frontend Engineer", company: "Jupiter", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=raj", primaryRole: "Frontend", secondaryRole: "Design", skills: ["Frontend", "Design"], twitter: "rajkumar", bio: "Crafting beautiful Web3 user experiences." },
+  { name: "Siti Nurha", title: "Product Designer", company: "Phantom", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=siti", primaryRole: "Design", secondaryRole: "Product", skills: ["Design", "Product"], twitter: "sitinurha", bio: "Designing intuitive interfaces for DeFi products." },
+  { name: "Wei Jie", title: "Protocol Engineer", company: "Jito", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=weijie", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "weijie", bio: "Low-level protocol optimization and MEV research." },
+  { name: "Priya Devi", title: "DevRel Engineer", company: "Solana Foundation", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=priya", primaryRole: "Community", secondaryRole: "Content", skills: ["Community", "Content", "Growth"], twitter: "priyadevi", bio: "Bridging developers and the Solana ecosystem." },
+  { name: "Hafiz Azman", title: "Backend Developer", company: "Drift", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=hafiz", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "hafizazman", bio: "Infrastructure and indexing for on-chain data." },
+  { name: "Yuki Tan", title: "Mobile Developer", company: "Backpack", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=yuki", primaryRole: "Frontend", secondaryRole: "Product", skills: ["Frontend", "Product"], twitter: "yukitan", bio: "Building mobile-first Solana wallets." },
+  { name: "Arjun Singh", title: "Data Scientist", company: "Pyth Network", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=arjun", primaryRole: "Product", secondaryRole: "Rust", skills: ["Product", "Rust"], bio: "On-chain data analytics and oracle research." },
+  { name: "Farah Amin", title: "Community Lead", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=farah", primaryRole: "Core Team", secondaryRole: "Community", skills: ["Core Team", "Community", "Growth"], twitter: "farahamin", bio: "Growing the Superteam MY community." },
+  { name: "Daniel Lim", title: "Security Researcher", company: "OtterSec", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=daniel", primaryRole: "Rust", skills: ["Rust"], twitter: "daniellim", bio: "Finding and fixing vulnerabilities in Solana programs." },
+  { name: "Aisyah Rani", title: "Technical Writer", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=aisyah", primaryRole: "Content", secondaryRole: "Community", skills: ["Content", "Community"], twitter: "aisyahrani", bio: "Making complex Solana concepts accessible." },
+  { name: "Zhen Wei", title: "Game Developer", company: "Star Atlas", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=zhenwei", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "zhenwei", bio: "Building on-chain gaming experiences." },
+  { name: "Kavitha Nair", title: "UI Engineer", company: "Tensor", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=kavitha", primaryRole: "Frontend", secondaryRole: "Design", skills: ["Frontend", "Design"], twitter: "kavithanair", bio: "Creative coding meets blockchain." },
+  { name: "Adam Hakim", title: "Blockchain Researcher", company: "Anza", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=adam", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], bio: "Researching zero-knowledge proofs on Solana." },
+  { name: "Li Wen", title: "DeFi Strategist", company: "Marinade", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=liwen", primaryRole: "Product", secondaryRole: "Growth", skills: ["Product", "Growth"], twitter: "liwen", bio: "Designing sustainable DeFi mechanisms." },
+  { name: "Nurul Huda", title: "Content Creator", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=nurul", primaryRole: "Core Team", secondaryRole: "Content", skills: ["Core Team", "Content", "Growth"], twitter: "nurulhuda", bio: "Creating educational Solana content." },
+  { name: "Cheng Hao", title: "DevOps Engineer", company: "Helius", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=chenghao", primaryRole: "Rust", secondaryRole: "Product", skills: ["Rust", "Product"], twitter: "chenghao", bio: "Running validator and RPC infrastructure." },
+  { name: "Amira Zainal", title: "Marketing Lead", company: "Superteam MY", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=amira", primaryRole: "Core Team", secondaryRole: "Growth", skills: ["Core Team", "Growth", "Community"], twitter: "amirazainal", bio: "Scaling Web3 projects through strategic marketing." },
+  { name: "Rizal Ahmad", title: "Full-Stack Developer", company: "Squads", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=rizal", primaryRole: "Rust", secondaryRole: "Frontend", skills: ["Rust", "Frontend"], twitter: "rizalahmad", bio: "Shipping full-stack dApps from KL to the world." },
 ];
 
 function generateMockMembers(count: number): Member[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `mock-${i}`,
-    name: `${FIRST_NAMES[i % FIRST_NAMES.length]} ${LAST_NAMES[i % LAST_NAMES.length]}`,
-    title: TITLES[i % TITLES.length],
-    bio: "Passionate builder contributing to the Solana ecosystem in Malaysia.",
-    avatar_url: mockAvatar(i),
-    skills: SKILL_SETS[i % SKILL_SETS.length],
-    twitter_handle: `${FIRST_NAMES[i % FIRST_NAMES.length].toLowerCase()}${LAST_NAMES[i % LAST_NAMES.length].toLowerCase()}`,
-    github_url: `https://github.com/${FIRST_NAMES[i % FIRST_NAMES.length].toLowerCase()}${LAST_NAMES[i % LAST_NAMES.length].toLowerCase()}`,
-    linkedin_url: "",
-    wallet_address: "",
-    is_spotlight: true,
-    display_order: i,
-    created_at: "",
-    updated_at: "",
-  }));
+  return Array.from({ length: count }, (_, i) => {
+    const src = CANONICAL_MEMBERS[i % CANONICAL_MEMBERS.length];
+    return {
+      id: `mock-${i}`,
+      name: src.name,
+      title: src.title,
+      bio: src.bio,
+      avatar_url: src.avatar,
+      skills: src.skills,
+      twitter_handle: src.twitter || "",
+      github_url: "",
+      linkedin_url: "",
+      wallet_address: "",
+      is_spotlight: true,
+      display_order: i,
+      created_at: "",
+      updated_at: "",
+    };
+  });
 }
 
 // --- Pixel Solana logo ---
@@ -237,52 +243,92 @@ interface EcoSpawn {
 }
 
 function DetailCardContent({ member }: { member: Member }) {
-  const isCoreTeam = member.skills.includes("Core Team");
+  const canonical = CANONICAL_MEMBERS.find((m) => m.name === member.name);
+  const primaryColor = getSkillColor(canonical?.primaryRole || member.skills[0] || "Product");
+  const secondaryColor = getSkillColor(canonical?.secondaryRole || canonical?.primaryRole || member.skills[0] || "Product");
+
   return (
-    <div className="w-full h-full p-3 flex flex-col items-center justify-center pointer-events-auto">
-      {member.avatar_url ? (
-        <img
-          src={member.avatar_url}
-          alt={member.name}
-          className={`w-24 h-24 rounded-xl object-cover ring-2 ${
-            isCoreTeam ? "ring-amber-500/50" : "ring-[#FFB800]/40"
-          }`}
-        />
-      ) : (
-        <div className={`w-24 h-24 rounded-xl flex items-center justify-center font-bold text-3xl ${
-          isCoreTeam ? "bg-amber-500/10 text-amber-400" : "bg-brand-purple/15 text-brand-purple-light"
-        }`}>
-          {getInitials(member.name)}
+    <div className="w-full h-full flex flex-col pointer-events-auto overflow-hidden">
+      {/* Top accent gradient */}
+      <div
+        className="h-1 shrink-0"
+        style={{ background: `linear-gradient(to right, ${primaryColor.text}, ${secondaryColor.text})` }}
+      />
+
+      <div
+        className="flex-1 flex flex-col items-center text-center p-3 min-h-0"
+        style={{
+          background: `linear-gradient(160deg, ${primaryColor.bg} 0%, ${secondaryColor.bg} 35%, transparent 65%)`,
+        }}
+      >
+        {/* Name + title on top */}
+        <h3 className="text-sm font-bold text-white tracking-wide uppercase truncate w-full mt-1">
+          {member.name}
+        </h3>
+        <p className="text-[10px] text-[#999] leading-relaxed line-clamp-2 mt-1 px-1">
+          {member.bio}
+        </p>
+
+        {/* Large centered avatar */}
+        <div className="flex-1 flex items-center justify-center my-2">
+          {member.avatar_url ? (
+            <div
+              className="w-48 h-48 rounded-xl overflow-hidden border-2"
+              style={{ borderColor: primaryColor.border }}
+            >
+              <img
+                src={member.avatar_url}
+                alt={member.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-48 h-48 rounded-xl flex items-center justify-center font-bold text-3xl border-2"
+              style={{ borderColor: primaryColor.border, backgroundColor: primaryColor.bg, color: primaryColor.text }}
+            >
+              {getInitials(member.name)}
+            </div>
+          )}
         </div>
-      )}
-      <h3 className={`text-xl font-bold mt-3 text-center leading-tight ${
-        isCoreTeam ? "text-amber-400" : "text-white"
-      }`}>
-        {member.name}
-      </h3>
-      <p className="text-base text-[#a1a1aa] mt-1 text-center">
-        {member.title}
-      </p>
-      {member.twitter_handle && (
-        <a
-          href={`https://x.com/${member.twitter_handle}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 mt-2 text-sm text-[#666] hover:text-white transition-colors"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-          </svg>
-          @{member.twitter_handle}
-        </a>
-      )}
-      {member.skills.length > 0 && (
-        <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-          {member.skills.slice(0, 4).map((skill) => (
-            <SkillBadge key={skill} skill={skill} size="sm" golden={isCoreTeam} />
-          ))}
+
+        {/* Skills */}
+        <div className="flex flex-wrap justify-center gap-1">
+          {member.skills.slice(0, 4).map((skill) => {
+            const sc = getSkillColor(skill);
+            return (
+              <span
+                key={skill}
+                className="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide"
+                style={{
+                  backgroundColor: sc.bg,
+                  color: sc.text,
+                  border: `1px solid ${sc.border}`,
+                }}
+              >
+                {skill}
+              </span>
+            );
+          })}
         </div>
-      )}
+
+        {/* Twitter */}
+        {member.twitter_handle && (
+          <div className="mt-1.5 pt-1.5 border-t border-[#ffffff10] w-full">
+            <a
+              href={`https://x.com/${member.twitter_handle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[11px] text-[#888] hover:text-white transition-colors"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              @{member.twitter_handle}
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
