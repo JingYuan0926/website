@@ -40,7 +40,7 @@ export default function AdminDashboard() {
     { label: "Members", value: stats.members, icon: Users, color: "text-brand-purple-light" },
     { label: "Events", value: stats.events, icon: Calendar, color: "text-brand-green" },
     { label: "Partners", value: stats.partners, icon: Handshake, color: "text-accent-gold" },
-    { label: "Testimonials", value: stats.testimonials, icon: MessageCircle, color: "text-brand-purple-light" },
+    { label: "Wall of Love", value: stats.testimonials, icon: MessageCircle, color: "text-brand-purple-light" },
   ];
 
   return (

@@ -115,7 +115,7 @@ export default function AdminTestimonials() {
   }
 
   return (
-    <AdminLayout title="Testimonials">
+    <AdminLayout title="Wall of Love">
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-text-secondary">{testimonials.length} testimonial{testimonials.length !== 1 ? "s" : ""}</p>
         <div className="flex items-center gap-2">

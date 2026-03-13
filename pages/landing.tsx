@@ -411,7 +411,7 @@ export default function Landing({ testimonials }: LandingProps) {
         id="events"
         className="relative px-6 flex items-center overflow-hidden"
         style={{
-          minHeight: "85dvh",
+          minHeight: "100dvh",
           scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
@@ -428,7 +428,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <FeaturesSection />
 
       {/* Statistics section */}
-      <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "85dvh", scrollSnapAlign: "start" }}>
+      <section id="statistics" className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "calc(100dvh - 60px)", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
@@ -854,15 +854,26 @@ function EventsPane() {
           learn more.
         </p>
 
-        <a
-          href={LUMA_CALENDAR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors"
-        >
-          View all on Luma
-          <ExternalLink size={14} />
-        </a>
+        <div className="flex flex-wrap items-center gap-3 mt-8">
+          <a
+            href="https://luma.com/create?calendar=cal-sZfiZHfUS5piycU"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white text-white text-sm font-semibold hover:bg-white/10 transition-colors"
+          >
+            Submit your event
+            <ExternalLink size={14} />
+          </a>
+          <a
+            href={LUMA_CALENDAR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors"
+          >
+            View all on Luma
+            <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
 
       {/* Right — event pane */}
@@ -894,7 +905,7 @@ function EventsPane() {
         {/* Scrollable event list */}
         <div
           ref={scrollRef}
-          className="max-h-[calc(85vh-280px)] overflow-y-auto p-4 scrollbar-thin"
+          className="max-h-[calc(85vh-80px)] overflow-y-auto p-4 scrollbar-thin"
         >
           {initialLoading && (
             <div className="flex justify-center py-16">

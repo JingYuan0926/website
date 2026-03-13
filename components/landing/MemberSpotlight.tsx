@@ -126,57 +126,79 @@ const OUTLINE_SET = new Set(ALL_OUTLINE.map(([r, c]) => `${r},${c}`));
 
 const CLEAR_ROWS = [0, VPAD + 3, VPAD + 7, TOTAL_ROWS - 1];
 
+// Card center rows (4th row of each 7×7 card)
+const RIGHT_CARD_ROW = 4;  // right card rows 1-7, middle
+const LEFT_CARD_ROW = 10;  // left card rows 7-13, center = 10
+const RIGHT_CARD_COL = 29; // left edge of right card (cols 29-35)
+const LEFT_CARD_COL = 9;   // right edge of left card (cols 3-9)
+
 function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string, number> {
   const path = new Map<string, number>();
   let idx = 0;
 
-  // Stop 4 cells past the logo edge into the padding
-  const stopCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
+  const targetRow = cardSide === "right" ? RIGHT_CARD_ROW : LEFT_CARD_ROW;
+  const stopCol = cardSide === "left" ? LEFT_CARD_COL : RIGHT_CARD_COL;
+  const logoEdge = cardSide === "left" ? PAD - 2 : PAD + LOGO_COLS + 1;
 
+  // Phase 1: Route horizontally from avatar toward logo edge
+  // Check if straight horizontal to logo edge is clear
+  let currentRow = r;
   let straightClear = true;
   if (cardSide === "left") {
-    for (let col = c - 1; col >= stopCol; col--) {
+    for (let col = c - 1; col >= logoEdge; col--) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   } else {
-    for (let col = c + 1; col <= stopCol; col++) {
+    for (let col = c + 1; col <= logoEdge; col++) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   }
 
-  if (straightClear) {
-    if (cardSide === "left") {
-      for (let col = c - 1; col >= stopCol; col--) path.set(`${r},${col}`, idx++);
-    } else {
-      for (let col = c + 1; col <= stopCol; col++) path.set(`${r},${col}`, idx++);
+  if (!straightClear) {
+    // Route through nearest clear row to get past logo
+    let bestRow = -1;
+    let bestDist = Infinity;
+    for (const cr of CLEAR_ROWS) {
+      const dist = Math.abs(r - cr);
+      if (dist >= bestDist) continue;
+      let blocked = false;
+      const dir = cr > r ? 1 : -1;
+      for (let row = r + dir; row !== cr + dir; row += dir) {
+        if (OUTLINE_SET.has(`${row},${c}`)) { blocked = true; break; }
+      }
+      if (!blocked) { bestDist = dist; bestRow = cr; }
     }
-    return path;
-  }
+    if (bestRow === -1) bestRow = CLEAR_ROWS[0];
 
-  let bestRow = -1;
-  let bestDist = Infinity;
-  for (const cr of CLEAR_ROWS) {
-    const dist = Math.abs(r - cr);
-    if (dist >= bestDist) continue;
-    let blocked = false;
-    const dir = cr > r ? 1 : -1;
-    for (let row = r + dir; row !== cr + dir; row += dir) {
-      if (OUTLINE_SET.has(`${row},${c}`)) { blocked = true; break; }
+    // Vertical to clear row
+    if (bestRow < r) {
+      for (let row = r - 1; row >= bestRow; row--) path.set(`${row},${c}`, idx++);
+    } else if (bestRow > r) {
+      for (let row = r + 1; row <= bestRow; row++) path.set(`${row},${c}`, idx++);
     }
-    if (!blocked) { bestDist = dist; bestRow = cr; }
-  }
-  if (bestRow === -1) bestRow = CLEAR_ROWS[0];
-
-  if (bestRow < r) {
-    for (let row = r - 1; row >= bestRow; row--) path.set(`${row},${c}`, idx++);
-  } else if (bestRow > r) {
-    for (let row = r + 1; row <= bestRow; row++) path.set(`${row},${c}`, idx++);
+    currentRow = bestRow;
   }
 
+  // Horizontal to logo edge
   if (cardSide === "left") {
-    for (let col = c - 1; col >= stopCol; col--) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c - 1; col >= logoEdge; col--) path.set(`${currentRow},${col}`, idx++);
   } else {
-    for (let col = c + 1; col <= stopCol; col++) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c + 1; col <= logoEdge; col++) path.set(`${currentRow},${col}`, idx++);
+  }
+  let currentCol = logoEdge;
+
+  // Phase 2: Route vertically to card center row
+  if (currentRow < targetRow) {
+    for (let row = currentRow + 1; row <= targetRow; row++) path.set(`${row},${currentCol}`, idx++);
+  } else if (currentRow > targetRow) {
+    for (let row = currentRow - 1; row >= targetRow; row--) path.set(`${row},${currentCol}`, idx++);
+  }
+
+  // Phase 3: Route horizontally to card edge
+  if (cardSide === "left") {
+    for (let col = currentCol - 1; col >= stopCol; col--) path.set(`${targetRow},${col}`, idx++);
+  } else {
+    for (let col = currentCol + 1; col <= stopCol; col++) path.set(`${targetRow},${col}`, idx++);
   }
 
   return path;
@@ -184,21 +206,26 @@ function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string
 
 // --- Solana ecosystem projects ---
 const ECOSYSTEM_PROJECTS = [
-  { name: "Jupiter", abbr: "JUP", color: "#00D18C", domain: "jup.ag" },
-  { name: "Raydium", abbr: "RAY", color: "#6C5CE7", domain: "raydium.io" },
-  { name: "Tensor", abbr: "TNS", color: "#FF6B6B", domain: "tensor.trade" },
-  { name: "Jito", abbr: "JTO", color: "#45B26B", domain: "jito.network" },
-  { name: "Phantom", abbr: "PHM", color: "#AB9FF2", domain: "phantom.app" },
-  { name: "Magic Eden", abbr: "ME", color: "#E42575", domain: "magiceden.io" },
-  { name: "Helius", abbr: "HEL", color: "#E97A28", domain: "helius.dev" },
-  { name: "Orca", abbr: "ORC", color: "#FFDA44", domain: "orca.so" },
-  { name: "Drift", abbr: "DFT", color: "#FF6142", domain: "drift.trade" },
-  { name: "Pyth", abbr: "PTH", color: "#7142CF", domain: "pyth.network" },
-  { name: "Bonk", abbr: "BNK", color: "#F0A030", domain: "bonkcoin.com" },
-  { name: "Helium", abbr: "HNT", color: "#474DFF", domain: "helium.com" },
-  { name: "Wormhole", abbr: "WH", color: "#00D4FF", domain: "wormhole.com" },
-  { name: "Meteora", abbr: "MTR", color: "#3EECAC", domain: "meteora.ag" },
-  { name: "Marinade", abbr: "MND", color: "#C1839F", domain: "marinade.finance" },
+  { name: "Solana", color: "#9945FF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" },
+  { name: "Jupiter", color: "#00D18C", logo: "https://static.jup.ag/jup/icon.png" },
+  { name: "Raydium", color: "#6C5CE7", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/logo.png" },
+  { name: "Bonk", color: "#F0A030", logo: "https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I" },
+  { name: "Jito", color: "#45B26B", logo: "https://metadata.jito.network/token/jto/icon.png" },
+  { name: "Pyth", color: "#7142CF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3/logo.png" },
+  { name: "Orca", color: "#FFDA44", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE/logo.png" },
+  { name: "Marinade", color: "#C1839F", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey/logo.png" },
+  { name: "Dogwifhat", color: "#E8A838", logo: "https://bafkreibk3covs5ltyqxa272uodhber5r6bq3tph3iyamkss33miq2wy7ae.ipfs.nftstorage.link" },
+  { name: "Helium", color: "#474DFF", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux/logo.png" },
+  { name: "Tensor", color: "#FF6B6B", logo: "https://coin-images.coingecko.com/coins/images/35972/large/tensor.jpeg" },
+  { name: "Phantom", color: "#AB9FF2", logo: "https://play-lh.googleusercontent.com/obRvW02OTYLzJuvic1ZbVDVXLXzI0Vt_JGOjlxZ92XMdBF_i3kqU92u9SgHvJ5pySdM" },
+  { name: "mSOL", color: "#5BACBA", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png" },
+  { name: "Serum", color: "#4FC5E8", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png" },
+  { name: "Saber", color: "#6966FB", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1/logo.png" },
+  { name: "Mango", color: "#E54033", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac/token.png" },
+  { name: "SAMO", color: "#EECAB0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU/logo.png" },
+  { name: "Star Atlas", color: "#40E0D0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx/logo.png" },
+  { name: "STEPN", color: "#83CF6A", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png" },
+  { name: "Audius", color: "#CC0FE0", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9LzCMqDgTKYz9Drzqnpgee3SGa89up3a247ypMj2xrqM/logo.png" },
 ];
 
 interface EcoSpawn {
@@ -207,6 +234,57 @@ interface EcoSpawn {
   duration: number;
   id: number;
   isCenter: boolean;
+}
+
+function DetailCardContent({ member }: { member: Member }) {
+  const isCoreTeam = member.skills.includes("Core Team");
+  return (
+    <div className="w-full h-full p-3 flex flex-col items-center justify-center pointer-events-auto">
+      {member.avatar_url ? (
+        <img
+          src={member.avatar_url}
+          alt={member.name}
+          className={`w-24 h-24 rounded-xl object-cover ring-2 ${
+            isCoreTeam ? "ring-amber-500/50" : "ring-[#FFB800]/40"
+          }`}
+        />
+      ) : (
+        <div className={`w-24 h-24 rounded-xl flex items-center justify-center font-bold text-3xl ${
+          isCoreTeam ? "bg-amber-500/10 text-amber-400" : "bg-brand-purple/15 text-brand-purple-light"
+        }`}>
+          {getInitials(member.name)}
+        </div>
+      )}
+      <h3 className={`text-xl font-bold mt-3 text-center leading-tight ${
+        isCoreTeam ? "text-amber-400" : "text-white"
+      }`}>
+        {member.name}
+      </h3>
+      <p className="text-base text-[#a1a1aa] mt-1 text-center">
+        {member.title}
+      </p>
+      {member.twitter_handle && (
+        <a
+          href={`https://x.com/${member.twitter_handle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 mt-2 text-sm text-[#666] hover:text-white transition-colors"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+          @{member.twitter_handle}
+        </a>
+      )}
+      {member.skills.length > 0 && (
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+          {member.skills.slice(0, 4).map((skill) => (
+            <SkillBadge key={skill} skill={skill} size="sm" golden={isCoreTeam} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function MemberSpotlight({ members }: MemberSpotlightProps) {
@@ -222,6 +300,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const [activeCardSide, setActiveCardSide] = useState<"left" | "right">("left");
   const [pathCells, setPathCells] = useState<Map<string, number>>(new Map());
   const [showCard, setShowCard] = useState(false);
+  const [locked, setLocked] = useState(false);
   const cardTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const logoMidCol = PAD + LOGO_COLS / 2;
@@ -238,6 +317,13 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
       let pi = 0;
       const occupied = new Set<string>();
 
+      // Exclusion zones with 1-cell buffer so 3×3 spawns don't get clipped by panes
+      function inExclusion(r: number, c: number): boolean {
+        if (r >= 0 && r <= 7 && c >= 0 && c <= 14) return true;
+        if (r >= 10 && r <= 14 && c >= 31 && c <= 39) return true;
+        return false;
+      }
+
       function placeBlocks(
         minR: number, maxR: number, minC: number, maxC: number, count: number
       ): Map<string, EcoSpawn> {
@@ -253,7 +339,8 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           let ok = true;
           for (let dr = -1; dr <= 1 && ok; dr++) {
             for (let dc = -1; dc <= 1 && ok; dc++) {
-              if (occupied.has(`${cr + dr},${cc + dc}`)) ok = false;
+              const key = `${cr + dr},${cc + dc}`;
+              if (occupied.has(key) || inExclusion(cr + dr, cc + dc)) ok = false;
             }
           }
           if (!ok) continue;
@@ -275,10 +362,10 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         return map;
       }
 
-      // Left: centers row 6..TOTAL_ROWS-3 (avoids first/last row + heading area), col 2..PAD-3
-      const newLeft = placeBlocks(6, TOTAL_ROWS - 3, 2, PAD - 3, 2 + Math.floor(Math.random() * 2));
-      // Right: centers row 2..TOTAL_ROWS-3, col PAD+LOGO_COLS+3..COLS-3
-      const newRight = placeBlocks(2, TOTAL_ROWS - 3, PAD + LOGO_COLS + 3, COLS - 3, 2 + Math.floor(Math.random() * 2));
+      // Left: centers row 2..TOTAL_ROWS-3, col 2..PAD-3 (exclusion zones filter out heading area)
+      const newLeft = placeBlocks(2, TOTAL_ROWS - 3, 2, PAD - 3, 3 + Math.floor(Math.random() * 2));
+      // Right: centers row 2..TOTAL_ROWS-3, col PAD+LOGO_COLS+3..COLS-3 (exclusion zones filter out button area)
+      const newRight = placeBlocks(2, TOTAL_ROWS - 3, PAD + LOGO_COLS + 3, COLS - 3, 3 + Math.floor(Math.random() * 2));
       setLeftSpawns(newLeft);
       setRightSpawns(newRight);
     };
@@ -294,33 +381,43 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
     };
   }, []);
 
-  function handleHover(member: Member, r: number, c: number) {
+  function activateMember(member: Member, r: number, c: number) {
     setActive(member);
     setActiveCol(c);
     setActiveRow(r);
     setShowCard(false);
 
-    // Force right only for the first row of avatars; all others use normal left/right logic
     const cardSide: "left" | "right" = r === VPAD ? "right" : c >= logoMidCol ? "right" : "left";
     setActiveCardSide(cardSide);
     const newPath = buildPath(r, c, cardSide);
     setPathCells(newPath);
 
-    // Show card once 4 golden cells enter the padding area past the logo edge
     if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
-    const triggerCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
-    let triggerDelay = newPath.size * 25; // fallback: full path
-    for (const [key, idx] of newPath) {
-      const col = parseInt(key.split(",")[1]);
-      if (cardSide === "left" ? col <= triggerCol : col >= triggerCol) {
-        triggerDelay = (idx + 1) * 25;
-        break;
-      }
-    }
+    const triggerDelay = newPath.size * 25;
     cardTimerRef.current = setTimeout(() => setShowCard(true), triggerDelay + 100);
   }
 
+  function handleHover(member: Member, r: number, c: number) {
+    if (locked) return;
+    activateMember(member, r, c);
+  }
+
+  function handleClick(member: Member, r: number, c: number) {
+    if (locked && active?.id === member.id) {
+      // Click same locked avatar → unlock
+      setLocked(false);
+      setActive(null);
+      setPathCells(new Map());
+      setShowCard(false);
+      if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+      return;
+    }
+    setLocked(true);
+    activateMember(member, r, c);
+  }
+
   function clearActive() {
+    if (locked) return;
     setActive(null);
     setPathCells(new Map());
     setShowCard(false);
@@ -341,33 +438,29 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
           75% { opacity: 1; transform: scale(1); }
           100% { opacity: 0; transform: scale(0.7); }
         }
+        @keyframes pulseGoldBorder {
+          0%, 100% {
+            box-shadow: inset 0 0 10px rgba(255,184,0,0.5), 0 0 6px rgba(255,184,0,0.2);
+          }
+          50% {
+            box-shadow: inset 0 0 22px rgba(255,184,0,0.9), 0 0 16px rgba(255,184,0,0.5);
+          }
+        }
+        @keyframes beamPulse {
+          0%, 100% {
+            background-color: rgba(255, 184, 0, 0.15);
+            border-color: rgba(255, 184, 0, 0.25);
+            box-shadow: none;
+          }
+          50% {
+            background-color: rgba(255, 184, 0, 0.55);
+            border-color: rgba(255, 184, 0, 0.65);
+            box-shadow: inset 0 0 10px rgba(255,184,0,0.35);
+          }
+        }
       `}</style>
 
-      {/* Heading — top left at 5% from top */}
-      <div className="absolute left-0 right-0 z-20 px-6 lg:px-16 pointer-events-none" style={{ top: "15%" }}>
-        <div className="max-w-md">
-          <h2
-            className="text-white font-semibold tracking-tight leading-[1.1]"
-            style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
-          >
-            Meet the community
-          </h2>
-          <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
-            Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
-          </p>
-        </div>
-      </div>
-
-      {/* View all members — bottom right at 5% from bottom */}
-      <div className="absolute right-0 z-20 px-6 lg:px-16" style={{ bottom: "15%" }}>
-        <Link
-          href="/members"
-          className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
-        >
-          View all members
-          <ArrowRight size={14} />
-        </Link>
-      </div>
+{/* Heading + View all members are now grid-placed below */}
 
       {/* Mobile: scrollable avatar grid */}
       <div className="lg:hidden relative z-10 w-full px-6 mt-[45%]">
@@ -411,7 +504,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                       <button
                         key={i}
                         onMouseEnter={() => handleHover(member, r, c)}
-                        onClick={() => handleHover(member, r, c)}
+                        onClick={() => handleClick(member, r, c)}
                         className={`relative rounded-[2px] overflow-hidden transition-all duration-150 group aspect-square ${
                           active?.id === member.id ? "z-10 scale-110" : "hover:scale-105"
                         }`}
@@ -422,9 +515,13 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                           className="w-full h-full object-cover"
                         />
                         <div
-                          className={`absolute inset-0 pointer-events-none border-2 border-[#FFB800] shadow-[inset_0_0_10px_rgba(255,184,0,0.5)] rounded-[2px] transition-opacity duration-150 ${
+                          className={`absolute inset-0 pointer-events-none border-2 border-[#FFB800] rounded-[2px] transition-opacity duration-150 ${
                             active?.id === member.id ? "opacity-100" : "opacity-0"
                           }`}
+                          style={{
+                            animation: active?.id === member.id && locked ? "pulseGoldBorder 1.5s ease-in-out infinite" : "none",
+                            boxShadow: active?.id === member.id && !locked ? "inset 0 0 10px rgba(255,184,0,0.5)" : undefined,
+                          }}
                         />
                       </button>
                     );
@@ -442,13 +539,18 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                   return (
                     <div
                       key={i}
-                      onMouseEnter={() => { if (!isOnPath) clearActive(); }}
-                      className="rounded-[2px] relative aspect-square"
-                      style={{
+                      onMouseEnter={() => { if (!locked && !isOnPath) clearActive(); }}
+                      className="rounded-[2px] relative aspect-square flex items-center justify-center"
+                      style={isOnPath && locked ? {
+                        animation: "beamPulse 2s ease-in-out infinite",
+                        animationDelay: `${(pathDelay ?? 0) * 60}ms`,
+                        borderWidth: 1,
+                        borderStyle: "solid",
+                      } : {
                         backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
                         borderWidth: 1,
                         borderStyle: "solid",
-                        borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.06)",
+                        borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.3)",
                         boxShadow: isOnPath ? "inset 0 0 8px rgba(255,184,0,0.2)" : "none",
                         transition: "background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease",
                         transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
@@ -459,107 +561,112 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                           key={spawn.id}
                           onMouseEnter={() => setHoveredSpawnId(spawn.id)}
                           onMouseLeave={() => setHoveredSpawnId(null)}
-                          className="flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-default"
+                          className="rounded-sm cursor-default overflow-hidden"
                           style={{
                             position: "absolute",
-                            top: -36,
-                            left: -36,
-                            width: 106,
-                            height: 106,
+                            top: "calc(-100% - 2px)",
+                            left: "calc(-100% - 2px)",
+                            width: "calc(300% + 4px)",
+                            height: "calc(300% + 4px)",
                             zIndex: 5,
                             animation: `ecoFade ${spawn.duration}ms ease both`,
                             animationDelay: `${spawn.delay}ms`,
                             animationPlayState: hoveredSpawnId === spawn.id ? "paused" : "running",
-                            backgroundColor: `${spawn.project.color}18`,
+                            backgroundColor: `black`,
                             border: `1px solid ${spawn.project.color}40`,
                             boxShadow: `inset 0 0 14px ${spawn.project.color}25`,
                           }}
                         >
                           <img
-                            src={`https://www.google.com/s2/favicons?domain=${spawn.project.domain}&sz=128`}
+                            src={spawn.project.logo}
                             alt={spawn.project.name}
-                            className="w-10 h-10 rounded-md object-contain"
+                            className="w-full h-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                           />
-                          <span
-                            className="text-[8px] font-bold leading-none select-none"
-                            style={{ color: `${spawn.project.color}DD` }}
-                          >
-                            {spawn.project.name}
-                          </span>
                         </div>
                       )}
                     </div>
                   );
                 })}
+
               </div>
 
-              {/* Detail card — appears after path animation completes */}
+              {/* Heading pane — rows 0-5, cols 1-12 (absolute overlay) */}
               <div
-                className={`absolute top-0 bottom-0 z-20 pointer-events-none transition-all duration-300 ${
-                  showCard && active ? "opacity-100" : "opacity-0"
-                }`}
+                className="absolute bg-black z-10 flex flex-col justify-center px-6"
                 style={{
-                  width: PAD * (34 + 2) - 4 * (34 + 2),
-                  ...(activeCardSide === "right"
-                    ? { right: 0 }
-                    : { left: 0 }),
+                  top: `${(0 / TOTAL_ROWS) * 100}%`,
+                  left: `${(1 / COLS) * 100}%`,
+                  width: `${(12 / COLS) * 100}%`,
+                  height: `${(6 / TOTAL_ROWS) * 100}%`,
                 }}
               >
-                {active && (
-                  <div className="pointer-events-auto w-full h-full bg-black p-6 flex flex-col items-center justify-center">
-                    {active.avatar_url ? (
-                      <img
-                        src={active.avatar_url}
-                        alt={active.name}
-                        className="w-16 h-16 rounded-xl object-cover ring-2 ring-[#FFB800]/40"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-xl bg-brand-purple/15 flex items-center justify-center text-brand-purple-light font-bold text-lg">
-                        {getInitials(active.name)}
-                      </div>
-                    )}
-                    <h3 className="text-base font-semibold text-text-primary mt-3">
-                      {active.name}
-                    </h3>
-                    <p className="text-sm text-text-secondary mt-0.5">
-                      {active.title}
-                    </p>
-                    {active.twitter_handle && (
-                      <a
-                        href={`https://x.com/${active.twitter_handle}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-1.5 text-xs text-text-muted hover:text-brand-purple-light transition-colors"
-                      >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                        </svg>
-                        @{active.twitter_handle}
-                      </a>
-                    )}
-                    {active.skills.length > 0 && (
-                      <div className="mt-3 flex flex-wrap justify-center gap-1">
-                        {active.skills.map((skill) => (
-                          <SkillBadge key={skill} skill={skill} size="sm" />
-                        ))}
-                      </div>
-                    )}
-                    {active.github_url && (
-                      <a
-                        href={active.github_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] text-text-secondary hover:text-text-primary transition-colors"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                        </svg>
-                        GitHub
-                      </a>
-                    )}
-                  </div>
-                )}
+                <h2
+                  className="text-white font-semibold tracking-tight leading-[1.1]"
+                  style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+                >
+                  Meet the community
+                </h2>
+                <p className="mt-5 text-[#a1a1aa] text-sm leading-relaxed">
+                  Talented builders, designers, and creators shaping Malaysia&rsquo;s Web3 landscape.
+                </p>
+              </div>
+
+              {/* View all members pane — rows 12-13, cols 33-38 (absolute overlay) */}
+              <div
+                className="absolute bg-black z-10 flex items-center justify-center"
+                style={{
+                  top: `${(12 / TOTAL_ROWS) * 100}%`,
+                  left: `${(33 / COLS) * 100}%`,
+                  width: `${(6 / COLS) * 100}%`,
+                  height: `${(2 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                <Link
+                  href="/members"
+                  className="text-sm font-semibold text-white/70 hover:text-white transition-colors inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/5"
+                >
+                  View all members
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+
+              {/* Right detail card — rows 1-7, cols 29-35 (7×7) */}
+              <div
+                className={`absolute bg-black z-20 pointer-events-none transition-all duration-300 ${
+                  showCard && active && activeCardSide === "right" ? "opacity-100" : "opacity-0"
+                } ${
+                  active?.skills.includes("Core Team")
+                    ? "border border-amber-500/40"
+                    : "border border-white/[0.06]"
+                }`}
+                style={{
+                  top: `${(1 / TOTAL_ROWS) * 100}%`,
+                  left: `${(29 / COLS) * 100}%`,
+                  width: `${(7 / COLS) * 100}%`,
+                  height: `${(7 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                {active && <DetailCardContent member={active} />}
+              </div>
+
+              {/* Left detail card — rows 7-13, cols 3-9 (7×7) */}
+              <div
+                className={`absolute bg-black z-20 pointer-events-none transition-all duration-300 ${
+                  showCard && active && activeCardSide === "left" ? "opacity-100" : "opacity-0"
+                } ${
+                  active?.skills.includes("Core Team")
+                    ? "border border-amber-500/40"
+                    : "border border-white/[0.06]"
+                }`}
+                style={{
+                  top: `${(7 / TOTAL_ROWS) * 100}%`,
+                  left: `${(3 / COLS) * 100}%`,
+                  width: `${(7 / COLS) * 100}%`,
+                  height: `${(7 / TOTAL_ROWS) * 100}%`,
+                }}
+              >
+                {active && <DetailCardContent member={active} />}
               </div>
             </div>
         </AnimatedSection>
@@ -568,6 +675,8 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
       {/* Fade overlays to blend grid edges */}
       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
     </section>
   );
 }

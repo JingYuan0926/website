@@ -4,16 +4,21 @@ import { DataTable, type Column } from "@/components/admin/DataTable";
 import { FormModal, type FieldDef } from "@/components/admin/FormModal";
 import { SkillBadge } from "@/components/shared/SkillBadge";
 import { supabase } from "@/lib/supabase";
+import { SKILL_CATEGORIES } from "@/lib/constants";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Member } from "@/lib/types";
+
+const SKILL_OPTIONS = SKILL_CATEGORIES
+  .filter((s) => s !== "All")
+  .map((s) => ({ value: s, label: s }));
 
 const FIELDS: FieldDef[] = [
   { key: "name", label: "Name", type: "text", required: true },
   { key: "title", label: "Title / Role", type: "text", required: true },
   { key: "bio", label: "Bio", type: "markdown", placeholder: "Short bio..." },
   { key: "avatar_url", label: "Avatar", type: "image", bucket: "avatars" },
-  { key: "skills", label: "Skills", type: "tags" },
+  { key: "skills", label: "Skills", type: "checkboxes", options: SKILL_OPTIONS },
   { key: "twitter_handle", label: "Twitter Handle", type: "text", placeholder: "username" },
   { key: "github_url", label: "GitHub URL", type: "text" },
   { key: "linkedin_url", label: "LinkedIn URL", type: "text" },
@@ -30,7 +35,7 @@ const COLUMNS: Column<Member>[] = [
     label: "Skills",
     render: (m) => (
       <div className="flex flex-wrap gap-1">
-        {m.skills.slice(0, 3).map((s) => (
+        {m.skills.map((s) => (
           <SkillBadge key={s} skill={s} size="sm" />
         ))}
       </div>
