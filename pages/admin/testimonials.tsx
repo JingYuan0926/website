@@ -9,9 +9,11 @@ import type { Testimonial } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
   { key: "author_name", label: "Author Name", type: "text", required: true },
+  { key: "author_handle", label: "Handle", type: "text", placeholder: "@username" },
   { key: "author_title", label: "Author Title", type: "text", placeholder: "Solana Developer" },
   { key: "author_avatar_url", label: "Author Avatar", type: "image", bucket: "avatars" },
   { key: "content", label: "Testimonial", type: "markdown", required: true },
+  { key: "image_url", label: "Card Image", type: "image", bucket: "general" },
   { key: "twitter_url", label: "Tweet URL", type: "text", placeholder: "https://x.com/..." },
   { key: "is_tweet_embed", label: "Embed as Tweet", type: "toggle" },
   { key: "display_order", label: "Display Order", type: "number" },

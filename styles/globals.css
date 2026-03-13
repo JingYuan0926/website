@@ -172,3 +172,28 @@ html.light .glass-card:hover {
 .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-subtle); border-radius: 2px; }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: var(--color-border-hover); }
 .scrollbar-thin { scrollbar-width: thin; scrollbar-color: var(--color-border-subtle) transparent; }
+
+/* Tweet-style cards */
+.tweet-card {
+  background: #16181c;
+  border: 1px solid #2f3336;
+}
+.tweet-card:hover {
+  background: #1d1f23;
+  border-color: #3a3f44;
+}
+html.light .tweet-card {
+  background: #ffffff;
+  border-color: #e1e8ed;
+}
+html.light .tweet-card:hover {
+  background: #f7f9fa;
+  border-color: #cfd9de;
+}
+
+/* Tweet card markdown link color */
+.tweet-prose a { color: #1d9bf0 !important; text-decoration: none !important; }
+.tweet-prose a:hover { text-decoration: underline !important; }
+.tweet-prose p { margin-bottom: 0.25rem; }
+.tweet-prose p:last-child { margin-bottom: 0; }
+html.light .tweet-prose a { color: #1d9bf0 !important; }

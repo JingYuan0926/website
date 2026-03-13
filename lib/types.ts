@@ -42,9 +42,11 @@ export interface Partner {
 export interface Testimonial {
   id: string;
   author_name: string;
+  author_handle: string;
   author_title: string;
   author_avatar_url: string;
   content: string;
+  image_url: string;
   twitter_url: string;
   is_tweet_embed: boolean;
   display_order: number;
