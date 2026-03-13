@@ -1,35 +1,31 @@
 import { cn } from "@/lib/utils";
 
-const SKILL_COLORS: Record<string, string> = {
-  Rust: "bg-[oklch(30%_0.08_25)] text-[oklch(75%_0.12_25)]",
-  Frontend: "bg-[oklch(30%_0.08_250)] text-[oklch(75%_0.12_250)]",
-  Backend: "bg-[oklch(30%_0.08_200)] text-[oklch(75%_0.12_200)]",
-  Design: "bg-[oklch(30%_0.08_320)] text-[oklch(75%_0.12_320)]",
-  Content: "bg-[oklch(30%_0.08_155)] text-[oklch(75%_0.12_155)]",
-  Growth: "bg-[oklch(30%_0.08_85)] text-[oklch(75%_0.12_85)]",
-  Product: "bg-[oklch(30%_0.08_285)] text-[oklch(75%_0.12_285)]",
-  Community: "bg-[oklch(30%_0.08_60)] text-[oklch(75%_0.12_60)]",
-  DeFi: "bg-[oklch(30%_0.08_155)] text-[oklch(75%_0.12_155)]",
-  NFTs: "bg-[oklch(30%_0.08_340)] text-[oklch(75%_0.12_340)]",
-  "Core Team": "bg-brand-purple/15 text-brand-purple-light",
-};
-
 interface SkillBadgeProps {
   skill: string;
   size?: "sm" | "md";
+  golden?: boolean;
 }
 
-export function SkillBadge({ skill, size = "sm" }: SkillBadgeProps) {
-  const colorClass = SKILL_COLORS[skill] || "bg-[#ffffff0a] text-text-secondary";
+export function SkillBadge({ skill, size = "sm", golden }: SkillBadgeProps) {
+  const isCore = skill === "Core Team";
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full font-medium",
-        size === "sm" ? "px-2.5 py-0.5 text-xs" : "px-3 py-1 text-sm",
-        colorClass
+        "inline-flex items-center gap-1 rounded-sm font-medium font-mono uppercase tracking-wider whitespace-nowrap shrink-0",
+        golden
+          ? "bg-amber-500/10 text-amber-400/80"
+          : "bg-[#ffffff0a] text-text-secondary",
+        size === "sm" ? "px-2.5 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
       )}
     >
+      {isCore && golden ? (
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="opacity-70">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM15.1 8H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z" />
+        </svg>
+      ) : (
+        <span className="opacity-50">#</span>
+      )}
       {skill}
     </span>
   );

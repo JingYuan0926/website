@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from "react";
-import { Search, Shuffle, ArrowDownAZ } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SKILL_CATEGORIES } from "@/lib/constants";
 import { MemberCard } from "./MemberCard";
@@ -9,24 +9,32 @@ interface MemberFiltersProps {
   members: Member[];
 }
 
-type SortMode = "default" | "name" | "shuffle";
-
 export function MemberFilters({ members }: MemberFiltersProps) {
   const [search, setSearch] = useState("");
-  const [activeSkill, setActiveSkill] = useState<SkillCategory>("All");
-  const [sortMode, setSortMode] = useState<SortMode>("default");
-  const [shuffleSeed, setShuffleSeed] = useState(0);
+  const [activeSkills, setActiveSkills] = useState<Set<SkillCategory>>(new Set());
 
-  const handleShuffle = useCallback(() => {
-    setSortMode("shuffle");
-    setShuffleSeed((s) => s + 1);
-  }, []);
+  function toggleSkill(skill: SkillCategory) {
+    setActiveSkills((prev) => {
+      const next = new Set(prev);
+      if (skill === "All") {
+        return new Set();
+      }
+      if (next.has(skill)) {
+        next.delete(skill);
+      } else {
+        next.add(skill);
+      }
+      return next;
+    });
+  }
 
   const filtered = useMemo(() => {
     let result = [...members];
 
-    if (activeSkill !== "All") {
-      result = result.filter((m) => m.skills.includes(activeSkill));
+    if (activeSkills.size > 0) {
+      result = result.filter((m) =>
+        m.skills.some((s) => activeSkills.has(s as SkillCategory))
+      );
     }
 
     if (search.trim()) {
@@ -39,20 +47,10 @@ export function MemberFilters({ members }: MemberFiltersProps) {
       );
     }
 
-    if (sortMode === "name") {
-      result.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortMode === "shuffle") {
-      // Simple seeded shuffle
-      for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(
-          ((Math.sin(i * 9301 + shuffleSeed * 49297) + 1) / 2) * (i + 1)
-        );
-        [result[i], result[j]] = [result[j], result[i]];
-      }
-    }
-
     return result;
-  }, [members, activeSkill, search, sortMode, shuffleSeed]);
+  }, [members, activeSkills, search]);
+
+  const isAllActive = activeSkills.size === 0;
 
   return (
     <div>
@@ -71,53 +69,29 @@ export function MemberFilters({ members }: MemberFiltersProps) {
         />
       </div>
 
-      {/* Skill filter tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {SKILL_CATEGORIES.map((skill) => (
-          <button
-            key={skill}
-            onClick={() => setActiveSkill(skill)}
-            className={cn(
-              "px-3.5 py-1.5 text-xs font-mono font-medium uppercase tracking-wider border transition-all duration-[var(--duration-fast)]",
-              activeSkill === skill
-                ? "bg-brand-green/15 border-brand-green/40 text-brand-green"
-                : "bg-transparent border-white/[0.08] text-text-secondary hover:border-white/20 hover:text-white"
-            )}
-          >
-            {skill}
-          </button>
-        ))}
-      </div>
-
-      {/* Sort controls + count */}
-      <div className="flex items-center gap-3 mb-8">
-        <button
-          onClick={handleShuffle}
-          className={cn(
-            "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium uppercase tracking-wider border transition-all",
-            sortMode === "shuffle"
-              ? "border-brand-green/40 text-brand-green"
-              : "border-white/[0.08] text-text-secondary hover:border-white/20 hover:text-white"
-          )}
-        >
-          <Shuffle size={12} />
-          Shuffle
-        </button>
-        <button
-          onClick={() => setSortMode("name")}
-          className={cn(
-            "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium uppercase tracking-wider border transition-all",
-            sortMode === "name"
-              ? "border-brand-green/40 text-brand-green"
-              : "border-white/[0.08] text-text-secondary hover:border-white/20 hover:text-white"
-          )}
-        >
-          <ArrowDownAZ size={12} />
-          Name
-        </button>
-
-        <span className="text-xs text-text-muted font-mono ml-1">
-          &bull; {filtered.length} member{filtered.length !== 1 ? "s" : ""}
+      {/* Skill filters + count */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap gap-2">
+          {SKILL_CATEGORIES.map((skill) => {
+            const isActive = skill === "All" ? isAllActive : activeSkills.has(skill);
+            return (
+              <button
+                key={skill}
+                onClick={() => toggleSkill(skill)}
+                className={cn(
+                  "px-3.5 py-1.5 text-xs font-mono font-medium uppercase tracking-wider border transition-all duration-[var(--duration-fast)]",
+                  isActive
+                    ? "bg-brand-green/15 border-brand-green/40 text-brand-green"
+                    : "bg-transparent border-white/[0.08] text-text-secondary hover:border-white/20 hover:text-white"
+                )}
+              >
+                {skill}
+              </button>
+            );
+          })}
+        </div>
+        <span className="text-xs text-text-muted font-mono ml-4 whitespace-nowrap">
+          {filtered.length} member{filtered.length !== 1 ? "s" : ""}
         </span>
       </div>
 
@@ -136,8 +110,7 @@ export function MemberFilters({ members }: MemberFiltersProps) {
           <button
             onClick={() => {
               setSearch("");
-              setActiveSkill("All");
-              setSortMode("default");
+              setActiveSkills(new Set());
             }}
             className="mt-4 px-4 py-2 text-xs font-mono uppercase tracking-wider border border-white/[0.08] text-text-secondary hover:text-white hover:border-white/20 transition-all"
           >

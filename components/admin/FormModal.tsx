@@ -6,7 +6,7 @@ import { Markdown } from "@/components/shared/Markdown";
 export interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags" | "image" | "markdown";
+  type: "text" | "textarea" | "number" | "date" | "select" | "toggle" | "tags" | "checkboxes" | "image" | "markdown";
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
@@ -43,7 +43,7 @@ export function FormModal({
       fields.forEach((f) => {
         if (f.type === "toggle") defaults[f.key] = false;
         else if (f.type === "number") defaults[f.key] = 0;
-        else if (f.type === "tags") defaults[f.key] = [];
+        else if (f.type === "tags" || f.type === "checkboxes") defaults[f.key] = [];
         else if (f.type === "select" && f.options?.length) defaults[f.key] = f.options[0].value;
         else defaults[f.key] = "";
       });
@@ -223,6 +223,35 @@ export function FormModal({
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {field.type === "checkboxes" && field.options && (
+                <div className="flex flex-wrap gap-2">
+                  {field.options.map((opt) => {
+                    const selected = ((formData[field.key] as string[]) || []).includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          const current = (formData[field.key] as string[]) || [];
+                          if (selected) {
+                            updateField(field.key, current.filter((v) => v !== opt.value));
+                          } else {
+                            updateField(field.key, [...current, opt.value]);
+                          }
+                        }}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                          selected
+                            ? "bg-brand-purple/15 border-brand-purple/40 text-brand-purple-light"
+                            : "bg-bg border-border-subtle text-text-muted hover:text-text-secondary hover:border-border-default"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
