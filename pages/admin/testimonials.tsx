@@ -10,8 +10,8 @@ import type { Testimonial } from "@/lib/types";
 const FIELDS: FieldDef[] = [
   { key: "author_name", label: "Author Name", type: "text", required: true },
   { key: "author_title", label: "Author Title", type: "text", placeholder: "Solana Developer" },
-  { key: "author_avatar_url", label: "Author Avatar URL", type: "text" },
-  { key: "content", label: "Testimonial", type: "textarea", required: true },
+  { key: "author_avatar_url", label: "Author Avatar", type: "image", bucket: "avatars" },
+  { key: "content", label: "Testimonial", type: "markdown", required: true },
   { key: "twitter_url", label: "Tweet URL", type: "text", placeholder: "https://x.com/..." },
   { key: "is_tweet_embed", label: "Embed as Tweet", type: "toggle" },
   { key: "display_order", label: "Display Order", type: "number" },
@@ -34,7 +34,17 @@ export default function AdminTestimonials() {
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => { fetchTestimonials(); }, []);
+  useEffect(() => {
+    fetchTestimonials();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("testimonials-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "testimonials" }, () => {
+        fetchTestimonials();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   async function fetchTestimonials() {
     if (!supabase) return;

@@ -1,46 +1,87 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Superteam dark palette */
-  --color-bg: #0f0f0f;
-  --color-bg-card: #161616;
-  --color-bg-card-hover: #1c1c1c;
-  --color-bg-elevated: #1a1a1a;
+  --color-bg: var(--t-bg);
+  --color-bg-card: var(--t-bg-card);
+  --color-bg-card-hover: var(--t-bg-card-hover);
+  --color-bg-elevated: var(--t-bg-elevated);
 
-  /* Text */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #71717a;
+  --color-text-primary: var(--t-text-primary);
+  --color-text-secondary: var(--t-text-secondary);
+  --color-text-muted: var(--t-text-muted);
 
-  /* Borders — white at low opacity */
-  --color-border-subtle: #ffffff1a;
-  --color-border-default: #ffffff26;
-  --color-border-hover: #ffffff40;
+  --color-border-subtle: var(--t-border-subtle);
+  --color-border-default: var(--t-border-default);
+  --color-border-hover: var(--t-border-hover);
 
-  /* Solana brand */
-  --color-brand-purple: #9945ff;
-  --color-brand-purple-light: #b77dff;
-  --color-brand-green: #14f195;
-  --color-brand-green-dark: #0bc47a;
+  --color-brand-purple: var(--t-brand-purple);
+  --color-brand-purple-light: var(--t-brand-purple-light);
+  --color-brand-green: var(--t-brand-green);
+  --color-brand-green-dark: var(--t-brand-green-dark);
 
-  /* Accent */
-  --color-accent: #09f;
+  --color-accent: var(--t-accent);
+  --color-success: var(--t-success);
+  --color-error: var(--t-error);
+  --color-warning: var(--t-warning);
+  --color-accent-gold: var(--t-accent-gold);
 
-  /* Semantic */
-  --color-success: #14f195;
-  --color-error: #ef4444;
-  --color-warning: #eab308;
-
-  /* Typography — Inter to match Superteam brand */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
+/* Dark theme (default) */
 :root {
+  --t-bg: #0f0f0f;
+  --t-bg-card: #161616;
+  --t-bg-card-hover: #1c1c1c;
+  --t-bg-elevated: #1a1a1a;
+
+  --t-text-primary: #ffffff;
+  --t-text-secondary: #a1a1aa;
+  --t-text-muted: #71717a;
+
+  --t-border-subtle: #ffffff1a;
+  --t-border-default: #ffffff26;
+  --t-border-hover: #ffffff40;
+
+  --t-brand-purple: #9945ff;
+  --t-brand-purple-light: #b77dff;
+  --t-brand-green: #14f195;
+  --t-brand-green-dark: #0bc47a;
+
+  --t-accent: #09f;
+  --t-success: #14f195;
+  --t-error: #ef4444;
+  --t-warning: #eab308;
+  --t-accent-gold: #eab308;
+
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --duration-slow: 500ms;
+}
+
+/* Light theme */
+html.light {
+  --t-bg: #f5f5f5;
+  --t-bg-card: #ffffff;
+  --t-bg-card-hover: #fafafa;
+  --t-bg-elevated: #f0f0f0;
+
+  --t-text-primary: #111111;
+  --t-text-secondary: #52525b;
+  --t-text-muted: #a1a1aa;
+
+  --t-border-subtle: #e4e4e7;
+  --t-border-default: #d4d4d8;
+  --t-border-hover: #a1a1aa;
+
+  --t-brand-purple: #7c3aed;
+  --t-brand-purple-light: #6d28d9;
+  --t-brand-green: #059669;
+  --t-brand-green-dark: #047857;
+
+  --t-error: #dc2626;
 }
 
 html {
@@ -65,6 +106,10 @@ body {
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
 
+html.light ::-webkit-scrollbar-track { background: #f5f5f5; }
+html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -82,7 +127,7 @@ body {
 .text-fluid-2xl { font-size: clamp(2rem, 1.4rem + 2vw, 3.25rem); }
 .text-fluid-3xl { font-size: clamp(2.5rem, 1.8rem + 2.5vw, 4.5rem); }
 
-/* Glass card effect — Superteam UAE style */
+/* Glass card effect */
 .glass-card {
   background: #ffffff08;
   border: 1px solid #ffffff15;
@@ -94,6 +139,32 @@ body {
   background: #ffffff0d;
   border-color: #ffffff25;
 }
+
+html.light .glass-card {
+  background: #ffffff;
+  border-color: #e4e4e7;
+  backdrop-filter: none;
+}
+
+html.light .glass-card:hover {
+  background: #fafafa;
+  border-color: #d4d4d8;
+}
+
+/* Markdown prose */
+.markdown-prose a { color: var(--color-brand-purple-light); text-decoration: none; }
+.markdown-prose a:hover { text-decoration: underline; }
+.markdown-prose strong { font-weight: 600; color: var(--color-text-primary); }
+.markdown-prose ul { list-style: disc inside; margin: 0.5rem 0; }
+.markdown-prose ol { list-style: decimal inside; margin: 0.5rem 0; }
+.markdown-prose li { margin: 0.25rem 0; }
+.markdown-prose p { margin-bottom: 0.5rem; }
+.markdown-prose p:last-child { margin-bottom: 0; }
+.markdown-prose code { padding: 0.1em 0.4em; border-radius: 0.25rem; background: var(--color-bg-elevated); color: var(--color-brand-purple-light); font-size: 0.85em; }
+.markdown-prose h1 { font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+.markdown-prose h2 { font-size: 1rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+.markdown-prose h3 { font-size: 0.875rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+.markdown-prose blockquote { border-left: 2px solid var(--color-brand-purple); padding-left: 0.75rem; margin: 0.5rem 0; color: var(--color-text-muted); font-style: italic; }
 
 /* Thin scrollbar for inner scroll panes */
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }

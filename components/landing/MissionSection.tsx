@@ -20,15 +20,19 @@ const ICON_MAP: Record<string, LucideIcon> = {
   globe: Globe,
 };
 
-export function MissionSection() {
+interface MissionSectionProps {
+  content?: Record<string, string>;
+}
+
+export function MissionSection({ content }: MissionSectionProps) {
   return (
     <section className="py-24 lg:py-32">
       <div className="max-w-[1200px] mx-auto px-6">
         <AnimatedSection>
           <SectionHeading
             label="What We Do"
-            title="Empowering Malaysia's Solana Builders"
-            description="From mentorship to funding, we provide everything builders need to succeed in the Solana ecosystem."
+            title={content?.title || "Empowering Malaysia's Solana Builders"}
+            description={content?.description || "From mentorship to funding, we provide everything builders need to succeed in the Solana ecosystem."}
             align="center"
           />
         </AnimatedSection>

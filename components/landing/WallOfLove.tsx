@@ -1,5 +1,6 @@
 import { AnimatedSection, AnimatedItem } from "@/components/shared/AnimatedSection";
 import { SectionHeading } from "@/components/shared/SectionHeading";
+import { Markdown } from "@/components/shared/Markdown";
 import { getInitials } from "@/lib/utils";
 import type { Testimonial } from "@/lib/types";
 
@@ -28,9 +29,9 @@ export function WallOfLove({ testimonials }: WallOfLoveProps) {
             <AnimatedItem key={testimonial.id}>
               <div className="break-inside-avoid glass-card rounded-2xl p-6">
                 {/* Quote */}
-                <p className="text-sm text-text-secondary leading-relaxed">
-                  &ldquo;{testimonial.content}&rdquo;
-                </p>
+                <div className="text-sm text-text-secondary leading-relaxed">
+                  &ldquo;<Markdown content={testimonial.content} />&rdquo;
+                </div>
 
                 {/* Author */}
                 <div className="mt-5 flex items-center gap-3">
