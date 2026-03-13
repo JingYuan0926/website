@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/solana-sol-icon.png\" -o /Users/derekliew/Developer/website/public/logo/solana.png)",
+      "Bash(brew list:*)",
+      "Bash(pip3 list:*)",
+      "Bash(ls /Users/derekliew/Developer/website/public/video*.mp4)",
+      "Bash(ls /Users/derekliew/Developer/website/public/*.mp4)",
+      "Bash(ls -t ~/Downloads/*.mp4)",
+      "Bash(yt-dlp -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]\" \"https://www.youtube.com/watch?v=BG1WeGdCJQI\" -o \"/Users/derekliew/Developer/website/public/video-solana.mp4\" --merge-output-format mp4)",
+      "Bash(/opt/homebrew/bin/yt-dlp -f \"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]\" \"https://www.youtube.com/watch?v=BG1WeGdCJQI\" -o \"/Users/derekliew/Developer/website/public/video-solana.mp4\" --merge-output-format mp4)",
+      "Bash(ls -la /Users/derekliew/Developer/website/public/video-solana*)",
+      "Bash(mv /Users/derekliew/Developer/website/public/video-solana.f137.mp4 /Users/derekliew/Developer/website/public/video-solana.mp4)",
+      "Bash(rm /Users/derekliew/Developer/website/public/video-solana.f140.m4a)"
+    ]
+  }
+}

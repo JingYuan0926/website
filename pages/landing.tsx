@@ -155,10 +155,114 @@ export const getStaticProps: GetStaticProps<LandingProps> = async () => {
   };
 };
 
+/* ── particle hover effect ────────────────────────── */
+
+function HighlightWord({
+  children,
+  color,
+  cursorUrl,
+  onClick,
+}: {
+  children: React.ReactNode;
+  color: string;
+  cursorUrl: string;
+  onClick?: () => void;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const [dims, setDims] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setDims({ w: entry.contentRect.width, h: entry.contentRect.height });
+    });
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Generate a hand-drawn underline path
+  const y = dims.h - 4;
+  const segments = 12;
+  const step = dims.w / segments;
+  let d = `M 0 ${y}`;
+  for (let i = 1; i <= segments; i++) {
+    const jitter = (Math.sin(i * 3.7) * 2.5);
+    d += ` Q ${i * step - step / 2} ${y + jitter} ${i * step} ${y + Math.sin(i * 2.1) * 1.5}`;
+  }
+
+  const pathLen = dims.w * 1.1;
+
+  const [cursorDataUrl, setCursorDataUrl] = useState("");
+
+  useEffect(() => {
+    if (cursorUrl.startsWith("emoji:")) {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='24' font-size='24'>${cursorUrl.slice(6)}</text></svg>`;
+      setCursorDataUrl(`url("data:image/svg+xml,${encodeURIComponent(svg)}") 16 16, pointer`);
+    } else {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 32, 32);
+          setCursorDataUrl(`url("${canvas.toDataURL("image/png")}") 16 16, pointer`);
+        }
+      };
+      img.src = cursorUrl;
+    }
+  }, [cursorUrl]);
+
+  const cursor = cursorDataUrl || "pointer";
+
+  return (
+    <span
+      ref={ref}
+      className="relative inline-block"
+      style={{ cursor }}
+      onClick={onClick}
+    >
+      {children}
+      {dims.w > 0 && (
+        <svg
+          className="absolute left-0 bottom-0 w-full pointer-events-none overflow-visible"
+          style={{ height: dims.h }}
+          preserveAspectRatio="none"
+        >
+          <path
+            ref={pathRef}
+            d={d}
+            fill="none"
+            stroke={color}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray={pathLen}
+            strokeDashoffset={pathLen}
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from={pathLen}
+              to="0"
+              dur="1s"
+              fill="freeze"
+              begin="0.5s"
+            />
+          </path>
+        </svg>
+      )}
+    </span>
+  );
+}
+
 /* ── page ──────────────────────────────────────────── */
 
 export default function Landing({ testimonials, missionPillars, announcements }: LandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [heroVideo, setHeroVideo] = useState<"malaysia" | "solana">("malaysia");
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -252,15 +356,22 @@ export default function Landing({ testimonials, missionPillars, announcements }:
 
       {/* Hero section + logo loop */}
       <section className="relative flex flex-col overflow-hidden" style={{ height: "100dvh", scrollSnapAlign: "start" }}>
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/video.mp4" type="video/mp4" />
-        </video>
+        <AnimatePresence mode="wait">
+          <motion.video
+            key={heroVideo}
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 w-full h-full object-cover"
+            src={heroVideo === "malaysia" ? "/video.mp4" : "/video-solana.mp4"}
+          />
+        </AnimatePresence>
 
         <div
           className="absolute inset-0 backdrop-blur-[2px]"
@@ -270,50 +381,36 @@ export default function Landing({ testimonials, missionPillars, announcements }:
           }}
         />
 
-        <div className="relative z-10 flex-1 flex items-end w-full max-w-[1400px] mx-auto px-6 pb-8 lg:pb-12 pt-32">
+        <div className="relative z-10 flex-1 flex items-end w-full max-w-[1400px] mx-auto px-6 pb-16 lg:pb-24 pt-32">
           <div>
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease, delay: 0.1 }}
-              className="text-white font-semibold tracking-tight leading-[1.05]"
-              style={{ fontSize: "clamp(3rem, 2rem + 5vw, 6.5rem)" }}
+              className="text-white font-black tracking-tight leading-[1.02]"
+              style={{ fontSize: "clamp(3.5rem, 2.5rem + 5vw, 7rem)" }}
             >
-              Structure powers
+              Empowering{" "}
+              <HighlightWord color="#9945ff" cursorUrl="/logo/solana.svg" onClick={() => setHeroVideo("solana")}>
+                Solana
+              </HighlightWord>
               <br />
-              intelligence
+              builders in{" "}
+              <HighlightWord color="#ed7b84" cursorUrl="emoji:🇲🇾" onClick={() => setHeroVideo("malaysia")}>
+                Malaysia
+              </HighlightWord>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease, delay: 0.2 }}
-              className="mt-6 text-white/80 max-w-2xl leading-relaxed"
-              style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.8vw, 1.5rem)" }}
+              className="mt-6 text-white/80 max-w-4xl leading-relaxed"
+              style={{ fontSize: "clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem)" }}
             >
-              The back-end built for AI content operations. Power web, mobile, and
-              agentic applications at scale.
+              Join our community of developers, designers, and creators or explore bounties, grants,
+              and opportunities to build on Solana from Malaysia to the world.
             </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease, delay: 0.3 }}
-              className="mt-10 flex flex-wrap items-center gap-4"
-            >
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#9945ff] text-white text-base font-semibold hover:bg-[#8a3ae6] transition-colors duration-150"
-              >
-                Start building
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/40 text-white text-base font-medium hover:bg-white/10 transition-colors duration-150"
-              >
-                Get a demo
-              </a>
-            </motion.div>
           </div>
         </div>
 
@@ -660,11 +757,7 @@ export default function Landing({ testimonials, missionPillars, announcements }:
             </p>
             <div className="flex items-center gap-2 text-xs text-[#71717a]">
               <span>Powered by</span>
-              <svg width="16" height="12" viewBox="0 0 397.7 311.7" className="inline-block">
-                <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="#14F195" />
-                <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="#14F195" />
-                <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="#14F195" />
-              </svg>
+              <img src="/logo/solana.png" alt="Solana" className="inline-block w-4 h-4 object-contain" />
               <span>Solana</span>
             </div>
           </div>
