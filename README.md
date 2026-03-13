@@ -4,7 +4,7 @@ The official website for **Superteam Malaysia** — the home for Solana builders
 
 Built for the [Superteam Malaysia Website Design & Build Challenge](https://superteam.fun/earn/listing/superteam-malaysia-website-design-and-build-challenge) on Superteam Earn.
 
-> Live Demo: [https://superteammy-three.vercel.app](https://superteammy-three.vercel.app)
+> Live Demo: [https://website-three-smoky-qlj2r0nen3.vercel.app](https://website-three-smoky-qlj2r0nen3.vercel.app)
 
 ---
 
