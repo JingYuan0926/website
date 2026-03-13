@@ -10,10 +10,10 @@ import type { Event } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
   { key: "title", label: "Title", type: "text", required: true },
-  { key: "description", label: "Description", type: "textarea" },
+  { key: "description", label: "Description", type: "markdown" },
   { key: "date", label: "Date & Time", type: "date", required: true },
   { key: "location", label: "Location", type: "text", placeholder: "Kuala Lumpur, Malaysia" },
-  { key: "image_url", label: "Image URL", type: "text" },
+  { key: "image_url", label: "Image", type: "image", bucket: "events" },
   { key: "luma_url", label: "Luma URL", type: "text", placeholder: "https://lu.ma/..." },
   {
     key: "status",
@@ -62,6 +62,14 @@ export default function AdminEvents() {
 
   useEffect(() => {
     fetchEvents();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("events-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => {
+        fetchEvents();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function fetchEvents() {

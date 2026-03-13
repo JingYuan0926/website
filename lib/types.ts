@@ -42,9 +42,11 @@ export interface Partner {
 export interface Testimonial {
   id: string;
   author_name: string;
+  author_handle: string;
   author_title: string;
   author_avatar_url: string;
   content: string;
+  image_url: string;
   twitter_url: string;
   is_tweet_embed: boolean;
   display_order: number;
@@ -73,6 +75,26 @@ export interface Profile {
   id: string;
   email: string;
   role: "admin" | "editor";
+  created_at: string;
+}
+
+export interface SiteContent {
+  id: string;
+  section: string;
+  key: string;
+  value: string;
+  type: "text" | "markdown" | "image" | "url";
+  updated_at: string;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string;
+  link_url: string;
+  is_published: boolean;
+  published_at: string;
   created_at: string;
 }
 

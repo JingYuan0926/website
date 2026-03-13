@@ -9,7 +9,7 @@ import type { FAQItem } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
   { key: "question", label: "Question", type: "text", required: true },
-  { key: "answer", label: "Answer", type: "textarea", required: true },
+  { key: "answer", label: "Answer", type: "markdown", required: true },
   { key: "display_order", label: "Display Order", type: "number" },
 ];
 
@@ -30,7 +30,17 @@ export default function AdminFAQ() {
   const [editing, setEditing] = useState<FAQItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => {
+    fetchItems();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("faq-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "faq_items" }, () => {
+        fetchItems();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   async function fetchItems() {
     if (!supabase) return;

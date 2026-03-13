@@ -11,8 +11,8 @@ import type { Member } from "@/lib/types";
 const FIELDS: FieldDef[] = [
   { key: "name", label: "Name", type: "text", required: true },
   { key: "title", label: "Title / Role", type: "text", required: true },
-  { key: "bio", label: "Bio", type: "textarea", placeholder: "Short bio..." },
-  { key: "avatar_url", label: "Avatar URL", type: "text", placeholder: "https://..." },
+  { key: "bio", label: "Bio", type: "markdown", placeholder: "Short bio..." },
+  { key: "avatar_url", label: "Avatar", type: "image", bucket: "avatars" },
   { key: "skills", label: "Skills", type: "tags" },
   { key: "twitter_handle", label: "Twitter Handle", type: "text", placeholder: "username" },
   { key: "github_url", label: "GitHub URL", type: "text" },
@@ -54,6 +54,14 @@ export default function AdminMembers() {
 
   useEffect(() => {
     fetchMembers();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("members-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "members" }, () => {
+        fetchMembers();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function fetchMembers() {

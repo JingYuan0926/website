@@ -15,12 +15,13 @@ const inter = Inter({
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isAdmin = router.pathname.startsWith("/admin");
+  const isLanding = router.pathname === "/landing";
 
   return (
     <div className={`${inter.variable} font-sans`}>
-      {!isAdmin && <Navbar />}
+      {!isAdmin && !isLanding && <Navbar />}
       <Component {...pageProps} />
-      {!isAdmin && <Footer />}
+      {!isAdmin && !isLanding && <Footer />}
       <Toaster
         position="bottom-right"
         toastOptions={{

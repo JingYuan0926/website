@@ -1,7 +1,15 @@
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
 import { SOCIAL_LINKS } from "@/lib/constants";
 
-export function JoinCTA() {
+interface JoinCTAProps {
+  content?: Record<string, string>;
+}
+
+export function JoinCTA({ content }: JoinCTAProps) {
+  const headline = content?.headline || "Ready to build with us?";
+  const description = content?.description || "Join Superteam Malaysia and connect with builders, discover opportunities, and grow in the Solana ecosystem.";
+  const telegramUrl = content?.telegram_url || SOCIAL_LINKS.telegram;
+  const twitterUrl = content?.twitter_url || SOCIAL_LINKS.twitter;
   return (
     <section className="py-24 lg:py-32">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -13,16 +21,15 @@ export function JoinCTA() {
 
             <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center">
               <h2 className="text-fluid-xl font-bold text-white tracking-tight">
-                Ready to build with us?
+                {headline}
               </h2>
               <p className="mt-4 text-fluid-base text-text-secondary max-w-lg mx-auto">
-                Join Superteam Malaysia and connect with builders, discover
-                opportunities, and grow in the Solana ecosystem.
+                {description}
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href={SOCIAL_LINKS.telegram}
+                  href={telegramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors"
@@ -33,7 +40,7 @@ export function JoinCTA() {
                   Join Telegram
                 </a>
                 <a
-                  href={SOCIAL_LINKS.twitter}
+                  href={twitterUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border-default text-white font-semibold text-sm hover:bg-[#ffffff0a] transition-colors"

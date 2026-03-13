@@ -155,7 +155,3 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- Storage buckets (run these separately in Supabase dashboard or via API)
--- INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
--- INSERT INTO storage.buckets (id, name, public) VALUES ('logos', 'logos', true);
--- INSERT INTO storage.buckets (id, name, public) VALUES ('events', 'events', true);

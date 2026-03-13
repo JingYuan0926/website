@@ -9,7 +9,7 @@ import type { Partner } from "@/lib/types";
 
 const FIELDS: FieldDef[] = [
   { key: "name", label: "Name", type: "text", required: true },
-  { key: "logo_url", label: "Logo URL", type: "text", placeholder: "https://..." },
+  { key: "logo_url", label: "Logo", type: "image", bucket: "logos" },
   { key: "website_url", label: "Website URL", type: "text" },
   {
     key: "tier",
@@ -47,7 +47,17 @@ export default function AdminPartners() {
   const [editing, setEditing] = useState<Partner | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => { fetchPartners(); }, []);
+  useEffect(() => {
+    fetchPartners();
+    if (!supabase) return;
+    const channel = supabase
+      .channel("partners-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "partners" }, () => {
+        fetchPartners();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   async function fetchPartners() {
     if (!supabase) return;
