@@ -1227,10 +1227,24 @@ function FAQSection() {
   return (
     <section
       id="faq"
-      className="relative bg-black px-6 flex items-center overflow-hidden py-16 lg:py-0"
-      style={{ minHeight: "100dvh", scrollSnapAlign: "start" }}
+      className="relative px-6 flex items-center overflow-hidden py-16 lg:py-0"
+      style={{ minHeight: "85dvh", scrollSnapAlign: "start", backgroundColor: "#0a0a0a" }}
     >
-      <div className="max-w-[1200px] mx-auto w-full">
+      {/* City skyline background */}
+      <div
+        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        style={{
+          height: "60%",
+          backgroundImage: "url(/city.svg)",
+          backgroundRepeat: "repeat-x",
+          backgroundPosition: "bottom center",
+          backgroundSize: "100vw auto",
+          opacity: 0.15,
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
+        }}
+      />
+      <div className="relative max-w-[1200px] mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-20">
           {/* Left side */}
           <div className="flex flex-col">
