@@ -154,12 +154,29 @@ export default function Landing({ testimonials }: LandingProps) {
 
   return (
     <div className="bg-black" style={{ scrollSnapType: "y proximity" }}>
+      {/* Announcement bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-[60] bg-[#7fd189] overflow-hidden transition-all duration-300 ${
+          isScrolled ? "h-0 opacity-0" : "h-8 opacity-100"
+        }`}
+      >
+        <div className="h-full flex items-center">
+          <div className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap">
+            {[...Array(2)].map((_, i) => (
+              <span key={i} className="text-xs font-medium text-black mx-8">
+                AI agents need structure. Build the foundation now &rarr;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AI agents need structure. Build the foundation now &rarr;
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Navigation */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+        className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-black/90 backdrop-blur-md border-b border-white/10"
-            : "bg-transparent"
+            ? "top-0 bg-black/90 backdrop-blur-md border-b border-white/10"
+            : "top-8 bg-transparent"
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-16">
@@ -553,6 +570,14 @@ export default function Landing({ testimonials }: LandingProps) {
 
       <style jsx>{`
         @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        @keyframes marquee {
           0% {
             transform: translateX(0);
           }
