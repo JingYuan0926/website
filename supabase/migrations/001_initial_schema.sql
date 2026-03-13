@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS partners (
   logo_url text DEFAULT '',
   website_url text DEFAULT '',
   tier text DEFAULT 'partner' CHECK (tier IN ('gold', 'silver', 'partner')),
+  logo_scale real DEFAULT 1.0,
   display_order integer DEFAULT 0,
   created_at timestamptz DEFAULT now()
 );

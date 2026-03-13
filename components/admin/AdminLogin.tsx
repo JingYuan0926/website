@@ -62,6 +62,18 @@ export function AdminLogin() {
             Sign In
           </button>
         </form>
+
+        <div className="mt-6 p-3 rounded-lg bg-brand-purple/5 border border-brand-purple/10">
+          <p className="text-xs text-text-muted text-center mb-2">Demo credentials</p>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-text-muted">Email:</span>
+            <code className="text-brand-purple-light">stmy@gmail.com</code>
+          </div>
+          <div className="flex items-center justify-between text-xs mt-1">
+            <span className="text-text-muted">Password:</span>
+            <code className="text-brand-purple-light">12345</code>
+          </div>
+        </div>
       </div>
     </div>
   );
