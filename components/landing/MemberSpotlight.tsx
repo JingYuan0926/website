@@ -185,26 +185,29 @@ function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string
 
 // --- Solana ecosystem projects ---
 const ECOSYSTEM_PROJECTS = [
-  { name: "Jupiter", abbr: "JUP", color: "#00D18C" },
-  { name: "Raydium", abbr: "RAY", color: "#6C5CE7" },
-  { name: "Tensor", abbr: "TNS", color: "#FF6B6B" },
-  { name: "Jito", abbr: "JTO", color: "#45B26B" },
-  { name: "Phantom", abbr: "PHM", color: "#AB9FF2" },
-  { name: "Magic Eden", abbr: "ME", color: "#E42575" },
-  { name: "Helius", abbr: "HEL", color: "#E97A28" },
-  { name: "Orca", abbr: "ORC", color: "#FFDA44" },
-  { name: "Drift", abbr: "DFT", color: "#FF6142" },
-  { name: "Pyth", abbr: "PTH", color: "#7142CF" },
-  { name: "Bonk", abbr: "BNK", color: "#F0A030" },
-  { name: "Helium", abbr: "HNT", color: "#474DFF" },
-  { name: "Wormhole", abbr: "WH", color: "#00D4FF" },
-  { name: "Meteora", abbr: "MTR", color: "#3EECAC" },
-  { name: "Marinade", abbr: "MND", color: "#C1839F" },
+  { name: "Jupiter", abbr: "JUP", color: "#00D18C", domain: "jup.ag" },
+  { name: "Raydium", abbr: "RAY", color: "#6C5CE7", domain: "raydium.io" },
+  { name: "Tensor", abbr: "TNS", color: "#FF6B6B", domain: "tensor.trade" },
+  { name: "Jito", abbr: "JTO", color: "#45B26B", domain: "jito.network" },
+  { name: "Phantom", abbr: "PHM", color: "#AB9FF2", domain: "phantom.app" },
+  { name: "Magic Eden", abbr: "ME", color: "#E42575", domain: "magiceden.io" },
+  { name: "Helius", abbr: "HEL", color: "#E97A28", domain: "helius.dev" },
+  { name: "Orca", abbr: "ORC", color: "#FFDA44", domain: "orca.so" },
+  { name: "Drift", abbr: "DFT", color: "#FF6142", domain: "drift.trade" },
+  { name: "Pyth", abbr: "PTH", color: "#7142CF", domain: "pyth.network" },
+  { name: "Bonk", abbr: "BNK", color: "#F0A030", domain: "bonkcoin.com" },
+  { name: "Helium", abbr: "HNT", color: "#474DFF", domain: "helium.com" },
+  { name: "Wormhole", abbr: "WH", color: "#00D4FF", domain: "wormhole.com" },
+  { name: "Meteora", abbr: "MTR", color: "#3EECAC", domain: "meteora.ag" },
+  { name: "Marinade", abbr: "MND", color: "#C1839F", domain: "marinade.finance" },
 ];
 
 interface EcoSpawn {
   project: (typeof ECOSYSTEM_PROJECTS)[number];
   delay: number;
+  duration: number;
+  id: number;
+  isCenter: boolean;
 }
 
 export function MemberSpotlight({ members }: MemberSpotlightProps) {
@@ -223,46 +226,66 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
 
   const logoMidCol = PAD + LOGO_COLS / 2;
 
-  // Ecosystem spawns
+  // Ecosystem spawns — each spawn gets its own random timing
   const [leftSpawns, setLeftSpawns] = useState<Map<string, EcoSpawn>>(new Map());
   const [rightSpawns, setRightSpawns] = useState<Map<string, EcoSpawn>>(new Map());
-  const [spawnKey, setSpawnKey] = useState(0);
+  const spawnIdRef = useRef(0);
+  const [hoveredSpawnId, setHoveredSpawnId] = useState<number | null>(null);
 
   useEffect(() => {
     const generate = () => {
       const shuffled = [...ECOSYSTEM_PROJECTS].sort(() => Math.random() - 0.5);
       let pi = 0;
+      const occupied = new Set<string>();
 
-      const leftCells: [number, number][] = [];
-      for (let r = 0; r < TOTAL_ROWS; r++) {
-        for (let c = 1; c < PAD - 2; c++) leftCells.push([r, c]);
-      }
-      const newLeft = new Map<string, EcoSpawn>();
-      const lCount = 3 + Math.floor(Math.random() * 3);
-      const lPick = [...leftCells].sort(() => Math.random() - 0.5);
-      for (let i = 0; i < lCount && i < lPick.length && pi < shuffled.length; i++) {
-        newLeft.set(`${lPick[i][0]},${lPick[i][1]}`, { project: shuffled[pi++], delay: Math.random() * 400 });
+      function placeBlocks(
+        minR: number, maxR: number, minC: number, maxC: number, count: number
+      ): Map<string, EcoSpawn> {
+        const map = new Map<string, EcoSpawn>();
+        const centers: [number, number][] = [];
+        for (let r = minR; r <= maxR; r++) {
+          for (let c = minC; c <= maxC; c++) centers.push([r, c]);
+        }
+        const picked = centers.sort(() => Math.random() - 0.5);
+        let placed = 0;
+        for (const [cr, cc] of picked) {
+          if (placed >= count || pi >= shuffled.length) break;
+          let ok = true;
+          for (let dr = -1; dr <= 1 && ok; dr++) {
+            for (let dc = -1; dc <= 1 && ok; dc++) {
+              if (occupied.has(`${cr + dr},${cc + dc}`)) ok = false;
+            }
+          }
+          if (!ok) continue;
+          const base = {
+            project: shuffled[pi++],
+            delay: Math.random() * 4000,
+            duration: 3000 + Math.random() * 2000,
+            id: spawnIdRef.current++,
+          };
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const key = `${cr + dr},${cc + dc}`;
+              occupied.add(key);
+              map.set(key, { ...base, isCenter: dr === 0 && dc === 0 });
+            }
+          }
+          placed++;
+        }
+        return map;
       }
 
-      const rightCells: [number, number][] = [];
-      for (let r = 0; r < TOTAL_ROWS; r++) {
-        for (let c = PAD + LOGO_COLS + 2; c < COLS - 1; c++) rightCells.push([r, c]);
-      }
-      const newRight = new Map<string, EcoSpawn>();
-      const rCount = 3 + Math.floor(Math.random() * 3);
-      const rPick = [...rightCells].sort(() => Math.random() - 0.5);
-      for (let i = 0; i < rCount && i < rPick.length && pi < shuffled.length; i++) {
-        newRight.set(`${rPick[i][0]},${rPick[i][1]}`, { project: shuffled[pi++], delay: Math.random() * 400 });
-      }
-
+      // Left: centers row 1..11, col 2..PAD-3
+      const newLeft = placeBlocks(1, TOTAL_ROWS - 2, 2, PAD - 3, 2 + Math.floor(Math.random() * 2));
+      // Right: centers row 1..11, col PAD+LOGO_COLS+3..COLS-3
+      const newRight = placeBlocks(1, TOTAL_ROWS - 2, PAD + LOGO_COLS + 3, COLS - 3, 2 + Math.floor(Math.random() * 2));
       setLeftSpawns(newLeft);
       setRightSpawns(newRight);
-      setSpawnKey((k) => k + 1);
     };
 
-    generate();
-    const interval = setInterval(generate, 5000);
-    return () => clearInterval(interval);
+    const timeout = setTimeout(generate, 150);
+    const interval = setInterval(generate, 8000);
+    return () => { clearTimeout(timeout); clearInterval(interval); };
   }, []);
 
   useEffect(() => {
@@ -400,23 +423,38 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                         transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
                       }}
                     >
-                      {showSpawn && (
+                      {showSpawn && spawn.isCenter && (
                         <div
-                          key={spawnKey}
-                          className="absolute inset-0 flex items-center justify-center rounded-[1px]"
+                          key={spawn.id}
+                          onMouseEnter={() => setHoveredSpawnId(spawn.id)}
+                          onMouseLeave={() => setHoveredSpawnId(null)}
+                          className="flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-default"
                           style={{
-                            animation: "ecoFade 4s ease forwards",
+                            position: "absolute",
+                            top: -36,
+                            left: -36,
+                            width: 106,
+                            height: 106,
+                            zIndex: 5,
+                            animation: `ecoFade ${spawn.duration}ms ease both`,
                             animationDelay: `${spawn.delay}ms`,
+                            animationPlayState: hoveredSpawnId === spawn.id ? "paused" : "running",
                             backgroundColor: `${spawn.project.color}18`,
-                            border: `1px solid ${spawn.project.color}35`,
-                            boxShadow: `inset 0 0 10px ${spawn.project.color}20`,
+                            border: `1px solid ${spawn.project.color}40`,
+                            boxShadow: `inset 0 0 14px ${spawn.project.color}25`,
                           }}
                         >
+                          <img
+                            src={`https://www.google.com/s2/favicons?domain=${spawn.project.domain}&sz=128`}
+                            alt={spawn.project.name}
+                            className="w-10 h-10 rounded-md object-contain"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                          />
                           <span
-                            className="text-[7px] font-bold leading-none select-none"
-                            style={{ color: `${spawn.project.color}CC` }}
+                            className="text-[8px] font-bold leading-none select-none"
+                            style={{ color: `${spawn.project.color}DD` }}
                           >
-                            {spawn.project.abbr}
+                            {spawn.project.name}
                           </span>
                         </div>
                       )}
