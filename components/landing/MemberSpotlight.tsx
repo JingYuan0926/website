@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
 import { SectionHeading } from "@/components/shared/SectionHeading";
@@ -11,7 +11,6 @@ interface MemberSpotlightProps {
   members: Member[];
 }
 
-// Generate mock members to fill all outline cells
 function mockAvatar(i: number): string {
   const gender = i % 2 === 0 ? "men" : "women";
   const id = ((i * 7 + 3) % 99) + 1;
@@ -19,47 +18,47 @@ function mockAvatar(i: number): string {
 }
 
 const FIRST_NAMES = [
-  "Alex", "Sarah", "Rizal", "Wei", "Amir", "Priya", "Jun", "Nurul", "David", "Mei",
-  "Farhan", "Jade", "Arjun", "Siti", "Marcus", "Hana", "Ravi", "Aisyah", "Brandon", "Yuki",
-  "Liam", "Sofia", "Kai", "Nina", "Omar", "Chloe", "Zain", "Aisha", "Ethan", "Mira",
-  "Hafiz", "Luna", "Raj", "Farah", "Dani", "Ivy", "Samir", "Tina", "Leon", "Amy",
-  "Nate", "Zara", "Joel", "Mia", "Fikri", "Rose", "Adam", "Lily", "Tariq", "Emi",
-  "Yusuf", "Rina", "Aiden", "Maya", "Imran", "Nora", "Leo", "Dina", "Ryan", "Kira",
-  "Zack", "Sera", "Adi", "Jia", "Erik", "Suki", "Faris", "Lena", "Max", "Yuna",
-  "Dex", "Vera", "Ali", "Anya",
+  "Alex","Sarah","Rizal","Wei","Amir","Priya","Jun","Nurul","David","Mei",
+  "Farhan","Jade","Arjun","Siti","Marcus","Hana","Ravi","Aisyah","Brandon","Yuki",
+  "Liam","Sofia","Kai","Nina","Omar","Chloe","Zain","Aisha","Ethan","Mira",
+  "Hafiz","Luna","Raj","Farah","Dani","Ivy","Samir","Tina","Leon","Amy",
+  "Nate","Zara","Joel","Mia","Fikri","Rose","Adam","Lily","Tariq","Emi",
+  "Yusuf","Rina","Aiden","Maya","Imran","Nora","Leo","Dina","Ryan","Kira",
+  "Zack","Sera","Adi","Jia","Erik","Suki","Faris","Lena","Max","Yuna",
+  "Dex","Vera","Ali","Anya",
 ];
 const LAST_NAMES = [
-  "Chen", "Lim", "Ahmad", "Ling", "Hassan", "Sharma", "Kai", "Aina", "Tan", "Xin",
-  "Yusof", "Wong", "Nair", "Fatimah", "Lee", "Kimura", "Kumar", "Malik", "Ong", "Tanaka",
-  "Park", "Silva", "Nakamura", "Patel", "Osman", "Dubois", "Karim", "Ibrahim", "Moore", "Das",
-  "Razak", "Torres", "Gupta", "Hasan", "Kim", "Flores", "Shah", "Costa", "Wu", "Reed",
-  "Ismail", "Zhou", "Santos", "Lopez", "Aziz", "Rivera", "Khan", "Yang", "Mahdi", "Sato",
-  "Ali", "Cheng", "Nash", "Lin", "Rossi", "Berg", "Cho", "Diaz", "Fong", "Cruz",
-  "Bakar", "Roy", "Hafiz", "Sun", "Holm", "Mori", "Idris", "Koh", "Stone", "Ito",
-  "Cole", "Nova", "Reza", "Devi",
+  "Chen","Lim","Ahmad","Ling","Hassan","Sharma","Kai","Aina","Tan","Xin",
+  "Yusof","Wong","Nair","Fatimah","Lee","Kimura","Kumar","Malik","Ong","Tanaka",
+  "Park","Silva","Nakamura","Patel","Osman","Dubois","Karim","Ibrahim","Moore","Das",
+  "Razak","Torres","Gupta","Hasan","Kim","Flores","Shah","Costa","Wu","Reed",
+  "Ismail","Zhou","Santos","Lopez","Aziz","Rivera","Khan","Yang","Mahdi","Sato",
+  "Ali","Cheng","Nash","Lin","Rossi","Berg","Cho","Diaz","Fong","Cruz",
+  "Bakar","Roy","Hafiz","Sun","Holm","Mori","Idris","Koh","Stone","Ito",
+  "Cole","Nova","Reza","Devi",
 ];
 const TITLES = [
-  "Full-Stack Dev", "Smart Contract Eng", "UI/UX Designer", "Community Lead", "DeFi Researcher",
-  "Frontend Dev", "Blockchain Dev", "Product Designer", "DevRel Engineer", "Data Analyst",
-  "Rust Developer", "Mobile Dev", "Protocol Engineer", "Graphic Designer", "Backend Dev",
-  "Web3 Educator", "Security Researcher", "NFT Artist", "Growth Lead", "Solana Dev",
-  "Token Engineer", "ZK Researcher", "Infra Lead", "Content Creator", "DAO Contributor",
-  "Game Dev", "Bridge Engineer", "Analytics Lead", "Tech Writer", "Validator Ops",
-  "SDK Developer", "MEV Researcher", "Wallet Dev", "DePIN Builder", "AI × Crypto",
-  "Grants Lead", "Ecosystem Dev", "Payments Dev", "Identity Eng", "NFT Dev",
-  "Staking Ops", "Oracle Dev", "Liquidity Eng", "Compliance Eng", "Marketing Lead",
-  "Onchain Analyst", "RWA Engineer", "Social Layer Dev", "Governance Lead", "Cross-chain Dev",
-  "Perp Dev", "Lending Protocol", "AMM Designer", "Indexer Dev", "Explorer Dev",
-  "Privacy Eng", "Consensus Dev", "Runtime Dev", "Tooling Dev", "Security Auditor",
-  "Farcaster Dev", "Blinks Dev", "cNFT Dev", "Token-2022 Dev", "SPL Dev",
-  "Anchor Dev", "Seahorse Dev", "Clockwork Dev", "Helius Dev", "Metaplex Dev",
-  "Jupiter Dev", "Marinade Dev", "Raydium Dev", "Tensor Dev",
+  "Full-Stack Dev","Smart Contract Eng","UI/UX Designer","Community Lead","DeFi Researcher",
+  "Frontend Dev","Blockchain Dev","Product Designer","DevRel Engineer","Data Analyst",
+  "Rust Developer","Mobile Dev","Protocol Engineer","Graphic Designer","Backend Dev",
+  "Web3 Educator","Security Researcher","NFT Artist","Growth Lead","Solana Dev",
+  "Token Engineer","ZK Researcher","Infra Lead","Content Creator","DAO Contributor",
+  "Game Dev","Bridge Engineer","Analytics Lead","Tech Writer","Validator Ops",
+  "SDK Developer","MEV Researcher","Wallet Dev","DePIN Builder","AI × Crypto",
+  "Grants Lead","Ecosystem Dev","Payments Dev","Identity Eng","NFT Dev",
+  "Staking Ops","Oracle Dev","Liquidity Eng","Compliance Eng","Marketing Lead",
+  "Onchain Analyst","RWA Engineer","Social Layer Dev","Governance Lead","Cross-chain Dev",
+  "Perp Dev","Lending Protocol","AMM Designer","Indexer Dev","Explorer Dev",
+  "Privacy Eng","Consensus Dev","Runtime Dev","Tooling Dev","Security Auditor",
+  "Farcaster Dev","Blinks Dev","cNFT Dev","Token-2022 Dev","SPL Dev",
+  "Anchor Dev","Seahorse Dev","Clockwork Dev","Helius Dev","Metaplex Dev",
+  "Jupiter Dev","Marinade Dev","Raydium Dev","Tensor Dev",
 ];
 const SKILL_SETS = [
-  ["React", "TypeScript", "Solana"], ["Rust", "Anchor", "Solana"], ["Figma", "CSS", "Design"],
-  ["Community", "Events"], ["DeFi", "Tokenomics"], ["Next.js", "Tailwind"],
-  ["Solidity", "Rust"], ["UI/UX", "Branding"], ["Docs", "APIs"],
-  ["Python", "SQL"], ["Rust", "Systems"], ["React Native", "Mobile"],
+  ["React","TypeScript","Solana"],["Rust","Anchor","Solana"],["Figma","CSS","Design"],
+  ["Community","Events"],["DeFi","Tokenomics"],["Next.js","Tailwind"],
+  ["Solidity","Rust"],["UI/UX","Branding"],["Docs","APIs"],
+  ["Python","SQL"],["Rust","Systems"],["React Native","Mobile"],
 ];
 
 function generateMockMembers(count: number): Member[] {
@@ -85,24 +84,24 @@ function generateMockMembers(count: number): Member[] {
 const LOGO_COLS = 12;
 const ROWS = 11;
 const PAD = 14;
-const COLS = LOGO_COLS + PAD * 2; // 22
+const COLS = LOGO_COLS + PAD * 2;
 
 const SOLANA_SHAPE: number[][] = [
-  [1,1,1,1,1,1,1,1,1,1,0,0], // top bar
+  [1,1,1,1,1,1,1,1,1,1,0,0],
   [0,1,1,1,1,1,1,1,1,1,1,0],
   [0,0,1,1,1,1,1,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0], // gap
-  [0,0,1,1,1,1,1,1,1,1,1,1], // mid bar (opposite slant)
+  [0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,1,1,1,1,1,1,1,1,1,1],
   [0,1,1,1,1,1,1,1,1,1,1,0],
   [1,1,1,1,1,1,1,1,1,1,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0], // gap
-  [1,1,1,1,1,1,1,1,1,1,0,0], // bottom bar
+  [0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1,0,0],
   [0,1,1,1,1,1,1,1,1,1,1,0],
   [0,0,1,1,1,1,1,1,1,1,1,1],
 ];
 
-const VPAD = 1; // vertical padding rows
-const TOTAL_ROWS = ROWS + VPAD * 2; // 13
+const VPAD = 1;
+const TOTAL_ROWS = ROWS + VPAD * 2;
 
 function cellInShape(r: number, c: number): boolean {
   const lr = r - VPAD;
@@ -118,7 +117,6 @@ function cellIsOutline(r: number, c: number): boolean {
   return false;
 }
 
-// Precompute outline cells
 const ALL_OUTLINE: [number, number][] = [];
 for (let r = 0; r < TOTAL_ROWS; r++) {
   for (let c = 0; c < COLS; c++) {
@@ -127,36 +125,35 @@ for (let r = 0; r < TOTAL_ROWS; r++) {
 }
 const OUTLINE_SET = new Set(ALL_OUTLINE.map(([r, c]) => `${r},${c}`));
 
-// Clear rows: top pad, gap between bars, bottom pad
 const CLEAR_ROWS = [0, VPAD + 3, VPAD + 7, TOTAL_ROWS - 1];
 
 function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string, number> {
   const path = new Map<string, number>();
   let idx = 0;
 
-  // First: check if straight horizontal is clear (no other members in the way)
+  // Stop 4 cells past the logo edge into the padding
+  const stopCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
+
   let straightClear = true;
   if (cardSide === "left") {
-    for (let col = c - 1; col >= 0; col--) {
+    for (let col = c - 1; col >= stopCol; col--) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   } else {
-    for (let col = c + 1; col < COLS; col++) {
+    for (let col = c + 1; col <= stopCol; col++) {
       if (OUTLINE_SET.has(`${r},${col}`)) { straightClear = false; break; }
     }
   }
 
   if (straightClear) {
-    // Go straight horizontal
     if (cardSide === "left") {
-      for (let col = c - 1; col >= 0; col--) path.set(`${r},${col}`, idx++);
+      for (let col = c - 1; col >= stopCol; col--) path.set(`${r},${col}`, idx++);
     } else {
-      for (let col = c + 1; col < COLS; col++) path.set(`${r},${col}`, idx++);
+      for (let col = c + 1; col <= stopCol; col++) path.set(`${r},${col}`, idx++);
     }
     return path;
   }
 
-  // Blocked: detour via nearest clear row
   let bestRow = -1;
   let bestDist = Infinity;
   for (const cr of CLEAR_ROWS) {
@@ -171,26 +168,47 @@ function buildPath(r: number, c: number, cardSide: "left" | "right"): Map<string
   }
   if (bestRow === -1) bestRow = CLEAR_ROWS[0];
 
-  // Step 1: vertical to clear row
   if (bestRow < r) {
     for (let row = r - 1; row >= bestRow; row--) path.set(`${row},${c}`, idx++);
   } else if (bestRow > r) {
     for (let row = r + 1; row <= bestRow; row++) path.set(`${row},${c}`, idx++);
   }
 
-  // Step 2: horizontal to card edge
   if (cardSide === "left") {
-    for (let col = c - 1; col >= 0; col--) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c - 1; col >= stopCol; col--) path.set(`${bestRow},${col}`, idx++);
   } else {
-    for (let col = c + 1; col < COLS; col++) path.set(`${bestRow},${col}`, idx++);
+    for (let col = c + 1; col <= stopCol; col++) path.set(`${bestRow},${col}`, idx++);
   }
 
   return path;
 }
 
+// --- Solana ecosystem projects ---
+const ECOSYSTEM_PROJECTS = [
+  { name: "Jupiter", abbr: "JUP", color: "#00D18C" },
+  { name: "Raydium", abbr: "RAY", color: "#6C5CE7" },
+  { name: "Tensor", abbr: "TNS", color: "#FF6B6B" },
+  { name: "Jito", abbr: "JTO", color: "#45B26B" },
+  { name: "Phantom", abbr: "PHM", color: "#AB9FF2" },
+  { name: "Magic Eden", abbr: "ME", color: "#E42575" },
+  { name: "Helius", abbr: "HEL", color: "#E97A28" },
+  { name: "Orca", abbr: "ORC", color: "#FFDA44" },
+  { name: "Drift", abbr: "DFT", color: "#FF6142" },
+  { name: "Pyth", abbr: "PTH", color: "#7142CF" },
+  { name: "Bonk", abbr: "BNK", color: "#F0A030" },
+  { name: "Helium", abbr: "HNT", color: "#474DFF" },
+  { name: "Wormhole", abbr: "WH", color: "#00D4FF" },
+  { name: "Meteora", abbr: "MTR", color: "#3EECAC" },
+  { name: "Marinade", abbr: "MND", color: "#C1839F" },
+];
+
+interface EcoSpawn {
+  project: (typeof ECOSYSTEM_PROJECTS)[number];
+  delay: number;
+}
+
 export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const realMembers = members.filter((m) => m.is_spotlight);
-  // Need enough members for all outline cells
   const spotlightMembers =
     realMembers.length >= ALL_OUTLINE.length
       ? realMembers.slice(0, ALL_OUTLINE.length)
@@ -199,26 +217,103 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
   const [active, setActive] = useState<Member | null>(null);
   const [activeCol, setActiveCol] = useState<number>(0);
   const [activeRow, setActiveRow] = useState<number>(0);
-  const logoMidCol = PAD + LOGO_COLS / 2; // center of the logo in the full grid
   const [pathCells, setPathCells] = useState<Map<string, number>>(new Map());
+  const [showCard, setShowCard] = useState(false);
+  const cardTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const logoMidCol = PAD + LOGO_COLS / 2;
+
+  // Ecosystem spawns
+  const [leftSpawns, setLeftSpawns] = useState<Map<string, EcoSpawn>>(new Map());
+  const [rightSpawns, setRightSpawns] = useState<Map<string, EcoSpawn>>(new Map());
+  const [spawnKey, setSpawnKey] = useState(0);
+
+  useEffect(() => {
+    const generate = () => {
+      const shuffled = [...ECOSYSTEM_PROJECTS].sort(() => Math.random() - 0.5);
+      let pi = 0;
+
+      const leftCells: [number, number][] = [];
+      for (let r = 0; r < TOTAL_ROWS; r++) {
+        for (let c = 1; c < PAD - 2; c++) leftCells.push([r, c]);
+      }
+      const newLeft = new Map<string, EcoSpawn>();
+      const lCount = 3 + Math.floor(Math.random() * 3);
+      const lPick = [...leftCells].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < lCount && i < lPick.length && pi < shuffled.length; i++) {
+        newLeft.set(`${lPick[i][0]},${lPick[i][1]}`, { project: shuffled[pi++], delay: Math.random() * 400 });
+      }
+
+      const rightCells: [number, number][] = [];
+      for (let r = 0; r < TOTAL_ROWS; r++) {
+        for (let c = PAD + LOGO_COLS + 2; c < COLS - 1; c++) rightCells.push([r, c]);
+      }
+      const newRight = new Map<string, EcoSpawn>();
+      const rCount = 3 + Math.floor(Math.random() * 3);
+      const rPick = [...rightCells].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < rCount && i < rPick.length && pi < shuffled.length; i++) {
+        newRight.set(`${rPick[i][0]},${rPick[i][1]}`, { project: shuffled[pi++], delay: Math.random() * 400 });
+      }
+
+      setLeftSpawns(newLeft);
+      setRightSpawns(newRight);
+      setSpawnKey((k) => k + 1);
+    };
+
+    generate();
+    const interval = setInterval(generate, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+    };
+  }, []);
 
   function handleHover(member: Member, r: number, c: number) {
     setActive(member);
     setActiveCol(c);
     setActiveRow(r);
+    setShowCard(false);
 
-    // Left half of logo → card on left, right half → card on right
     const cardSide: "left" | "right" = c < logoMidCol ? "left" : "right";
-    setPathCells(buildPath(r, c, cardSide));
+    const newPath = buildPath(r, c, cardSide);
+    setPathCells(newPath);
+
+    // Show card once 4 golden cells enter the padding area past the logo edge
+    if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+    const triggerCol = cardSide === "left" ? PAD - 4 : PAD + LOGO_COLS + 3;
+    let triggerDelay = newPath.size * 25; // fallback: full path
+    for (const [key, idx] of newPath) {
+      const col = parseInt(key.split(",")[1]);
+      if (cardSide === "left" ? col <= triggerCol : col >= triggerCol) {
+        triggerDelay = (idx + 1) * 25;
+        break;
+      }
+    }
+    cardTimerRef.current = setTimeout(() => setShowCard(true), triggerDelay + 100);
   }
 
   function clearActive() {
     setActive(null);
     setPathCells(new Map());
+    setShowCard(false);
+    if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
   }
+
+  const activeSide = active ? (activeCol < logoMidCol ? "left" : "right") : null;
 
   return (
     <section className="py-24 lg:py-32">
+      <style>{`
+        @keyframes ecoFade {
+          0% { opacity: 0; transform: scale(0.7); }
+          15% { opacity: 1; transform: scale(1); }
+          75% { opacity: 1; transform: scale(1); }
+          100% { opacity: 0; transform: scale(0.7); }
+        }
+      `}</style>
       <div className="max-w-[1200px] mx-auto px-6">
         <AnimatedSection>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
@@ -240,7 +335,6 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
         <AnimatedSection>
           <div className="flex justify-center">
             <div className="relative" onMouseLeave={clearActive}>
-              {/* Pixel grid */}
               <div
                 className="grid gap-[2px]"
                 style={{
@@ -251,30 +345,7 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                 {Array.from({ length: TOTAL_ROWS * COLS }).map((_, i) => {
                   const r = Math.floor(i / COLS);
                   const c = i % COLS;
-                  const isIn = cellInShape(r, c);
                   const isEdge = OUTLINE_SET.has(`${r},${c}`);
-
-                  // Outside logo — black grid cell (or golden path)
-                  if (!isIn) {
-                    const pathDelay = pathCells.get(`${r},${c}`);
-                    const isOnPath = pathDelay !== undefined;
-                    return (
-                      <div
-                        key={i}
-                        onMouseEnter={() => { if (!isOnPath) clearActive(); }}
-                        className="rounded-[2px]"
-                        style={{
-                          backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
-                          borderWidth: 1,
-                          borderStyle: "solid",
-                          borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.06)",
-                          boxShadow: isOnPath ? "inset 0 0 8px rgba(255,184,0,0.2)" : "none",
-                          transition: "background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease",
-                          transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
-                        }}
-                      />
-                    );
-                  }
 
                   // Outline cell — member avatar
                   if (isEdge) {
@@ -282,7 +353,6 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                       ([or, oc]) => or === r && oc === c
                     );
                     const member = spotlightMembers[outlineIdx];
-
                     return (
                       <button
                         key={i}
@@ -297,7 +367,6 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                           alt={member.name}
                           className="w-full h-full object-cover"
                         />
-                        {/* Golden glow on active */}
                         <div
                           className={`absolute inset-0 pointer-events-none border-2 border-[#FFB800] shadow-[inset_0_0_10px_rgba(255,184,0,0.5)] rounded-[2px] transition-opacity duration-150 ${
                             active?.id === member.id ? "opacity-100" : "opacity-0"
@@ -307,32 +376,59 @@ export function MemberSpotlight({ members }: MemberSpotlightProps) {
                     );
                   }
 
-                  // Interior cell — same as empty (black grid, or golden path)
-                  const intPathDelay = pathCells.get(`${r},${c}`);
-                  const intOnPath = intPathDelay !== undefined;
+                  // All other cells — black grid with possible path or ecosystem spawn
+                  const pathDelay = pathCells.get(`${r},${c}`);
+                  const isOnPath = pathDelay !== undefined;
+
+                  const cellSide = c < PAD ? "left" : c >= PAD + LOGO_COLS ? "right" : null;
+                  const spawns = cellSide === "left" ? leftSpawns : cellSide === "right" ? rightSpawns : null;
+                  const spawn = spawns?.get(`${r},${c}`);
+                  const showSpawn = !!spawn && activeSide !== cellSide && !isOnPath;
+
                   return (
                     <div
                       key={i}
-                      onMouseEnter={() => { if (!intOnPath) clearActive(); }}
-                      className="rounded-[2px]"
+                      onMouseEnter={() => { if (!isOnPath) clearActive(); }}
+                      className="rounded-[2px] relative"
                       style={{
-                        backgroundColor: intOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
+                        backgroundColor: isOnPath ? "rgba(255, 184, 0, 0.25)" : "rgb(0,0,0)",
                         borderWidth: 1,
                         borderStyle: "solid",
-                        borderColor: intOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.06)",
-                        boxShadow: intOnPath ? "inset 0 0 8px rgba(255,184,0,0.2)" : "none",
+                        borderColor: isOnPath ? "rgba(255, 184, 0, 0.35)" : "rgba(255,255,255,0.06)",
+                        boxShadow: isOnPath ? "inset 0 0 8px rgba(255,184,0,0.2)" : "none",
                         transition: "background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease",
-                        transitionDelay: intOnPath ? `${intPathDelay * 25}ms` : "0ms",
+                        transitionDelay: isOnPath ? `${pathDelay * 25}ms` : "0ms",
                       }}
-                    />
+                    >
+                      {showSpawn && (
+                        <div
+                          key={spawnKey}
+                          className="absolute inset-0 flex items-center justify-center rounded-[1px]"
+                          style={{
+                            animation: "ecoFade 4s ease forwards",
+                            animationDelay: `${spawn.delay}ms`,
+                            backgroundColor: `${spawn.project.color}18`,
+                            border: `1px solid ${spawn.project.color}35`,
+                            boxShadow: `inset 0 0 10px ${spawn.project.color}20`,
+                          }}
+                        >
+                          <span
+                            className="text-[7px] font-bold leading-none select-none"
+                            style={{ color: `${spawn.project.color}CC` }}
+                          >
+                            {spawn.project.abbr}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
 
-              {/* Floating detail card — positioned near hovered member */}
+              {/* Detail card — appears after path animation completes */}
               <div
-                className={`absolute top-0 bottom-0 z-20 pointer-events-none transition-all duration-200 ${
-                  active ? "opacity-100" : "opacity-0"
+                className={`absolute top-0 bottom-0 z-20 pointer-events-none transition-all duration-300 ${
+                  showCard && active ? "opacity-100" : "opacity-0"
                 }`}
                 style={{
                   width: PAD * (34 + 2) - 4 * (34 + 2),
