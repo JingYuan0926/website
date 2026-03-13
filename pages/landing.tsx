@@ -304,7 +304,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <section
         className="relative px-6 flex items-center overflow-hidden"
         style={{
-          height: "85dvh",
+          minHeight: "85dvh",
           scrollSnapAlign: "start",
           backgroundColor: "#0a0a0a",
           backgroundImage:
@@ -321,7 +321,7 @@ export default function Landing({ testimonials }: LandingProps) {
       <FeaturesSection />
 
       {/* Statistics section */}
-      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ height: "85dvh", scrollSnapAlign: "start" }}>
+      <section className="relative px-6 overflow-hidden bg-black flex items-center" style={{ minHeight: "85dvh", scrollSnapAlign: "start" }}>
         {/* Deep purple gradient background */}
         <div className="absolute inset-0" style={{
           background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,20,160,0.45) 0%, rgba(60,15,120,0.2) 40%, #0a0a0a 85%)",
@@ -332,7 +332,7 @@ export default function Landing({ testimonials }: LandingProps) {
         <div className="relative max-w-[1200px] mx-auto">
           {/* Glass card */}
           <div
-            className="rounded-3xl p-10 lg:p-14"
+            className="rounded-3xl p-5 sm:p-8 lg:p-14"
             style={{
               background: "linear-gradient(135deg, rgba(100,40,180,0.15) 0%, rgba(60,20,120,0.08) 100%)",
               border: "1px solid rgba(153,69,255,0.18)",
@@ -644,7 +644,7 @@ function EventsPane() {
       <div>
         <h2
           className="text-white font-semibold tracking-tight leading-[1.08]"
-          style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)", whiteSpace: "nowrap" }}
+          style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
         >
           Moments that built
           <br />
@@ -669,7 +669,7 @@ function EventsPane() {
       </div>
 
       {/* Right — event pane */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden max-w-[480px] lg:ml-auto" style={{ transform: "scale(0.9)", transformOrigin: "top right" }}>
+      <div className="rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden lg:max-w-[480px] lg:ml-auto lg:scale-90 lg:origin-top-right">
         {/* Tab toggle */}
         <div className="relative flex gap-1 p-2 mx-3 mt-3 rounded-lg bg-[#0a0a0a]">
           <motion.div
@@ -1121,11 +1121,11 @@ function FAQSection() {
 
   return (
     <section
-      className="relative bg-black px-6 flex items-center overflow-hidden"
-      style={{ height: "100dvh", scrollSnapAlign: "start" }}
+      className="relative bg-black px-6 flex items-center overflow-hidden py-16 lg:py-0"
+      style={{ minHeight: "100dvh", scrollSnapAlign: "start" }}
     >
       <div className="max-w-[1200px] mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-20">
           {/* Left side */}
           <div className="flex flex-col">
             <h2
@@ -1163,7 +1163,7 @@ function FAQSection() {
               ))}
             </div>
 
-            {/* Category image */}
+            {/* Category image — hidden on mobile */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeCategory}
@@ -1171,7 +1171,7 @@ function FAQSection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="mt-8 flex-1 min-h-0 rounded-xl border border-dashed border-[#333] bg-[#0a0a0a] overflow-hidden flex items-center justify-center"
+                className="hidden lg:flex mt-8 flex-1 min-h-0 rounded-xl border border-dashed border-[#333] bg-[#0a0a0a] overflow-hidden items-center justify-center"
               >
                 <img
                   src={category.image}
