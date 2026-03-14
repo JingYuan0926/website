@@ -164,6 +164,15 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
           }}
         >
           {gradientBorderOverlay}
+          {/* Glass shine effect for Core Team */}
+          {isCoreTeam && (
+            <div
+              className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-2xl"
+              aria-hidden="true"
+            >
+              <div className="core-shine absolute inset-0" />
+            </div>
+          )}
           {/* Avatar */}
           <div className="relative aspect-[4/5] bg-[#0a0a0a] overflow-hidden">
             <img
@@ -406,7 +415,12 @@ export default function MembersPage() {
       );
     }
 
-    return result;
+    // Core Team members always first
+    return [...result].sort((a, b) => {
+      const aCore = a.skills.includes("Core Team") ? 0 : 1;
+      const bCore = b.skills.includes("Core Team") ? 0 : 1;
+      return aCore - bCore;
+    });
   }, [members, search, activeFilter]);
 
   return (
@@ -554,15 +568,51 @@ export default function MembersPage() {
                 <p className="text-xs text-[#444] mt-1">Try adjusting your search or filters</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-                {filtered.map((member: Member, i: number) => (
-                  <MemberCard key={member.name} member={member} index={i} />
-                ))}
-              </div>
+              <>
+                {/* Mobile: grid (core team pinned top row) */}
+                <div className="grid grid-cols-2 gap-3 sm:hidden">
+                  {filtered.map((member: Member, i: number) => (
+                    <MemberCard key={member.name} member={member} index={i} />
+                  ))}
+                </div>
+                {/* Tablet+: grid */}
+                <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+                  {filtered.map((member: Member, i: number) => (
+                    <MemberCard key={member.name} member={member} index={i} />
+                  ))}
+                </div>
+              </>
             )}
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <style jsx global>{`
+        @keyframes coreShine {
+          0%, 80% {
+            transform: translateX(-100%) skewX(-15deg);
+            opacity: 0;
+          }
+          85% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(200%) skewX(-15deg);
+            opacity: 0;
+          }
+        }
+        .core-shine {
+          background: linear-gradient(
+            105deg,
+            transparent 30%,
+            rgba(242, 205, 93, 0.12) 45%,
+            rgba(242, 205, 93, 0.25) 50%,
+            rgba(242, 205, 93, 0.12) 55%,
+            transparent 70%
+          );
+          animation: coreShine 5s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
