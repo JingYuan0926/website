@@ -130,6 +130,7 @@ const DEFAULT_STATS: StatItem[] = [
 export default function Landing({ testimonials, missionPillars, announcements, partners, stats, content, faqItems, spotlightMembers, communityProjects }: LandingProps) {
   const c = (key: string, fallback: string) => content[key] || fallback;
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [heroVideo, setHeroVideo] = useState<"malaysia" | "solana">("malaysia");
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -220,7 +221,7 @@ export default function Landing({ testimonials, missionPillars, announcements, p
             </a>
           </div>
 
-          <button className="md:hidden p-2 text-white/70" aria-label="Menu">
+          <button className="md:hidden p-2 text-white/70" aria-label="Menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             <svg
               width="20"
               height="20"
@@ -229,10 +230,56 @@ export default function Landing({ testimonials, missionPillars, announcements, p
               stroke="currentColor"
               strokeWidth="1.5"
             >
-              <path d="M4 8h16M4 16h16" />
+              {mobileMenuOpen ? (
+                <path d="M6 6l12 12M6 18L18 6" />
+              ) : (
+                <path d="M4 8h16M4 16h16" />
+              )}
             </svg>
           </button>
         </div>
+
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden bg-black/95 backdrop-blur-md border-b border-white/10"
+            >
+              <nav className="flex flex-col px-6 py-4 gap-1">
+                {NAV_ITEMS.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2.5 text-sm font-semibold tracking-wider text-white/70 hover:text-white transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/10">
+                  <a
+                    href="/members"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs font-semibold tracking-wider px-5 py-2.5 rounded-full border border-white/30 text-white/80 hover:border-white/60 hover:text-white transition-colors"
+                  >
+                    MEMBERS
+                  </a>
+                  <a
+                    href="#cta"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs font-semibold tracking-wider px-5 py-2.5 rounded-full bg-[#9945ff] text-white hover:bg-[#8a3ae6] transition-colors"
+                  >
+                    JOIN US
+                  </a>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero section + logo loop */}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { Markdown } from "@/components/shared/Markdown";
 import { getInitials } from "@/lib/utils";
@@ -98,7 +98,11 @@ function TweetCard({ testimonial }: { testimonial: Testimonial }) {
 
 export function WallOfLove({ testimonials, content = {} }: WallOfLoveProps) {
   const c = (key: string, fallback: string) => content[key] || fallback;
+  const [showAll, setShowAll] = useState(false);
   if (!testimonials?.length) return null;
+
+  const MOBILE_LIMIT = 5;
+  const visibleTestimonials = showAll ? testimonials : testimonials;
 
   return (
     <section
@@ -119,14 +123,17 @@ export function WallOfLove({ testimonials, content = {} }: WallOfLoveProps) {
         </div>
 
         <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4">
-          {testimonials.map((testimonial) => {
+          {visibleTestimonials.map((testimonial, i) => {
             const tweetId =
               testimonial.is_tweet_embed && testimonial.twitter_url
                 ? extractTweetId(testimonial.twitter_url)
                 : null;
 
             return (
-              <div key={testimonial.id}>
+              <div
+                key={testimonial.id}
+                className={i >= MOBILE_LIMIT && !showAll ? "hidden sm:block" : ""}
+              >
                 <div className="rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] overflow-hidden">
                   {tweetId ? (
                     <div className="tweet-embed" data-theme="dark">
@@ -140,6 +147,17 @@ export function WallOfLove({ testimonials, content = {} }: WallOfLoveProps) {
             );
           })}
         </div>
+
+        {testimonials.length > MOBILE_LIMIT && !showAll && (
+          <div className="sm:hidden mt-6 text-center">
+            <button
+              onClick={() => setShowAll(true)}
+              className="px-5 py-2.5 rounded-full border border-white/30 text-white text-sm font-semibold hover:bg-white/10 transition-colors"
+            >
+              Show all
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

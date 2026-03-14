@@ -284,24 +284,42 @@ export function FeaturesSection({ pillars, content = {} }: { pillars?: MissionPi
           </div>
 
           {/* Mobile fallback */}
-          <div className="lg:hidden">
-            <span className="text-xs font-mono text-[#555] tracking-wider">
-              {String(active + 1).padStart(2, "0")}
-            </span>
-            <h3 className="mt-2 text-2xl font-semibold text-white tracking-tight leading-tight">
-              {feat.title}
-            </h3>
-            <p className="mt-4 text-[#a1a1aa] text-base leading-relaxed">
-              {feat.description}
-            </p>
-            <ul className="mt-5 space-y-2">
-              {feat.bullets.map((b) => (
-                <li key={b} className="flex items-center gap-2.5 text-white text-sm">
-                  <span className="w-1 h-1 rounded-full bg-white shrink-0" />
-                  {b}
-                </li>
+          <div className="lg:hidden flex gap-4">
+            {/* Number strip */}
+            <div className="relative shrink-0 flex flex-col items-center">
+              <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 border-l border-dashed border-[#333]" aria-hidden="true" />
+              {features.map((_, i) => (
+                <div
+                  key={i}
+                  className={`relative z-10 w-7 h-7 flex items-center justify-center text-[10px] font-mono shrink-0 transition-all duration-300 ${
+                    i === 0 ? "" : "mt-2"
+                  } ${
+                    active === i
+                      ? "border border-white text-white bg-black"
+                      : "border border-[#333] text-[#555] bg-black"
+                  }`}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </div>
               ))}
-            </ul>
+            </div>
+            {/* Content */}
+            <div className="min-w-0">
+              <h3 className="text-2xl font-semibold text-white tracking-tight leading-tight">
+                {feat.title}
+              </h3>
+              <p className="mt-4 text-[#a1a1aa] text-base leading-relaxed">
+                {feat.description}
+              </p>
+              <ul className="mt-5 space-y-2">
+                {feat.bullets.map((b) => (
+                  <li key={b} className="flex items-center gap-2.5 text-white text-sm">
+                    <span className="w-1 h-1 rounded-full bg-white shrink-0" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>

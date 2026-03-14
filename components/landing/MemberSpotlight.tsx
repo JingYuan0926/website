@@ -499,8 +499,17 @@ export function MemberSpotlight({ members, content = {}, projects: projectsProp 
 
 {/* Heading + View all members are now grid-placed below */}
 
-      {/* Mobile: scrollable avatar grid */}
-      <div className="lg:hidden relative z-10 w-full px-6 mt-[45%]">
+      {/* Mobile: title + avatar grid + button */}
+      <div className="lg:hidden relative z-10 w-full px-6 pt-16 pb-8">
+        <h2
+          className="text-white font-semibold tracking-tight leading-[1.1] mb-3"
+          style={{ fontSize: "clamp(1.75rem, 1.2rem + 2vw, 2.75rem)" }}
+        >
+          {c("community.title", "Meet the community")}
+        </h2>
+        <p className="text-[#a1a1aa] text-sm leading-relaxed mb-8">
+          {c("community.description", "Talented builders, designers, and creators shaping Malaysia\u2019s Web3 landscape.")}
+        </p>
         <div className="grid grid-cols-5 gap-2">
           {spotlightMembers.slice(0, 15).map((m: Member, i: number) => (
             <div key={m.id || i} className="aspect-square rounded-lg overflow-hidden bg-[#1a1a1a]">
@@ -513,6 +522,15 @@ export function MemberSpotlight({ members, content = {}, projects: projectsProp 
               )}
             </div>
           ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link
+            href="/members"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/20 text-sm font-semibold text-white/70 hover:text-white hover:border-white/40 hover:bg-white/5 transition-colors"
+          >
+            See all members
+            <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
 
